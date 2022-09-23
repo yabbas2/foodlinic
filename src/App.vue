@@ -1,9 +1,5 @@
 <template>
   <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
     <router-view/>
   </div>
 </template>
@@ -17,16 +13,43 @@
   color: #2c3e50;
 }
 
-nav {
-  padding: 30px;
+:root {
+  --font-open-sans: "Open Sans",sans-serif;
+  --font-comfortaa: 'Comfortaa', cursive;
+  --font-roboto: "Roboto", sans-serif;
+  --font-inter: "Inter", sans-serif;
 }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
+/*----------- Colors -----------*/
+:root {
+  --color-default: #212529;
+  --color-primary: #f25b47;
+  --color-secondary: #37373f;
+  --color-tertiary: #39175c;
 }
 
-nav a.router-link-exact-active {
-  color: #42b983;
+/*----------- Smooth scroll behavior -----------*/
+:root {
+  scroll-behavior: smooth;
+}
+
+/*----------- General -----------*/
+body {
+  font-family: var(--font-open-sans);
+  color: var(--color-default);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-roboto);
 }
 </style>
