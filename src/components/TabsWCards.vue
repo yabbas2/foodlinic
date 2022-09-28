@@ -25,26 +25,14 @@
             <b-card-text>{{card.ingredients}}</b-card-text>
             <b-card-text v-if="card.portion > 1">{{card.portion}} <b-icon icon="people-fill" style="width: 25px; height: 25px;"></b-icon></b-card-text>
             <b-card-text v-else>{{card.portion}} <b-icon icon="person-fill" style="width: 20px; height: 20px;"></b-icon></b-card-text>
-            <b-input-group class="justify-content-center">
-              <b-input-group-prepend>
-                <b-button pill href="#" :disabled="card.qty==0" :variant="card.color" @click="cardCountDec(idx)">
-                  <b-icon icon="dash" scale="1.2" class="align-middle"></b-icon>
-                </b-button>
-              </b-input-group-prepend>
-              <b-form-input 
-                plaintext
-                :value="card.qty"
-                type="number" 
-                class="text-center input-style"
-                aria-label="card count"
-              >
-              </b-form-input>
-              <b-input-group-append>
-                <b-button pill href="#" :disabled="card.qty==inputNumberLimit" :variant="card.color" @click="cardCountInc(idx)">
-                  <b-icon icon="plus" scale="1.2" class="align-middle"></b-icon>
-                </b-button>
-              </b-input-group-append>
-            </b-input-group>
+            <b-form-spinbutton
+              v-model="card.qty"
+              min="0"
+              :max="inputNumberLimit"
+              step="1"
+              class="w-100"
+              @change="cardCountChangedEvent"
+            ></b-form-spinbutton>
           </b-card>
         </b-card-group>
       </b-tab>
@@ -53,21 +41,7 @@
 </template>
 
 <style scoped>
-.input-style {
-  max-width: 3.5rem;
-}
 
-/* Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Firefox */
-input[type=number] {
-  -moz-appearance: textfield;
-}
 </style>
 
 <script>
@@ -94,14 +68,7 @@ export default {
         return ['bg-light', 'text-dark']
       }
     },
-    cardCountInc(cardId) {
-      this.cardDecksLoc[cardId].qty++;
-      this.cardDecksLoc=[...this.cardDecksLoc];
-      this.$emit('cartChanged', this.cardDecksLoc);
-    },
-    cardCountDec(cardId) {
-      this.cardDecksLoc[cardId].qty--;
-      this.cardDecksLoc=[...this.cardDecksLoc];
+    cardCountChangedEvent() {
       this.$emit('cartChanged', this.cardDecksLoc);
     }
   },

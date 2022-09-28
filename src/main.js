@@ -17,8 +17,15 @@ Vue.use(IconsPlugin)
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 
+/*--------------------IMPORT VUETIFY-------------------------*/
+import Vuetify from 'vuetify'
+//import 'vuetify/dist/vuetify.min.css'
+
+Vue.use(Vuetify)
+
 
 new Vue({
+  vuetify : new Vuetify(),
   router,
   store,
   render: h => h(App),

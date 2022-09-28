@@ -51,7 +51,7 @@
                   >
                     <b-td>{{item.name}}</b-td>
                     <b-td>
-                      <b-button pill :id="'delBtn-'+item.id" href="#" variant="danger" @click="deleteItem(item.id)">
+                      <b-button pill href="#" variant="danger" @click="deleteItem(item.id)">
                         <b-icon icon="trash" scale="1" class="align-middle"></b-icon>
                       </b-button>
                     </b-td>
