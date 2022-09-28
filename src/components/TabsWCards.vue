@@ -4,7 +4,7 @@
       <b-tab v-for="(tab, index) in tabs" :key="tab.id" :title="tab.name" :title-link-class="linkClass(index)" class="container align-items-center justify-content-center">
         <b-card-group columns class="container align-items-center justify-content-center mx-0 mt-5">
           <b-card 
-            v-for="card in cardDecks"
+            v-for="(card, idx) in cardDecksLoc"
             v-if="card.refId === tab.id"
             :key="card.name"
             :title="card.name"
@@ -27,21 +27,20 @@
             <b-card-text v-else>{{card.portion}} <b-icon icon="person-fill" style="width: 20px; height: 20px;"></b-icon></b-card-text>
             <b-input-group class="justify-content-center">
               <b-input-group-prepend>
-                <b-button pill href="#" :disabled="cardCount[card.id]==0" :variant="card.color" @click="cardCountDec(card.id)">
+                <b-button pill href="#" :disabled="card.qty==0" :variant="card.color" @click="cardCountDec(idx)">
                   <b-icon icon="dash" scale="1.2" class="align-middle"></b-icon>
                 </b-button>
               </b-input-group-prepend>
               <b-form-input 
                 plaintext
-                :id="String(card.id)"
-                :value="cardCount[card.id]"
+                :value="card.qty"
                 type="number" 
                 class="text-center input-style"
                 aria-label="card count"
               >
               </b-form-input>
               <b-input-group-append>
-                <b-button pill href="#" :disabled="cardCount[card.id]==inputNumberLimit" :variant="card.color" @click="cardCountInc(card.id)">
+                <b-button pill href="#" :disabled="card.qty==inputNumberLimit" :variant="card.color" @click="cardCountInc(idx)">
                   <b-icon icon="plus" scale="1.2" class="align-middle"></b-icon>
                 </b-button>
               </b-input-group-append>
@@ -75,12 +74,11 @@ input[type=number] {
 export default {
   name: "Tabs",
   created() {
-    this.cardCountInit();
   },
   data() {
     return {
       tabIndex: 0,
-      cardCount: {}
+      cardDecksLoc: this.cardDecks
     }
   },
   props: {
@@ -96,18 +94,15 @@ export default {
         return ['bg-light', 'text-dark']
       }
     },
-    cardCountInit() {
-      for (const value of Object.values(this.cardDecks)) {this.cardCount[value.id] = 0;}
-    },
     cardCountInc(cardId) {
-      this.cardCount[cardId]++;
-      this.cardCount={...this.cardCount};
-      this.$emit('cartChanged', this.cardCount);
+      this.cardDecksLoc[cardId].qty++;
+      this.cardDecksLoc=[...this.cardDecksLoc];
+      this.$emit('cartChanged', this.cardDecksLoc);
     },
     cardCountDec(cardId) {
-      this.cardCount[cardId]--;
-      this.cardCount={...this.cardCount};
-      this.$emit('cartChanged', this.cardCount);
+      this.cardDecksLoc[cardId].qty--;
+      this.cardDecksLoc=[...this.cardDecksLoc];
+      this.$emit('cartChanged', this.cardDecksLoc);
     }
   },
   computed: {
