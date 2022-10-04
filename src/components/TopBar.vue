@@ -1,21 +1,37 @@
 <template>
-	<div>
-    <b-navbar toggleable="lg" fixed="top" type="dark" class="bg-navbar">
-      <b-navbar-brand class="d-flex align-items-center" href="#">
-        <img class="logo-img" src="../assets/logo.png" alt="">
-        <h1 class="logo-h1">foodlinic</h1>
-      </b-navbar-brand>
-      <!-- Right aligned nav items -->
-      <b-navbar-nav class="ml-auto">
-        <b-nav-form>
-          <b-button pill size="sm" class="cart-btn my-2 my-sm-0" type="button" variant="danger" @click="$emit('cartBtnClicked')">
-            <b-icon font-scale="1.5" icon="cart-fill"></b-icon>
-            <b-badge pill variant="light">{{cartCounter}}<span class="sr-only">cart counter</span></b-badge>
-          </b-button>
-        </b-nav-form>
-      </b-navbar-nav>
-    </b-navbar>
-  </div>
+  <v-app-bar
+    fixed
+    color="#39175c"
+    dark
+    elevation="5"
+  >
+    <v-toolbar-title>
+      <v-container>
+        <v-row no-gutters>
+          <v-col class="my-auto">
+            <v-img :src="require('../assets/logo.png')" width="60"></v-img>
+          </v-col>
+          <v-col class="my-auto">
+            <v-img :src="require('../assets/logo-name.png')" width="120"></v-img>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-toolbar-title>
+    <v-spacer></v-spacer>
+    <v-badge
+      :content="cartCounter"
+      :value="cartCounter"
+      color="#f25b47"
+      overlap
+      bordered
+      offset-x="17"
+      offset-y="22"
+    >
+      <v-btn icon @click="$emit('cartBtnClicked')">
+        <v-icon size="30">mdi-cart</v-icon>
+      </v-btn>
+    </v-badge>
+  </v-app-bar>
 </template>
 
 <style scoped>

@@ -1,8 +1,10 @@
 <template>
-  <!--<div id="preloader"></div>-->
-  <div class="text-center text-danger justify-content-center m-5">
-    <b-spinner class="align-middle" style="width: 3rem; height: 3rem;"></b-spinner>
-  </div>
+  <v-progress-circular
+    indeterminate
+    size="50"
+    color="#f25b47"
+    class="mt-16"
+  ></v-progress-circular>
 </template>
 
 <style scoped>

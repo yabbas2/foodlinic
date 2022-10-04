@@ -1,58 +1,178 @@
 <template>
-  <div class="mt-5 ratio">
-    <b-tabs v-model="tabIndex" pills content-class="mt-3" align="center">
-      <b-tab v-for="(tab, index) in tabs" :key="tab.id" :title="tab.name" :title-link-class="linkClass(index)" class="container align-items-center justify-content-center">
-        <b-card-group columns class="container align-items-center justify-content-center mx-0 mt-5">
-          <b-card 
+<div class="mt-0">
+  <v-tabs
+    v-model="tab"
+    align-with-title
+    show-arrows="always"
+    centered
+    background-color="white"
+    color="red"
+    center-active
+    light
+  >
+    <v-tabs-slider color="red"></v-tabs-slider>
+    <v-tab v-for="tab in tabs" :key="tab.id">{{tab.name}}</v-tab>
+  </v-tabs>
+  <v-tabs-items v-model="tab">
+    <v-tab-item
+      v-for="tab in tabs"
+      :key="tab.id"
+    >
+      <v-container fluid class="my-10">
+        <v-row>
+          <v-col 
             v-for="(card, idx) in cardDecksLoc"
             v-if="card.refId === tab.id"
             :key="card.name"
-            :title="card.name"
-            :sub-title="String(card.price) + 'kr'"
-            :img-src="card.imgSrc"
-            img-alt="Image"
-            img-top
-            tag="article"
-            style="max-width: 20rem; min-width: 30%;"
-            class="mb-4 mx-4"
-            :header="card.status"
-            header-tag="header"
-            :header-bg-variant="card.color"
-            header-text-variant="white"
-            :border-variant="card.color"
-            align="center"
+            align-self="center"
           >
-            <b-card-text>{{card.ingredients}}</b-card-text>
-            <b-card-text v-if="card.portion > 1">{{card.portion}} <b-icon icon="people-fill" style="width: 25px; height: 25px;"></b-icon></b-card-text>
-            <b-card-text v-else>{{card.portion}} <b-icon icon="person-fill" style="width: 20px; height: 20px;"></b-icon></b-card-text>
-            <b-form-spinbutton
-              v-model="card.qty"
-              min="0"
-              :max="inputNumberLimit"
-              step="1"
-              class="w-100"
-              @change="cardCountChangedEvent"
-            ></b-form-spinbutton>
-          </b-card>
-        </b-card-group>
-      </b-tab>
-    </b-tabs>
-  </div>
+            <v-card height="100%" class="text-left mx-auto my-1" max-width="300" max-height="450" elevation="5">
+              <v-img height="200" :src="card.imgSrc"></v-img>
+              <v-card-title class="text-h5">{{card.name}}</v-card-title>
+              <v-card-subtitle class="text-subtitle-1 red--text">{{card.price}}kr</v-card-subtitle>
+              <v-card-actions>
+                <v-btn
+                  fab
+                  dark
+                  small
+                  elevation="3"
+                  color="red lighten-1"
+                  @click="revealNutFacts[idx]=true;revealNutFacts=[...revealNutFacts]"
+                >
+                  <v-icon dark>mdi-information-variant</v-icon>
+                </v-btn>
+                <v-select
+                  v-model="card.qty"
+                  :items="selectItems"
+                  menu-props="auto"
+                  label="Select"
+                  hide-details
+                  append-icon="mdi-cart"
+                  single-line
+                  class="mr-auto ml-5 my-0 py-0"
+                  style="max-width:5rem;"
+                  color="#f25b47"
+                  solo
+                  dense
+                  @change="cardCountChangedEvent"
+                ></v-select>
+              </v-card-actions>
+              <v-expand-transition>
+                <v-card
+                  :id="card.id"
+                  v-if="revealNutFacts[idx]"
+                  class="transition-fast-in-fast-out v-card--reveal v-card--scroll"
+                  height="100%"
+                >
+                  <v-card-title>
+                    <p class="text-h5 text--primary">Details</p>
+                  </v-card-title>
+                  <v-card-text class="v-card-text--scroll">
+                    <v-container>
+                      <v-row no-gutters>
+                        <v-col>
+                          <p class="text--primary font-italic"><pre>Portion: </pre></p>
+                        </v-col>
+                        <v-col>
+                          <div class="text--secondary">
+                            {{card.portion}} 
+                            <v-icon small v-if="card.portion > 1">mdi-account-multiple</v-icon>
+                            <v-icon small v-else>mdi-account</v-icon>
+                          </div>
+                        </v-col>
+                      </v-row>
+                      <v-row no-gutters>
+                        <v-col>
+                          <p class="text--primary font-italic"><pre>Ingredients: </pre></p>
+                        </v-col>
+                        <v-col>
+                          <p class="text--secondary">{{card.ingredients}}</p>
+                        </v-col>
+                      </v-row>
+                      <v-row no-gutters>
+                        <v-col>
+                          <p class="text--primary font-italic"><pre>Nutrition Facts (per 100g): </pre></p>
+                          <v-simple-table dense class="text-center">
+                            <template v-slot:default>
+                              <tbody class="text--secondary">
+                                <tr>
+                                  <td>fact1</td>
+                                  <td>5%</td>
+                                </tr>
+                                <tr>
+                                  <td>fact2</td>
+                                  <td>10%</td>
+                                </tr>
+                                <tr>
+                                  <td>fact3</td>
+                                  <td>85%</td>
+                                </tr>
+                              </tbody>
+                            </template>
+                          </v-simple-table>
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-card-text>
+                  <v-card-actions class="card-actions">
+                    <v-btn
+                      fab
+                      dark
+                      small
+                      elevation="3"
+                      color="red lighten-1"
+                      @click="revealNutFacts[idx]=false;revealNutFacts=[...revealNutFacts]"
+                    >
+                      <v-icon dark>mdi-arrow-down</v-icon>
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-expand-transition>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-tab-item>
+  </v-tabs-items>
+</div>
 </template>
 
 <style scoped>
+.v-card--reveal {
+  bottom: 0;
+  opacity: 1 !important;
+  position: absolute;
+  width: 100%;
+}
 
+.v-card--scroll {
+  display: flex !important;
+  flex-direction: column;
+}
+
+.v-card-text--scroll {
+  flex-grow: 1;
+  overflow: auto;
+}
+
+.card-actions {
+  position: absolute;
+  bottom: 0.25rem;
+}
 </style>
 
 <script>
 export default {
   name: "Tabs",
-  created() {
+  mounted() {
   },
   data() {
     return {
       tabIndex: 0,
-      cardDecksLoc: this.cardDecks
+      cardDecksLoc: this.cardDecks,
+      tab: null,
+      revealNutFacts: Array(this.cardDecks.length).fill(false),
+      selectItems: [0,1,2,3,4,5,6,7,8,9,10]
     }
   },
   props: {
@@ -61,16 +181,9 @@ export default {
     inputNumberLimit: Number
   },
   methods: {
-    linkClass(idx) {
-      if (this.tabIndex === idx) {
-        return ['bg-danger', 'text-white', 'font-weight-bold']
-      } else {
-        return ['bg-light', 'text-dark']
-      }
-    },
     cardCountChangedEvent() {
       this.$emit('cartChanged', this.cardDecksLoc);
-    }
+    },
   },
   computed: {
   }

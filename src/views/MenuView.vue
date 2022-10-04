@@ -4,7 +4,7 @@
     <Intro img-src="menu.png"></Intro>
     <TabsWCards v-if="!preloaderEnabled" :tabs="menuCatgs" :cardDecks="menuItems" :inputNumberLimit="menuItemCartLimit" @cartChanged="cartChangedEvent"></TabsWCards>
     <Preloader v-if="preloaderEnabled"></Preloader>
-    <CartModal :tableItems="menuItems" :showModal="showCartModal" @modalClosed="modalClosedEvent" @cartChanged="cartChangedEvent"></CartModal>
+    <CartDialog :cartItems="menuItems" v-model="showCartDialog" @cartChanged="cartChangedEvent"></CartDialog>
   </div>
 </template>
 
@@ -19,7 +19,7 @@ import TopBar from "@/components/TopBar.vue";
 import Preloader from "@/components/Preloader.vue";
 import Intro from "@/components/Intro.vue";
 import TabsWCards from "@/components/TabsWCards.vue";
-import CartModal from "@/components/CartModal.vue";
+import CartDialog from "@/components/CartDialog.vue";
 import axios from 'axios'
 
 
@@ -42,7 +42,7 @@ export default {
       preloaderEnabled: true,
       menuCatgs: [],
       menuItems: [],
-      showCartModal: null
+      showCartDialog: null
     }
   },
   components: {
@@ -50,16 +50,13 @@ export default {
     Preloader,
     Intro,
     TabsWCards,
-    CartModal
-},
+    CartDialog,
+  },
   methods: {
-    modalClosedEvent() {
-      console.log("cartModal closed!");
-      this.showCartModal = false;
-    },
     cartBtnClickedEvent() {
       console.log("cartBtn clicked!");
-      this.showCartModal = true;
+      this.showCartDialog = true;
+      //this.$router.push('/cart');
     },
     constructMenuCatgsObj(jsonData) {
       this.menuCatgs = jsonData;
@@ -82,7 +79,11 @@ export default {
     },
     reactOnReceivedData() {
       if (this.successfulWaitedEvent != this.waitedEvents.length) {return;}
-      if ( (this.menuCatgs.length > 0) && (Object.keys(this.menuItems).length > 0) ) {this.preloaderEnabled = false;}
+      if ( (this.menuCatgs.length > 0) && (Object.keys(this.menuItems).length > 0) ) {
+        setTimeout(() => {
+          this.preloaderEnabled = false
+        }, 500);
+      }
     },
     async fetchMenuCatgs() {
       await axios.get('http://127.0.0.1:9000/foodapis/menu-category') /*TODO: change in production to https://foodlinic.pythonanywhere.com/foodapis/menu-category*/
@@ -124,6 +125,7 @@ export default {
         this.cartCounter += this.menuItems[idx].qty;
       }
       console.log(this.menuItems);
+      console.log(this.cartCounter);
     }
   },
   computed: {
