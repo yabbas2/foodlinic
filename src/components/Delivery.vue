@@ -1,20 +1,19 @@
 <template>
   <v-card tile flat>
     <v-select
-      ref="select"
       v-model="locSelected"
       :items="locOptions"
       menu-props="auto"
       label="Select Meeting Point"
-      hide-details
-      append-icon="mdi-map-marker"
-      single-line
+      prepend-icon="mdi-map-marker"
       class="mx-auto my-auto"
-      color="#f25b47"
-      solo
-      @change="setMapLocation();inputChangedEvent();"
+      color="#39175c"
+      :rules="[val => validateLocation(val)]"
+      :success="validLocation.int"
+      :error="!validLocation.ext"
+      @input="validLocation.ext=true"
     ></v-select>
-    <v-card class="mt-6">
+    <v-card class="mt-2">
       <GmapMap
         :center="locMapCenter"
         :zoom="locMapZoomLvl"
@@ -43,9 +42,12 @@
           label="Select Date"
           prepend-icon="mdi-calendar"
           readonly
-          color="#f25b47"
+          color="#39175c"
           v-bind="attrs"
           v-on="on"
+          :rules="[val => validateDate(val)]"
+          :success="validDate.int"
+          :error="!validDate.ext"
         >
         </v-text-field>
       </template>
@@ -57,7 +59,7 @@
         show-week
         first-day-of-week="1"
         color="#39175c"
-        @input="showDateMenu=false;inputChangedEvent();"
+        @input="showDateMenu=false;validDate.ext=true;"
       >
       </v-date-picker>
     </v-menu>
@@ -70,39 +72,43 @@
       min-width="290px"
       max-width="290px"
     >
-    <template v-slot:activator="{on, attrs}">
-      <v-text-field
+      <template v-slot:activator="{on, attrs}">
+        <v-text-field
+          v-model="time"
+          label="Select time"
+          prepend-icon="mdi-clock-time-four-outline"
+          readonly
+          color="#39175c"
+          v-bind="attrs"
+          v-on="on"
+          :rules="[val => validateTime(val)]"
+          :success="validTime.int"
+          :error="!validTime.ext"
+        >
+        </v-text-field>
+      </template>
+      <v-time-picker
         v-model="time"
-        label="Select time"
-        prepend-icon="mdi-clock-time-four-outline"
-        readonly
-        color="#f25b47"
-        v-bind="attrs"
-        v-on="on"
+        full-width
+        format="24hr"
+        :allowed-hours="allowedHours"
+        :allowed-minutes="allowedMinutes"
+        color="#39175c"
+        @input="showTimeMenu=false;validTime.ext=true;"
       >
-      </v-text-field>
-    </template>
-    <v-time-picker
-      v-model="time"
-      full-width
-      format="24hr"
-      :allowed-hours="allowedHours"
-      :allowed-minutes="allowedMinutes"
-      color="#39175c"
-      @input="showTimeMenu=false;inputChangedEvent();"
-    >
-    </v-time-picker>
+      </v-time-picker>
     </v-menu>
     <v-textarea
       v-model="notes"
-      color="#f25b47"
-      clearable
+      color="#39175c"
       clear-icon="mdi-close-circle"
       rows="1"
       prepend-icon="mdi-comment"
       auto-grow
-      :rules="notesRule"
       counter
+      :rules="[val => validateNotes(val) || 'Max 100 characters']"
+      :error="!validNotes.ext"
+      @input="validNotes.ext=true"
     >
       <template v-slot:label>
         <div>
@@ -143,8 +149,11 @@ export default {
       time: null,
       allowedHours: [10, 17, 22],
       allowedMinutes: [0],
-      notesRule: [v => v.length <= 100 || 'Max 100 characters'],
       notes: '',
+      validLocation:  {int: false, ext: true},
+      validDate:      {int: false, ext: true},
+      validTime:      {int: false, ext: true},
+      validNotes:     {int: false, ext: true},
     }
   },
   methods: {
@@ -173,13 +182,29 @@ export default {
           console.log(error) /*TODO: better error handling*/
         })
     },
-    setMapLocation() {
-      console.log(this.locSelected);
-      console.log(this.notes.substring(0, 100));
+    validateAllInputs() {
+      this.validLocation.ext  = this.validLocation.int;
+      this.validDate.ext      = this.validDate.int;
+      this.validTime.ext      = this.validTime.int;
+      this.validNotes.ext     = this.validNotes.int;
+      return (this.validLocation.int && this.validDate.int && this.validTime.int && this.validNotes.int);
     },
-    inputChangedEvent() {
-      this.$emit('inputChanged', (this.time!==null && this.date!==null && this.locSelected!==null));
-    }
+    validateLocation(val) {
+      this.validLocation.int = (val !== null);
+      return this.validLocation.int;
+    },
+    validateDate(val) {
+      this.validDate.int = (val !== null);
+      return this.validDate.int;
+    },
+    validateTime(val) {
+      this.validTime.int = (val !== null);
+      return this.validTime.int;
+    },
+    validateNotes(val) {
+      this.validNotes.int = (val.length <= 100);
+      return this.validNotes.int;
+    },
   },
   computed: {
     locMarkerPos() {

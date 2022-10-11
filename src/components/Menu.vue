@@ -21,15 +21,15 @@
       <v-container fluid class="my-10">
         <v-row>
           <v-col 
-            v-for="(card, idx) in cardDecksLoc"
-            v-if="card.refId === tab.id"
-            :key="card.name"
+            v-for="(item, idx) in menuItems"
+            v-if="item.refId === tab.id"
+            :key="item.name"
             align-self="center"
           >
             <v-card height="100%" class="text-left mx-auto my-1" max-width="300" max-height="450" elevation="5">
-              <v-img height="200" :src="card.imgSrc"></v-img>
-              <v-card-title class="text-h5">{{card.name}}</v-card-title>
-              <v-card-subtitle class="text-subtitle-1 red--text">{{card.price}}kr</v-card-subtitle>
+              <v-img height="200" :src="item.imgSrc"></v-img>
+              <v-card-title class="text-h5">{{item.name}}</v-card-title>
+              <v-card-subtitle class="text-subtitle-1 red--text">{{item.price}}kr</v-card-subtitle>
               <v-card-actions>
                 <v-btn
                   fab
@@ -42,7 +42,7 @@
                   <v-icon dark>mdi-information-variant</v-icon>
                 </v-btn>
                 <v-select
-                  v-model="card.qty"
+                  v-model="item.qty"
                   :items="selectItems"
                   menu-props="auto"
                   label="Select"
@@ -54,12 +54,12 @@
                   color="#f25b47"
                   solo
                   dense
-                  @change="cardCountChangedEvent"
+                  @change="itemCountChangedEvent"
                 ></v-select>
               </v-card-actions>
               <v-expand-transition>
                 <v-card
-                  :id="card.id"
+                  :id="item.id"
                   v-if="revealNutFacts[idx]"
                   class="transition-fast-in-fast-out v-card--reveal v-card--scroll"
                   height="100%"
@@ -75,8 +75,8 @@
                         </v-col>
                         <v-col>
                           <div class="text--secondary">
-                            {{card.portion}} 
-                            <v-icon small v-if="card.portion > 1">mdi-account-multiple</v-icon>
+                            {{item.portion}} 
+                            <v-icon small v-if="item.portion > 1">mdi-account-multiple</v-icon>
                             <v-icon small v-else>mdi-account</v-icon>
                           </div>
                         </v-col>
@@ -86,7 +86,7 @@
                           <p class="text--primary font-italic"><pre>Ingredients: </pre></p>
                         </v-col>
                         <v-col>
-                          <p class="text--secondary">{{card.ingredients}}</p>
+                          <p class="text--secondary">{{item.ingredients}}</p>
                         </v-col>
                       </v-row>
                       <v-row no-gutters>
@@ -163,13 +163,13 @@
 
 <script>
 export default {
-  name: "Tabs",
+  name: "Menu",
   mounted() {
   },
   data() {
     return {
       tabIndex: 0,
-      cardDecksLoc: this.cardDecks,
+      menuItems: this.cardDecks,
       tab: null,
       revealNutFacts: Array(this.cardDecks.length).fill(false),
       selectItems: [0,1,2,3,4,5,6,7,8,9,10]
@@ -178,11 +178,10 @@ export default {
   props: {
     tabs: Array,
     cardDecks: Array,
-    inputNumberLimit: Number
   },
   methods: {
-    cardCountChangedEvent() {
-      this.$emit('cartChanged', this.cardDecksLoc);
+    itemCountChangedEvent() {
+      this.$emit('cartChanged', this.menuItems);
     },
   },
   computed: {

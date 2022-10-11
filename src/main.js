@@ -14,12 +14,6 @@ Vue.use(GmapVue, {
   dynamicLoad: false,
 })
 
-/*--------------------IMPORT TEL INPUT-------------------------*/
-import VueTelInput from 'vue-tel-input';
-import 'vue-tel-input/dist/vue-tel-input.css';
-
-Vue.use(VueTelInput);
-
 /*--------------------IMPORT BOOTSTRAP-------------------------*/
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
@@ -29,16 +23,16 @@ Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 
 /*--------------------IMPORT VUETIFY-------------------------*/
-import Vuetify from 'vuetify'
+import Vuetify from 'vuetify';
 import 'vuetify/dist/vuetify.min.css'
 import '@mdi/font/css/materialdesignicons.css'
 
-Vue.use(Vuetify)
+Vue.use(Vuetify);
 
 
 new Vue({
-  vuetify : new Vuetify({
-    icons: {iconfont: 'mdi'}
+  vuetify: new Vuetify({
+    icons: {iconfont: 'mdi'},
   }),
   router,
   store,

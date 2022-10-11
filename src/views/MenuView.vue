@@ -1,24 +1,22 @@
 <template>
-  <div class="menu-view">
+  <div>
     <TopBar :cart-counter="cartCounter" @cartBtnClicked="cartBtnClickedEvent"></TopBar>
     <Intro img-src="menu.png"></Intro>
-    <TabsWCards v-if="!preloaderEnabled" :tabs="menuCatgs" :cardDecks="menuItems" :inputNumberLimit="menuItemCartLimit" @cartChanged="cartChangedEvent"></TabsWCards>
+    <Menu v-if="!preloaderEnabled" :tabs="menuCatgs" :cardDecks="menuItems" @cartChanged="cartChangedEvent"></Menu>
     <Preloader v-if="preloaderEnabled"></Preloader>
-    <CartDialog :cartItems="menuItems" v-model="showCartDialog" @cartChanged="cartChangedEvent"></CartDialog>
+    <CartDialog :cartItems="menuItems" v-model="showCartDialog" @cartChanged="cartChangedEvent" @cartClearRequest="cartClearedEvent"></CartDialog>
   </div>
 </template>
 
 <style scoped>
-.menu-view {
-  height: 100vh;
-}
+
 </style>
 
 <script>
 import TopBar from "@/components/TopBar.vue";
 import Preloader from "@/components/Preloader.vue";
 import Intro from "@/components/Intro.vue";
-import TabsWCards from "@/components/TabsWCards.vue";
+import Menu from "@/components/Menu.vue";
 import CartDialog from "@/components/CartDialog.vue";
 import axios from 'axios'
 
@@ -36,7 +34,6 @@ export default {
     return {
       cartCounter: 0,
       cartObj: {},
-      menuItemCartLimit: 10,
       waitedEvents: [],
       successfulWaitedEvent: 0,
       preloaderEnabled: true,
@@ -49,14 +46,12 @@ export default {
     TopBar,
     Preloader,
     Intro,
-    TabsWCards,
+    Menu,
     CartDialog,
   },
   methods: {
     cartBtnClickedEvent() {
-      console.log("cartBtn clicked!");
       this.showCartDialog = true;
-      //this.$router.push('/cart');
     },
     constructMenuCatgsObj(jsonData) {
       this.menuCatgs = jsonData;
@@ -68,10 +63,10 @@ export default {
         delete menuItemObj.menu_category_ref;
         menuItemObj['qty'] = 0;
         menuItemObj['total_price'] = 0;
-        if      (menuItemObj.status == 'New')     {menuItemObj['color'] = "danger";}
+        /*if      (menuItemObj.status == 'New')     {menuItemObj['color'] = "danger";}
         else if (menuItemObj.status == 'Try It')  {menuItemObj['color'] = "info";}
         else if (menuItemObj.status == 'Popular') {menuItemObj['color'] = "success";}
-        else                                      {menuItemObj['color'] = "dark";}
+        else                                      {menuItemObj['color'] = "dark";}*/
         try {menuItemObj['imgSrc'] = require('../assets/menu-items/' + menuItemObj.name.replaceAll(' ', '-') + '.png');}
         catch (e) {menuItemObj['imgSrc'] = require('../assets/no-image.png');}
         this.menuItems.push(menuItemObj);
@@ -126,9 +121,14 @@ export default {
       }
       console.log(this.menuItems);
       console.log(this.cartCounter);
-    }
+    },
+    cartClearedEvent() {
+      this.cartCounter = 0;
+      for (var idx = 0; idx < this.menuItems.length; idx++) {
+        this.menuItems[idx].total_price = 0;
+        this.menuItems[idx].qty = 0;
+      }
+    },
   },
-  computed: {
-  }
 };
 </script>
