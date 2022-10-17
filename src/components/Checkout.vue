@@ -9,11 +9,11 @@
       <tbody>
         <tr>
           <td class="text-left text-subtitle-1 font-weight-medium">Subtotal</td>
-          <td class="text-right text-subtitle-1 font-weight-medium">{{subtotal}}kr</td>
+          <td class="text-right text-subtitle-1 font-weight-medium">{{formatCurrency(totalPrice)}}</td>
         </tr>
         <tr>
           <td class="text-left text-subtitle-1 font-weight-medium">Delivery Fees</td>
-          <td class="text-right text-subtitle-1 font-weight-medium">0kr</td>
+          <td class="text-right text-subtitle-1 font-weight-medium">{{formatCurrency(0)}}</td>
         </tr>
         <tr>
           <td class="text-left text-subtitle-1 font-weight-medium">Taxes</td>
@@ -30,17 +30,17 @@
               :success="validPromoCode"
             ></v-text-field>
           </td>
-          <td class="text-right text-subtitle-1 font-weight-medium">{{discount * -1}}kr</td>
+          <td class="text-right text-subtitle-1 font-weight-medium">{{discount * -100}}%</td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
           <th class="text-left text-h6 font-weight-bold">Total</th>
-          <th class="text-right text-h6 font-weight-bold">{{subtotal - discount}}kr</th>
+          <th class="text-right text-h6 font-weight-bold">{{formatCurrency(totalToPay)}}</th>
         </tr>
       </tfoot>
     </v-simple-table>
-    <v-divider></v-divider>
+    <v-divider class="my-4"></v-divider>
     <div ref="paypal"></div>
   </v-card>
 </template>
@@ -50,11 +50,17 @@
 </style>
 
 <script>
+import axios from 'axios'
+import currency from 'currency.js'
+
 export default {
   name: "Checkout",
+  created() {
+    this.fetchPromoCodes();
+  },
   mounted() {
     const script = document.createElement("script");
-    script.src = "https://www.paypal.com/sdk/js?client-id=AUjd3Wob2Uqji05N-C6ITlLPuFW3FHGycZlOzQJHL2_bI_TzPv_xxJNuqdxcs5Mf4AVW2MukbixoKKgU&currency=SEK";
+    script.src = "https://www.paypal.com/sdk/js?client-id=Afypn0F0ftWe0TzZ7w_MEF-h7p3kT-0bfsgULFkpf5qKy9K3o9arN84xlIwOw0Kw7HSKShpDrJjvzQKa&currency=SEK";
     script.addEventListener("load", this.setLoaded);
     document.body.appendChild(script);
   },
@@ -64,26 +70,46 @@ export default {
   data() {
     return {
       promoCode: '',
-      availPromoCodes: [
-        {code: '', discount: 0},
-        {code: 'new2022!', discount: 100}
-      ],
-      subtotal: this.totalPrice,
-      discount: 0,
+      availPromoCodes: [],
+      discount: 0.0,
       validPromoCode: false,
     }
   },
   methods: {
+    collectInfo() {
+      return {total: currency(this.totalToPay)};
+    },
+    formatCurrency(val) {
+      return currency(val, {symbol: ':-', pattern: '#!'}).format();
+    },
+    constructPromoCodeObj(jsonData) {
+      this.availPromoCodes = jsonData;
+    },
+    async fetchPromoCodes() {
+      await axios.get('http://127.0.0.1:9000/foodapis/promocode') /*TODO: change in production to https://foodlinic.pythonanywhere.com/foodapis/promocode*/
+        .then(response => {
+          this.constructPromoCodeObj(response.data);
+        })
+        .catch(error => {
+          console.log(error) /*TODO: better error handling*/
+        })
+    },
     checkPromoCode(val) {
       this.validPromoCode = false;
-      this.discount = 0;
+      this.discount = 0.0;
       if (val.length == 8) {
         for(const elem of this.availPromoCodes) {
-          if (val.toLowerCase() === elem.code) {
+          if (val.toLowerCase() === elem.name) {
             this.discount = elem.discount;
             this.validPromoCode = true;
           }
         }
+      }
+      else if (val.length == 0) {
+        this.validPromoCode = true;
+      }
+      else {
+        /* still show error */
       }
       return this.validPromoCode;
     },
@@ -98,25 +124,35 @@ export default {
           },
           // Set up the transaction
           createOrder: (data, actions) => {
+            console.log(String(currency(this.totalToPay)));
             return actions.order.create({
               purchase_units: [{
                 amount: {
                   currency_code: "SEK",
-                  value: String(this.subtotal - this.discount),
+                  value: String(currency(this.totalToPay)),
                 }
               }]
             });
           },
           // Finalize the transaction
           onApprove: async (data, actions) => {
-            const order = await actions.order.capture();
+            let order = await actions.order.capture();
             console.log(order);
+            if (order) {this.$emit('checkout', true);}
           },
-          onError: err => {
-            console.log(err);
+          onCancel: async (data) => {
+            this.$emit('checkout', false);
+          },
+          onError: async (err) => {
+            this.$emit('checkout', false);
           },
         }).render(this.$refs.paypal);
     },
   },
+  computed: {
+    totalToPay() {
+      return (this.discount > 0.0)? (this.totalPrice * (1.0 - this.discount)) : (this.totalPrice);
+    },
+  }
 }
 </script>

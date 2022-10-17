@@ -1,8 +1,8 @@
 <template>
   <v-card tile flat>
     <v-select
-      v-model="locSelected"
-      :items="locOptions"
+      v-model="delvySelected"
+      :items="delvyOptions"
       menu-props="auto"
       label="Select Meeting Point"
       prepend-icon="mdi-map-marker"
@@ -13,20 +13,19 @@
       :error="!validLocation.ext"
       @input="validLocation.ext=true"
     ></v-select>
-    <v-card class="mt-2">
+    <v-card class="mt-0 mb-6">
       <GmapMap
-        :center="locMapCenter"
-        :zoom="locMapZoomLvl"
+        :center="delvyMapCenter"
+        :zoom="delvyMapZoomLvl"
         style="min-width: 200px; min-height: 300px"
       >
         <GmapMarker
-          :position="locMarkerPos"
+          :position="delvyMarkerPos"
           :clickable="true"
           :draggable="true"
         />
       </GmapMap>
     </v-card>
-    <v-divider></v-divider>
     <v-menu
       v-model="showDateMenu"
       :close-on-content-click="false"
@@ -38,7 +37,7 @@
     >
       <template v-slot:activator="{on, attrs}">
         <v-text-field
-          v-model="date"
+          v-model="delvyDate"
           label="Select Date"
           prepend-icon="mdi-calendar"
           readonly
@@ -52,7 +51,7 @@
         </v-text-field>
       </template>
       <v-date-picker
-        v-model="date"
+        v-model="delvyDate"
         :min="minDate"
         :max="maxDate"
         :allowed-dates="allowedDates"
@@ -63,43 +62,8 @@
       >
       </v-date-picker>
     </v-menu>
-    <v-menu
-      v-model="showTimeMenu"
-      :close-on-content-click="false"
-      :nudge-right="40"
-      transition="scale-transition"
-      offset-y
-      min-width="290px"
-      max-width="290px"
-    >
-      <template v-slot:activator="{on, attrs}">
-        <v-text-field
-          v-model="time"
-          label="Select time"
-          prepend-icon="mdi-clock-time-four-outline"
-          readonly
-          color="#39175c"
-          v-bind="attrs"
-          v-on="on"
-          :rules="[val => validateTime(val)]"
-          :success="validTime.int"
-          :error="!validTime.ext"
-        >
-        </v-text-field>
-      </template>
-      <v-time-picker
-        v-model="time"
-        full-width
-        format="24hr"
-        :allowed-hours="allowedHours"
-        :allowed-minutes="allowedMinutes"
-        color="#39175c"
-        @input="showTimeMenu=false;validTime.ext=true;"
-      >
-      </v-time-picker>
-    </v-menu>
     <v-textarea
-      v-model="notes"
+      v-model="delvyNotes"
       color="#39175c"
       clear-icon="mdi-close-circle"
       rows="1"
@@ -131,7 +95,7 @@ const { googleMapsApiInitializer } = helpers;
 export default {
   name: "Delivery",
   created() {
-    this.fetchLocations();
+    this.fetchDeliveryLocations();
   },
   mounted() {
     googleMapsApiInitializer({
@@ -140,43 +104,43 @@ export default {
   },
   data() {
     return {
-      locSelected: null,
-      locOptions: [],
+      delvySelected: null,
+      delvyOptions: [],
       showDateMenu: false,
-      showTimeMenu: false,
-      date: null,
+      delvyDate: null,
       allowedDates: val => new Date(val).getDay() !== 0 && new Date(val).getDay() !== 6, /*Sundays and Saturdays are not allowed*/
-      time: null,
-      allowedHours: [10, 17, 22],
-      allowedMinutes: [0],
-      notes: '',
+      delvyNotes: '',
       validLocation:  {int: false, ext: true},
       validDate:      {int: false, ext: true},
-      validTime:      {int: false, ext: true},
       validNotes:     {int: false, ext: true},
+      delvyDefault: {lat:57.71778786574879, lng:11.972795513941245, zoom_lvl:10},
     }
   },
   methods: {
-    constructLocationObj(jsonData) {
-      this.locOptions = [];
+    collectInfo() {
+      return {location: this.delvySelected.name, date: this.delvyDate, notes: this.delvyNotes};
+    },
+    constructDeliveryObj(jsonData) {
+      this.delvyOptions = [];
       for (var idx = 0; idx < jsonData.length; idx++) {
-        this.locOptions[idx] = 
+        this.delvyOptions[idx] = 
         {
           value: 
           {
             lat: jsonData[idx].coor_lat,
             lng: jsonData[idx].coor_lng,
-            zoom_lvl: jsonData[idx].zoom_lvl
+            zoom_lvl: jsonData[idx].zoom_lvl,
+            name: jsonData[idx].loc_name
           }, 
-          text: jsonData[idx].name
+          text: jsonData[idx].loc_name
         };
       }
-      console.log(this.locOptions);
+      console.log(this.delvyOptions);
     },
-    async fetchLocations() {
-      await axios.get('http://127.0.0.1:9000/foodapis/location') /*TODO: change in production to https://foodlinic.pythonanywhere.com/foodapis/location*/
+    async fetchDeliveryLocations() {
+      await axios.get('http://127.0.0.1:9000/foodapis/delivery') /*TODO: change in production to https://foodlinic.pythonanywhere.com/foodapis/delivery*/
         .then(response => {
-          this.constructLocationObj(response.data);
+          this.constructDeliveryObj(response.data);
         })
         .catch(error => {
           console.log(error) /*TODO: better error handling*/
@@ -185,9 +149,8 @@ export default {
     validateAllInputs() {
       this.validLocation.ext  = this.validLocation.int;
       this.validDate.ext      = this.validDate.int;
-      this.validTime.ext      = this.validTime.int;
       this.validNotes.ext     = this.validNotes.int;
-      return (this.validLocation.int && this.validDate.int && this.validTime.int && this.validNotes.int);
+      return (this.validLocation.int && this.validDate.int && this.validNotes.int);
     },
     validateLocation(val) {
       this.validLocation.int = (val !== null);
@@ -197,27 +160,23 @@ export default {
       this.validDate.int = (val !== null);
       return this.validDate.int;
     },
-    validateTime(val) {
-      this.validTime.int = (val !== null);
-      return this.validTime.int;
-    },
     validateNotes(val) {
       this.validNotes.int = (val.length <= 100);
       return this.validNotes.int;
     },
   },
   computed: {
-    locMarkerPos() {
-      if (this.locSelected === null)  {return {lat:57.71778786574879, lng:11.972795513941245};}
-      else                            {return {lat: this.locSelected.lat, lng: this.locSelected.lng};}
+    delvyMarkerPos() {
+      if (this.delvySelected === null)  {return {lat: this.delvyDefault.lat, lng: this.delvyDefault.lng};}
+      else                              {return {lat: this.delvySelected.lat, lng: this.delvySelected.lng};}
     },
-    locMapCenter() {
-      if (this.locSelected === null)  {return {lat:57.71778786574879, lng:11.972795513941245};}
-      else                            {return {lat: this.locSelected.lat, lng: this.locSelected.lng};}
+    delvyMapCenter() {
+      if (this.delvySelected === null)  {return {lat: this.delvyDefault.lat, lng: this.delvyDefault.lng};}
+      else                              {return {lat: this.delvySelected.lat, lng: this.delvySelected.lng};}
     },
-    locMapZoomLvl() {
-      if (this.locSelected === null)  {return 10;}
-      else                            {return 15;}
+    delvyMapZoomLvl() {
+      if (this.delvySelected === null)  {return this.delvyDefault.zoom_lvl;}
+      else                              {return this.delvySelected.zoom_lvl;}
     },
     minDate() { /*TODO:include the orders time to determine the next available time for delivery - should not be next day only*/
       /* Next available day */

@@ -1,6 +1,7 @@
 <template>
   <v-dialog
-    v-model="show"
+    :value="show"
+    @input="$emit('show', $event)"
     transition="dialog-bottom-transition"
     max-width="800"
     content-class="mx-0 mb-0 v-dialog--fullscreen cart-dialog"
@@ -12,84 +13,90 @@
           class="mx-auto my-auto" 
           max-width="50" 
           :src="require('../assets/cart.png')"
-        >
-        </v-img>
+        />
         <v-spacer></v-spacer>
         <v-btn 
           small
           outlined
           rounded
           :ripple="{class: 'red--text'}"
-          @click="show=false"
+          @click="$emit('show', false)"
         >
           <v-icon>mdi-close</v-icon>
           Close
         </v-btn>
       </v-card-title>
-      <v-card-text class="px-0 py-0 v-card-text--scroll" v-if="cartItemsCount > 0">
-        <v-stepper
-          v-model="currStep"
-          vertical
-          tile
-          flat
-        >
-          <template
-            v-for="(step, n) in steps"
+      <div v-show="checkoutOpStatus===undefined" class="v-card-text--scroll">
+        <v-card-text class="px-0 py-0" v-if="cartItemsCount > 0">
+          <v-stepper
+            v-model="currStep"
+            vertical
+            tile
+            flat
           >
-            <v-stepper-step 
-              v-if="true"
-              :key="'step-'+String(n)"
-              :complete="stepComplete(n+1)"
-              :step="n+1"
-              :rules="[value => step.valid]" 
-              :color="stepStatus(n+1)">
-              {{step.name}}
-            </v-stepper-step>
-            <v-stepper-content
-              v-if="true"
-              :step="n+1" 
-              :key="'step-content-'+String(n)"
+            <template
+              v-for="(step, n) in steps"
             >
-              <template v-if="n == 0">
-                <ReviewCart ref="reviewCartComp" :tableItems="cartItems" @cartChanged="cartChangedEvent($event)"></ReviewCart>
-                <v-divider></v-divider>
-                <div>
-                  <CartContBtn :showLoading="totalLoading" :totalPrice="total" @btnClicked="step.validator"></CartContBtn>
-                  <CartOtherBtn :action="'clear'" @btnClicked="$emit('cartClearRequest')"></CartOtherBtn>
-                </div>
-              </template>
-              <template v-if="n == 1">
-                <Delivery ref="deliveryComp"></Delivery>
-                <v-divider></v-divider>
-                <div>
-                  <CartContBtn :showLoading="totalLoading" :totalPrice="total" @btnClicked="step.validator"></CartContBtn>
-                  <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
-                </div>
-              </template>
-              <template v-if="n == 2">
-                <Contact ref="contactComp"></Contact>
-                <v-divider></v-divider>
-                <div>
-                  <CartContBtn :showLoading="totalLoading" :totalPrice="total" @btnClicked="step.validator"></CartContBtn>
-                  <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
-                </div>
-              </template>
-              <template v-if="n == 3">
-                <Checkout ref="checkoutComp" :totalPrice="total"></Checkout>
-                <v-divider></v-divider>
-                <div>
-                  <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
-                </div>
-              </template>
-            </v-stepper-content>
-          </template>
-        </v-stepper>
-      </v-card-text>
-      <v-card-text v-else class="text-h6 justify-center">Your cart is empty!</v-card-text>
+              <v-stepper-step 
+                v-if="true"
+                :key="'step-'+String(n)"
+                :complete="stepComplete(n+1)"
+                :step="n+1"
+                :rules="[value => step.valid]" 
+                :color="stepStatus(n+1)">
+                {{step.name}}
+              </v-stepper-step>
+              <v-stepper-content
+                v-if="true"
+                :step="n+1" 
+                :key="'step-content-'+String(n)"
+              >
+                <template v-if="n == 0">
+                  <ReviewCart ref="reviewCartComp" v-model="items" @cartChanged="cartChangedEvent"></ReviewCart>
+                  <v-divider class="my-4"></v-divider>
+                  <div>
+                    <CartContBtn :showLoading="totalLoading" :totalPrice="total" @btnClicked="step.validator"></CartContBtn>
+                    <CartOtherBtn :action="'clear'" @btnClicked="$emit('cartCleared')"></CartOtherBtn>
+                  </div>
+                </template>
+                <template v-if="n == 1">
+                  <Delivery ref="deliveryComp"></Delivery>
+                  <v-divider class="my-4"></v-divider>
+                  <div>
+                    <CartContBtn :showLoading="totalLoading" :totalPrice="total" @btnClicked="step.validator"></CartContBtn>
+                    <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
+                  </div>
+                </template>
+                <template v-if="n == 2">
+                  <Contact ref="contactComp"></Contact>
+                  <v-divider class="my-4"></v-divider>
+                  <div>
+                    <CartContBtn :showLoading="totalLoading" :totalPrice="total" @btnClicked="step.validator"></CartContBtn>
+                    <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
+                  </div>
+                </template>
+                <template v-if="n == 3">
+                  <Checkout ref="checkoutComp" :totalPrice="total" @checkout="actOnCheckout($event)"></Checkout>
+                  <v-divider class="my-4"></v-divider>
+                  <div>
+                    <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
+                  </div>
+                </template>
+              </v-stepper-content>
+            </template>
+          </v-stepper>
+        </v-card-text>
+        <v-card-text v-else class="text-h6 justify-center">Your cart is empty!</v-card-text>
+      </div>
+      <div v-show="checkoutOpStatus!==undefined">
+        <v-card-text class="px-0 py-0">
+          <CheckoutResult :result="checkoutOpStatus" @btnClicked="actOnCheckout(undefined)"></CheckoutResult>
+        </v-card-text>
+      </div>
     </v-card>
     <v-snackbar v-model="showSnackbar">
       Required field(s) missing/invalid!
-      <template v-slot:action="{ attrs }">
+      <template v-slot:action="{attrs}">
         <v-btn
           color="#f25b47"
           text
@@ -131,6 +138,8 @@ import Contact from "@/components/Contact.vue"
 import Checkout from "@/components/Checkout.vue"
 import CartContBtn from "@/components/CartContBtn.vue";
 import CartOtherBtn from "@/components/CartOtherBtn.vue";
+import CheckoutResult from "@/components/CheckoutResult.vue"
+import axios from 'axios'
 
 
 export default {
@@ -142,10 +151,11 @@ export default {
     Checkout,
     CartContBtn,
     CartOtherBtn,
+    CheckoutResult,
   },
   props: {
-    value: Boolean,
-    cartItems: Array
+    value: Array,
+    show: Boolean,
   },
   data() {
     return {
@@ -157,18 +167,45 @@ export default {
         {name: "Checkout"     , valid: true, validator: () => {this.checkCheckoutForm(3);}},
       ],
       lastStep: 4,
-      stepForm: [],
       totalLoading: false,
       showSnackbar: false,
+      checkoutOpStatus: undefined,
     }
   },
   methods: {
-    cartChangedEvent(eventValue) {
+    async pushOrderData() {
+      let dataToPost = {
+        cartItems: this.$refs.reviewCartComp[0].collectInfo(),
+        contact: this.$refs.contactComp[0].collectInfo(),
+        delivery: this.$refs.deliveryComp[0].collectInfo(),
+        checkout: this.$refs.checkoutComp[0].collectInfo()
+      };
+      console.log(dataToPost);
+      await axios.post('http://127.0.0.1:9000/foodapis/order/', dataToPost) /*TODO: change in production to https://foodlinic.pythonanywhere.com/foodapis/order*/
+        .then(response => {
+          console.log(response);
+        })
+        .catch(error => {
+          console.log(error) /*TODO: better error handling*/
+        })
+    },
+    actOnCheckout(result) {
+      this.checkoutOpStatus = result;
+      if (this.checkoutOpStatus) {
+        this.pushOrderData();
+        this.$emit('cartCleared');
+      }
+      else {
+        /* stop any processing */
+        this.pushOrderData();
+      }
+    },
+    cartChangedEvent() {
       this.totalLoading = true;
       setTimeout(() => {
         this.totalLoading = false
       }, 500);
-      this.$emit('cartChanged', eventValue);
+      this.$emit('cartChanged');
     },
 
     stepComplete(step) {
@@ -195,29 +232,32 @@ export default {
     checkCheckoutForm(stepIdx) {
       return true;
     },
-    placeOrder() {
-      this.currStep = this.lastStep + 1;
-    }
   },
   computed: {
     total() {
-      return this.cartItems.reduce((acc, obj) => acc + obj.total_price, 0);
+      return this.items.reduce((acc, obj) => acc + obj.total_price, 0);
+    },
+    cartItems() {
+      return this.items.filter(item => item.qty > 0);
     },
     cartItemsCount() {
-      return this.cartItems.filter(item => item.qty > 0).length;
+      return this.cartItems.length;
     },
-    show: {
+    items: {
       get() {
-        return this.value
+        return this.value;
       },
       set(value) {
-         this.$emit('input', value)
+        this.$emit('input', value);
       }
     },
   },
   watch: {
     show(newState, oldState) {
       this.currStep = 1;
+      if (newState == false) {
+        this.checkoutOpStatus = undefined;
+      }
     },
   },
 };

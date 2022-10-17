@@ -26,7 +26,7 @@
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
               <v-select
-                :value="item.qty"
+                v-model="item.qty"
                 :items="selectItems"
                 menu-props="auto"
                 label="Select"
@@ -42,7 +42,7 @@
               ></v-select>
             </div>
           </td>
-          <td class="text-right">{{item.total_price}}kr</td>
+          <td class="text-right">{{formatCurrency(item.total_price)}}</td>
         </tr>
       </tbody>
     </template>
@@ -62,10 +62,12 @@
 </style>
 
 <script>
+import currency from 'currency.js'
+
 export default {
   name: "ReviewCart",
   props: {
-    tableItems: Array,
+    value: Array,
   },
   data() {
     return {
@@ -74,24 +76,40 @@ export default {
         {key: 'qty', label: 'Qty'}, 
         {key: 'total_price', label: 'Price'}
       ],
-      items: this.tableItems,
       selectItems: [0,1,2,3,4,5,6,7,8,9,10],
     }
   },
   methods: {
+    collectInfo() {
+      let orderObj = [];
+      for (var idx = 0; idx < this.getTableItems.length; idx++) {
+        orderObj.push({id: this.getTableItems[idx].id, qty: this.getTableItems[idx].qty});
+      }
+      return orderObj;
+    },
+    formatCurrency(val) {
+      return currency(val, {symbol: ':-', pattern: '#!'}).format();
+    },
     itemCountChanged(itemId, value) {
-      this.totalLoading = true;
       for (var idx = 0; idx < this.items.length; idx++) {
         if (this.items[idx].id == itemId) {
           this.items[idx].qty = value;
         }
       }
-      this.$emit('cartChanged', this.items);
+      this.$emit('cartChanged');
     },
   },
   computed: {
     getTableItems() {
       return this.items.filter(item => item.qty > 0);
+    },
+    items: {
+      get() {
+        return this.value;
+      },
+      set(value) {
+        this.$emit('input', value);
+      }
     },
   },
 }

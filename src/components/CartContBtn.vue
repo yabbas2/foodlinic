@@ -3,6 +3,7 @@
     color="#39175c"
     dark
     @click="$emit('btnClicked')"
+    class="mx-1"
   >
     <div class="d-flex justify-space-between">
       <div style="width:3rem;" v-if="!showLoading" class="text-capitalize">{{totalPrice}}kr</div>

@@ -65,6 +65,9 @@ export default {
     }
   },
   methods: {
+    collectInfo() {
+      return this.form;
+    },
     validateAllInputs() {
       this.validFirstName.ext   = this.validFirstName.int;
       this.validSecondName.ext  = this.validSecondName.int;
