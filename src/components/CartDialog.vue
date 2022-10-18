@@ -181,7 +181,7 @@ export default {
         checkout: this.$refs.checkoutComp[0].collectInfo()
       };
       console.log(dataToPost);
-      await axios.post('https://foodlinic-backend.onrender.com/foodapis/order/', dataToPost)
+      await axios.post('https://foodlinic.pythonanywhere.com/foodapis/order/', dataToPost)
         .then(response => {
           console.log(response);
         })

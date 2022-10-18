@@ -138,7 +138,7 @@ export default {
       console.log(this.delvyOptions);
     },
     async fetchDeliveryLocations() {
-      await axios.get('https://foodlinic-backend.onrender.com/foodapis/delivery')
+      await axios.get('https://foodlinic.pythonanywhere.com/foodapis/delivery')
         .then(response => {
           this.constructDeliveryObj(response.data);
         })
