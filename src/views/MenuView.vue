@@ -1,9 +1,13 @@
 <template>
   <div>
     <TopBar 
+      v-model="showNavDrwr"
       :cart-counter="cartCounter" 
       @cartBtnClicked="cartBtnClickedEvent"
     ></TopBar>
+    <NavDrwr
+      v-model="showNavDrwr"
+    ></NavDrwr>
     <Intro 
       img-src="menu.png"
     ></Intro>
@@ -27,6 +31,7 @@
 
 <script>
 import TopBar from "@/components/TopBar.vue";
+import NavDrwr from "@/components/NavDrwr.vue";
 import Intro from "@/components/Intro.vue";
 import Menu from "@/components/Menu.vue";
 import CartDialog from "@/components/CartDialog.vue";
@@ -42,11 +47,13 @@ export default {
       cartCounter: 0,
       preloaderEnabled: true,
       menuItems: [],
-      showCartDialog: null
+      showCartDialog: null,
+      showNavDrwr: false,
     }
   },
   components: {
     TopBar,
+    NavDrwr,
     Intro,
     Menu,
     CartDialog,

@@ -138,7 +138,7 @@ export default {
       console.log(this.delvyOptions);
     },
     async fetchDeliveryLocations() {
-      await axios.get('http://127.0.0.1:9000/foodapis/delivery') /*TODO: change in production to https://foodlinic.pythonanywhere.com/foodapis/delivery*/
+      await axios.get('http://127.0.0.1:9000/foodapis/delivery')
         .then(response => {
           this.constructDeliveryObj(response.data);
         })

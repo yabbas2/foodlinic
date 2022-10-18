@@ -4,13 +4,15 @@
     color="#39175c"
     dark
     elevation="5"
+    clipped-left
   >
+    <v-app-bar-nav-icon @click.stop="showNavDrwr=!showNavDrwr"></v-app-bar-nav-icon>
     <v-toolbar-title>
       <v-container>
         <v-row no-gutters>
-          <v-col class="my-auto">
+          <!--<v-col class="my-auto">
             <v-img :src="require('../assets/logo.png')" width="60"></v-img>
-          </v-col>
+          </v-col>-->
           <v-col class="my-auto">
             <v-img :src="require('../assets/logo-name.png')" width="120"></v-img>
           </v-col>
@@ -57,7 +59,18 @@
 export default {
   name: "TopBar",
   props: {
-    cartCounter: Number
+    value: Boolean,
+    cartCounter: Number,
+  },
+  computed: {
+    showNavDrwr: {
+      get() {
+        return this.value;
+      },
+      set(value) {
+        this.$emit('input', value);
+      }
+    }
   }
 };
 </script>

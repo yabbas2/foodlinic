@@ -181,7 +181,7 @@ export default {
         checkout: this.$refs.checkoutComp[0].collectInfo()
       };
       console.log(dataToPost);
-      await axios.post('http://127.0.0.1:9000/foodapis/order/', dataToPost) /*TODO: change in production to https://foodlinic.pythonanywhere.com/foodapis/order*/
+      await axios.post('http://127.0.0.1:9000/foodapis/order/', dataToPost)
         .then(response => {
           console.log(response);
         })
