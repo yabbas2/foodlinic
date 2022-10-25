@@ -3,7 +3,6 @@
     indeterminate
     size="50"
     color="#f25b47"
-    class="mt-16"
   ></v-progress-circular>
 </template>
 

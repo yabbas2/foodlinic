@@ -1,85 +1,86 @@
 <template>
   <v-card tile flat>
-    <v-select
-      v-model="delvySelected"
-      :items="delvyOptions"
-      menu-props="auto"
-      label="Select Meeting Point"
-      prepend-icon="mdi-map-marker"
-      class="mx-auto my-auto"
-      color="#39175c"
-      :rules="[val => validateLocation(val)]"
-      :success="validLocation.int"
-      :error="!validLocation.ext"
-      @input="validLocation.ext=true"
-    ></v-select>
-    <v-card class="mt-0 mb-6">
-      <GmapMap
-        :center="delvyMapCenter"
-        :zoom="delvyMapZoomLvl"
-        style="min-width: 200px; min-height: 300px"
-      >
-        <GmapMarker
-          :position="delvyMarkerPos"
-          :clickable="true"
-          :draggable="true"
-        />
-      </GmapMap>
-    </v-card>
-    <v-menu
-      v-model="showDateMenu"
-      :close-on-content-click="false"
-      :nudge-right="40"
-      transition="scale-transition"
-      offset-y
-      min-width="290px"
-      max-width="290px"
+    <v-form 
+      ref="delvyform" 
+      v-model="validForm" 
+      lazy-validation
     >
-      <template v-slot:activator="{on, attrs}">
-        <v-text-field
-          v-model="delvyDate"
-          label="Select Date"
-          prepend-icon="mdi-calendar"
-          readonly
-          color="#39175c"
-          v-bind="attrs"
-          v-on="on"
-          :rules="[val => validateDate(val)]"
-          :success="validDate.int"
-          :error="!validDate.ext"
-        >
-        </v-text-field>
-      </template>
-      <v-date-picker
-        v-model="delvyDate"
-        :min="minDate"
-        :max="maxDate"
-        :allowed-dates="allowedDates"
-        show-week
-        first-day-of-week="1"
+      <v-select
+        v-model="delvySelected"
+        :items="delvyOptions"
+        menu-props="auto"
+        label="Select Meeting Point"
+        prepend-icon="mdi-map-marker"
+        class="mx-auto my-auto"
         color="#39175c"
-        @input="showDateMenu=false;validDate.ext=true;"
+        :rules="[val => validateLocation(val)]"
+        :success="validLocation"
+      ></v-select>
+      <v-card class="mt-0 mb-6">
+        <GmapMap
+          :center="delvyMapCenter"
+          :zoom="delvyMapZoomLvl"
+          style="min-width: 200px; min-height: 300px"
+        >
+          <GmapMarker
+            :position="delvyMarkerPos"
+            :clickable="true"
+            :draggable="true"
+          />
+        </GmapMap>
+      </v-card>
+      <v-menu
+        v-model="showDateMenu"
+        :close-on-content-click="false"
+        :nudge-right="40"
+        transition="scale-transition"
+        offset-y
+        min-width="290px"
+        max-width="290px"
       >
-      </v-date-picker>
-    </v-menu>
-    <v-textarea
-      v-model="delvyNotes"
-      color="#39175c"
-      clear-icon="mdi-close-circle"
-      rows="1"
-      prepend-icon="mdi-comment"
-      auto-grow
-      counter
-      :rules="[val => validateNotes(val) || 'Max 100 characters']"
-      :error="!validNotes.ext"
-      @input="validNotes.ext=true"
-    >
-      <template v-slot:label>
-        <div>
-          Delivery notes <small>(optional)</small>
-        </div>
-      </template>
-    </v-textarea>
+        <template v-slot:activator="{on, attrs}">
+          <v-text-field
+            v-model="delvyDate"
+            label="Select Date"
+            prepend-icon="mdi-calendar"
+            readonly
+            color="#39175c"
+            v-bind="attrs"
+            v-on="on"
+            :rules="[val => validateDate(val)]"
+            :success="validDate"
+          >
+          </v-text-field>
+        </template>
+        <v-date-picker
+          v-model="delvyDate"
+          :min="minDate"
+          :max="maxDate"
+          :allowed-dates="allowedDates"
+          show-week
+          first-day-of-week="1"
+          color="#39175c"
+          @input="showDateMenu=false"
+        >
+        </v-date-picker>
+      </v-menu>
+      <v-textarea
+        v-model="delvyNotes"
+        color="#39175c"
+        clear-icon="mdi-close-circle"
+        rows="1"
+        prepend-icon="mdi-comment"
+        auto-grow
+        counter
+        :rules="[val => validateNotes(val) || 'Max 100 characters']"
+      >
+        <template v-slot:label>
+          <div>
+            Delivery notes <small>(optional)</small>
+          </div>
+        </template>
+      </v-textarea>
+    </v-form>
   </v-card>
 </template>
 
@@ -104,15 +105,16 @@ export default {
   },
   data() {
     return {
+      validForm: true,
       delvySelected: null,
       delvyOptions: [],
       showDateMenu: false,
       delvyDate: null,
       allowedDates: val => new Date(val).getDay() !== 0 && new Date(val).getDay() !== 6, /*Sundays and Saturdays are not allowed*/
       delvyNotes: '',
-      validLocation:  {int: false, ext: true},
-      validDate:      {int: false, ext: true},
-      validNotes:     {int: false, ext: true},
+      validLocation: false,
+      validDate:     false,
+      validNotes:    false,
       delvyDefault: {lat:57.71778786574879, lng:11.972795513941245, zoom_lvl:10},
     }
   },
@@ -146,23 +148,17 @@ export default {
           console.log(error) /*TODO: better error handling*/
         })
     },
-    validateAllInputs() {
-      this.validLocation.ext  = this.validLocation.int;
-      this.validDate.ext      = this.validDate.int;
-      this.validNotes.ext     = this.validNotes.int;
-      return (this.validLocation.int && this.validDate.int && this.validNotes.int);
-    },
     validateLocation(val) {
-      this.validLocation.int = (val !== null);
-      return this.validLocation.int;
+      this.validLocation = (val !== null);
+      return this.validLocation;
     },
     validateDate(val) {
-      this.validDate.int = (val !== null);
-      return this.validDate.int;
+      this.validDate = (val !== null);
+      return this.validDate;
     },
     validateNotes(val) {
-      this.validNotes.int = (val.length <= 100);
-      return this.validNotes.int;
+      this.validNotes = (val.length <= 100);
+      return this.validNotes;
     },
   },
   computed: {

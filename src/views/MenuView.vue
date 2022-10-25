@@ -1,27 +1,9 @@
 <template>
   <div>
-    <TopBar 
-      v-model="showNavDrwr"
-      :cart-counter="cartCounter" 
-      @cartBtnClicked="cartBtnClickedEvent"
-    ></TopBar>
-    <NavDrwr
-      v-model="showNavDrwr"
-    ></NavDrwr>
-    <Intro 
-      img-src="menu.png"
-    ></Intro>
-    <Menu 
-      v-model="menuItems" 
-      @cartChanged="cartChangedEvent"
-    ></Menu>
-    <CartDialog 
-      v-model="menuItems" 
-      :show="showCartDialog"
-      @show="showCartDialog=$event"
-      @cartChanged="cartChangedEvent" 
-      @cartCleared="cartClearedEvent"
-    ></CartDialog>
+    <MainView></MainView>
+    <Intro img-src="menu.png"></Intro>
+    <Menu></Menu>
+    <CartDialog></CartDialog>
   </div>
 </template>
 
@@ -30,54 +12,19 @@
 </style>
 
 <script>
-import TopBar from "@/components/TopBar.vue";
-import NavDrwr from "@/components/NavDrwr.vue";
 import Intro from "@/components/Intro.vue";
 import Menu from "@/components/Menu.vue";
 import CartDialog from "@/components/CartDialog.vue";
+import MainView from "@/views/MainView.vue";
 
 
 export default {
   name: "MenuView",
-  created() {
-    
-  },
-  data() {
-    return {
-      cartCounter: 0,
-      preloaderEnabled: true,
-      menuItems: [],
-      showCartDialog: null,
-      showNavDrwr: false,
-    }
-  },
   components: {
-    TopBar,
-    NavDrwr,
+    MainView,
     Intro,
     Menu,
     CartDialog,
-  },
-  methods: {
-    cartBtnClickedEvent() {
-      this.showCartDialog = true;
-    },
-    cartChangedEvent() {
-      this.cartCounter = 0;
-      for (var idx = 0; idx < this.menuItems.length; idx++) {
-        this.menuItems[idx].total_price = this.menuItems[idx].price * this.menuItems[idx].qty;
-        this.cartCounter += this.menuItems[idx].qty;
-      }
-      console.log(this.menuItems);
-      console.log(this.cartCounter);
-    },
-    cartClearedEvent() {
-      this.cartCounter = 0;
-      for (var idx = 0; idx < this.menuItems.length; idx++) {
-        this.menuItems[idx].total_price = 0;
-        this.menuItems[idx].qty = 0;
-      }
-    },
-  },
+},
 };
 </script>

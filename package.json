@@ -10,12 +10,14 @@
     "@mdi/font": "^7.0.96",
     "axios": "^0.27.2",
     "core-js": "^3.25.5",
+    "crypto-js": "^4.1.1",
     "currency.js": "^2.0.4",
     "gmap-vue": "^3.5.4",
+    "pinia": "^2.0.23",
+    "validator": "^13.7.0",
     "vue": "^2.6.14",
     "vue-router": "^3.5.1",
-    "vuetify": "^2.6.11",
-    "vuex": "^3.6.2"
+    "vuetify": "^2.6.11"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~5.0.0",

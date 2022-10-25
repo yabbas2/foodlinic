@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
-import store from './store'
 
 Vue.config.productionTip = false
 
@@ -21,13 +20,18 @@ import '@mdi/font/css/materialdesignicons.css'
 
 Vue.use(Vuetify);
 
+/*--------------------IMPORT PINIA-------------------------*/
+import { createPinia, PiniaVuePlugin } from 'pinia'
+
+Vue.use(PiniaVuePlugin)
+const pinia = createPinia()
+
 
 new Vue({
   vuetify: new Vuetify({
     icons: {iconfont: 'mdi'},
   }),
   router,
-  store,
+  pinia,
   render: h => h(App),
-  created() {},
 }).$mount('#app')

@@ -1,12 +1,12 @@
 <template>
   <v-dialog
-    :value="show"
-    @input="$emit('show', $event)"
+    v-model="vsbyStore.cartDiagVsby"
     transition="dialog-bottom-transition"
     max-width="800"
+    @click:outside="closeDialog"
+    @keydown.esc="closeDialog"
     content-class="mx-0 mb-0 v-dialog--fullscreen cart-dialog"
-    :overlay-opacity="0.9"
-  >
+  ><!--:overlay-opacity="0.9"-->
     <v-card tile flat class="v-card--scroll" height="100%">
       <v-card-title>
         <v-img 
@@ -20,82 +20,90 @@
           outlined
           rounded
           :ripple="{class: 'red--text'}"
-          @click="$emit('show', false)"
+          @click="closeDialog"
         >
           <v-icon>mdi-close</v-icon>
           Close
         </v-btn>
       </v-card-title>
-      <div v-show="checkoutOpStatus===undefined" class="v-card-text--scroll">
-        <v-card-text class="px-0 py-0" v-if="cartItemsCount > 0">
-          <v-stepper
-            v-model="currStep"
-            vertical
-            tile
-            flat
+      <v-spacer></v-spacer>
+      <!--start: cart dialog view-->
+      <v-card-subtitle v-show="!checkoutSuccess" class="justify-center py-0">
+      </v-card-subtitle>
+      <v-spacer v-show="!checkoutSuccess"></v-spacer>
+      <v-card-text v-show="(cartStore.cartItemsCount>0)&&(!checkoutSuccess)" class="px-0 py-0 v-card-text--scroll">
+        <v-stepper
+          v-model="currStep"
+          vertical
+          tile
+          flat
+        >
+          <template
+            v-for="(step, n) in steps"
           >
-            <template
-              v-for="(step, n) in steps"
+            <v-stepper-step 
+              v-if="true"
+              :key="'step-'+String(n)"
+              :complete="stepComplete(n+1)"
+              :step="n+1"
+              :rules="[value => step.valid]" 
+              :color="stepStatus(n+1)">
+              {{step.name}}
+            </v-stepper-step>
+            <v-stepper-content
+              v-if="true"
+              :step="n+1" 
+              :key="'step-content-'+String(n)"
             >
-              <v-stepper-step 
-                v-if="true"
-                :key="'step-'+String(n)"
-                :complete="stepComplete(n+1)"
-                :step="n+1"
-                :rules="[value => step.valid]" 
-                :color="stepStatus(n+1)">
-                {{step.name}}
-              </v-stepper-step>
-              <v-stepper-content
-                v-if="true"
-                :step="n+1" 
-                :key="'step-content-'+String(n)"
-              >
-                <template v-if="n == 0">
-                  <ReviewCart ref="reviewCartComp" v-model="items" @cartChanged="cartChangedEvent"></ReviewCart>
-                  <v-divider class="my-4"></v-divider>
-                  <div>
-                    <CartContBtn :showLoading="totalLoading" :totalPrice="total" @btnClicked="step.validator"></CartContBtn>
-                    <CartOtherBtn :action="'clear'" @btnClicked="$emit('cartCleared')"></CartOtherBtn>
-                  </div>
-                </template>
-                <template v-if="n == 1">
-                  <Delivery ref="deliveryComp"></Delivery>
-                  <v-divider class="my-4"></v-divider>
-                  <div>
-                    <CartContBtn :showLoading="totalLoading" :totalPrice="total" @btnClicked="step.validator"></CartContBtn>
-                    <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
-                  </div>
-                </template>
-                <template v-if="n == 2">
-                  <Contact ref="contactComp"></Contact>
-                  <v-divider class="my-4"></v-divider>
-                  <div>
-                    <CartContBtn :showLoading="totalLoading" :totalPrice="total" @btnClicked="step.validator"></CartContBtn>
-                    <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
-                  </div>
-                </template>
-                <template v-if="n == 3">
-                  <Checkout ref="checkoutComp" :totalPrice="total" @checkout="actOnCheckout($event)"></Checkout>
-                  <v-divider class="my-4"></v-divider>
-                  <div>
-                    <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
-                  </div>
-                </template>
-              </v-stepper-content>
-            </template>
-          </v-stepper>
-        </v-card-text>
-        <v-card-text v-else class="text-h6 justify-center">Your cart is empty!</v-card-text>
-      </div>
-      <div v-show="checkoutOpStatus!==undefined">
-        <v-card-text class="px-0 py-0">
-          <CheckoutResult :result="checkoutOpStatus" @btnClicked="actOnCheckout(undefined)"></CheckoutResult>
-        </v-card-text>
-      </div>
+              <template v-if="n == 0">
+                <ReviewCart ref="reviewCartComp"></ReviewCart>
+                <v-divider class="my-4"></v-divider>
+                <div>
+                  <CartContBtn :showLoading="totalPriceLoading" :totalPrice="cartStore.totalPrice" @btnClicked="step.validator"></CartContBtn>
+                  <CartOtherBtn :action="'clear'" @btnClicked="cartStore.clearCart"></CartOtherBtn>
+                </div>
+              </template>
+              <template v-if="n == 1">
+                <Delivery ref="deliveryComp"></Delivery>
+                <v-divider class="my-4"></v-divider>
+                <div>
+                  <CartContBtn :showLoading="totalPriceLoading" :totalPrice="cartStore.totalPrice" @btnClicked="step.validator"></CartContBtn>
+                  <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
+                </div>
+              </template>
+              <template v-if="n == 2">
+                <Checkout ref="checkoutComp" :totalPrice="cartStore.totalPrice" @checkout="actOnCheckout($event)"></Checkout>
+                <v-divider class="my-4"></v-divider>
+                <div>
+                  <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
+                </div>
+              </template>
+            </v-stepper-content>
+          </template>
+        </v-stepper>
+      </v-card-text>
+      <v-card-text v-show="(cartStore.cartItemsCount==0)&&(!checkoutSuccess)" class="text-h6 justify-center">Your cart is empty!</v-card-text>
+      <v-spacer v-show="!checkoutSuccess"></v-spacer>
+      <!--end: cart dialog view-->
+      <!--start: checkout success view-->
+      <v-card-subtitle v-show="checkoutSuccess" class="justify-center py-0">
+        <v-img 
+          class="mx-auto my-auto" 
+          max-width="150" 
+          :src="require('../assets/op-completed.png')"
+        >
+        </v-img>
+        <div class="text-h5 text-center font-weight-bold">Order Successful</div>
+      </v-card-subtitle>
+      <v-card-text v-show="checkoutSuccess" class="text-body-1 text-center pt-8">
+        Thank you! Your order is currently being processed. You will receive an order confirmation email soon.
+      </v-card-text>
+      <!--end: checkout success view-->
+      <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
     </v-card>
     <v-snackbar v-model="showSnackbar">
-      Required field(s) missing/invalid!
+      {{msgSnackbar}}
       <template v-slot:action="{attrs}">
         <v-btn
           color="#f25b47"
@@ -110,7 +118,7 @@
 
 <style>
 .cart-dialog {
-  border-radius: 0 !important;
+  border-radius: 30px 30px 0 0 !important;
   margin: 0 !important;
   height: 90% !important;
   position: fixed !important;
@@ -132,30 +140,32 @@
 </style>
 
 <script>
+import {useCartStore} from '@/store/cart'
+import {useVsbyStore} from '@/store/vsby'
 import ReviewCart from "@/components/ReviewCart.vue"
 import Delivery from "@/components/Delivery.vue"
-import Contact from "@/components/Contact.vue"
 import Checkout from "@/components/Checkout.vue"
-import CartContBtn from "@/components/CartContBtn.vue";
-import CartOtherBtn from "@/components/CartOtherBtn.vue";
-import CheckoutResult from "@/components/CheckoutResult.vue"
+import CartContBtn from "@/components/ui-elems/CartContBtn.vue";
+import CartOtherBtn from "@/components/ui-elems/CartOtherBtn.vue";
 import axios from 'axios'
 
 
 export default {
   name: "CartDialog",
+  setup() {
+    const cartStore = useCartStore()
+    const vsbyStore = useVsbyStore()
+    return {
+      cartStore,
+      vsbyStore,
+    }
+  },
   components: {
     ReviewCart,
     Delivery,
-    Contact,
     Checkout,
     CartContBtn,
     CartOtherBtn,
-    CheckoutResult,
-  },
-  props: {
-    value: Array,
-    show: Boolean,
   },
   data() {
     return {
@@ -163,20 +173,22 @@ export default {
       steps: [
         {name: "Review Order" , valid: true, validator: () => {this.checkReviewForm(0);}},
         {name: "Delivery"     , valid: true, validator: () => {this.checkDeliveryForm(1);}},
-        {name: "Contact"      , valid: true, validator: () => {this.checkContactForm(2);}},
-        {name: "Checkout"     , valid: true, validator: () => {this.checkCheckoutForm(3);}},
+        {name: "Checkout"     , valid: true, validator: () => {this.checkCheckoutForm(2);}},
       ],
-      lastStep: 4,
-      totalLoading: false,
+      totalPriceLoading: false,
       showSnackbar: false,
-      checkoutOpStatus: undefined,
+      msgSnackbar: '',
+      checkoutSuccess: false,
     }
   },
   methods: {
+    showSnackbarError(errMsg) {
+      this.showSnackbar = true;
+      this.msgSnackbar = errMsg;
+    },
     async pushOrderData() {
       let dataToPost = {
         cartItems: this.$refs.reviewCartComp[0].collectInfo(),
-        contact: this.$refs.contactComp[0].collectInfo(),
         delivery: this.$refs.deliveryComp[0].collectInfo(),
         checkout: this.$refs.checkoutComp[0].collectInfo()
       };
@@ -190,24 +202,15 @@ export default {
         })
     },
     actOnCheckout(result) {
-      this.checkoutOpStatus = result;
-      if (this.checkoutOpStatus) {
+      this.checkoutSuccess = result;
+      if (this.checkoutSuccess) {
         this.pushOrderData();
         this.$emit('cartCleared');
       }
       else {
-        /* stop any processing */
-        this.pushOrderData();
+        this.showSnackbarError('Transaction failed/cancelled!');
       }
     },
-    cartChangedEvent() {
-      this.totalLoading = true;
-      setTimeout(() => {
-        this.totalLoading = false
-      }, 500);
-      this.$emit('cartChanged');
-    },
-
     stepComplete(step) {
       return this.currStep > step;
     },
@@ -215,49 +218,23 @@ export default {
       return this.currStep > step ? 'green' : '#39175c';
     },
     checkReviewForm(stepIdx) {
-      let isValid = true; // No logic is needed for now
-      if (isValid)  {this.currStep++;this.steps[stepIdx].valid = true;}
-      else          {this.showSnackbar = true;this.steps[stepIdx].valid = false;}
+      // No logic is needed for now
+      this.currStep++;
+      this.steps[stepIdx].valid = true;
+      return true;
     },
     checkDeliveryForm(stepIdx) {
-      let isValid = this.$refs.deliveryComp[0].validateAllInputs();
+      let isValid = this.$refs.deliveryComp[0].$refs.delvyform.validate();
       if (isValid)  {this.currStep++;this.steps[stepIdx].valid = true;}
-      else          {this.showSnackbar = true;this.steps[stepIdx].valid = false;}
-    },
-    checkContactForm(stepIdx) {
-      let isValid = this.$refs.contactComp[0].validateAllInputs();
-      if (isValid)  {this.currStep++;this.steps[stepIdx].valid = true;}
-      else          {this.showSnackbar = true;this.steps[stepIdx].valid = false;}
+      else          {this.showSnackbarError('Required field(s) missing/invalid!');this.steps[stepIdx].valid = false;}
     },
     checkCheckoutForm(stepIdx) {
       return true;
     },
-  },
-  computed: {
-    total() {
-      return this.items.reduce((acc, obj) => acc + obj.total_price, 0);
-    },
-    cartItems() {
-      return this.items.filter(item => item.qty > 0);
-    },
-    cartItemsCount() {
-      return this.cartItems.length;
-    },
-    items: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit('input', value);
-      }
-    },
-  },
-  watch: {
-    show(newState, oldState) {
+    closeDialog() {
       this.currStep = 1;
-      if (newState == false) {
-        this.checkoutOpStatus = undefined;
-      }
+      this.checkoutSuccess = false;
+      this.vsbyStore.cartDiagVsby = false;
     },
   },
 };

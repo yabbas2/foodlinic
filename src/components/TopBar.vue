@@ -6,7 +6,7 @@
     elevation="5"
     clipped-left
   >
-    <v-app-bar-nav-icon @click.stop="showNavDrwr=!showNavDrwr"></v-app-bar-nav-icon>
+    <v-app-bar-nav-icon @click.stop="vsbyStore.navDrwrVsby=!vsbyStore.navDrwrVsby"></v-app-bar-nav-icon>
     <v-toolbar-title>
       <v-container>
         <v-row no-gutters>
@@ -21,15 +21,15 @@
     </v-toolbar-title>
     <v-spacer></v-spacer>
     <v-badge
-      :content="cartCounter"
-      :value="cartCounter"
+      :content="cartStore.cartItemsCount"
+      :value="cartStore.cartItemsCount"
       color="#f25b47"
       overlap
       bordered
       offset-x="17"
       offset-y="22"
     >
-      <v-btn icon @click="$emit('cartBtnClicked')">
+      <v-btn icon @click="cartBtnClicked">
         <v-icon size="30">mdi-cart</v-icon>
       </v-btn>
     </v-badge>
@@ -56,21 +56,32 @@
 </style>
 
 <script>
+import {useUserStore} from '@/store/user'
+import {useCartStore} from '@/store/cart'
+import {useVsbyStore} from '@/store/vsby'
+
+
 export default {
   name: "TopBar",
-  props: {
-    value: Boolean,
-    cartCounter: Number,
+  setup() {
+    const userStore = useUserStore()
+    const cartStore = useCartStore()
+    const vsbyStore = useVsbyStore()
+    return {
+      userStore,
+      cartStore,
+      vsbyStore,
+    }
   },
-  computed: {
-    showNavDrwr: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit('input', value);
+  methods: {
+    cartBtnClicked() {
+      if ( (this.cartStore.cartItemsCount > 0) && (!this.userStore.isLoggedIn) ) {
+        this.vsbyStore.signinDiagVsby = true;
+      }
+      else {
+        this.vsbyStore.cartDiagVsby = true;
       }
     }
-  }
+  },
 };
 </script>
