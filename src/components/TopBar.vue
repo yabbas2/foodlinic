@@ -6,13 +6,19 @@
     elevation="5"
     clipped-left
   >
-    <v-app-bar-nav-icon @click.stop="vsbyStore.navDrwrVsby=!vsbyStore.navDrwrVsby"></v-app-bar-nav-icon>
+    <v-app-bar-nav-icon @click.stop="vsbyStore.navDrwrVsby=!vsbyStore.navDrwrVsby" style="margin-left: 0rem;">
+      <v-icon v-show="!userStore.isLoggedIn">mdi-menu</v-icon>
+      <v-avatar v-show="userStore.isLoggedIn" color="#f25b47" size="33">
+        <span class="white--text text-substitle-1 text-uppercase">{{userStore.firstname[0]}}{{userStore.lastname[0]}}</span>
+      </v-avatar>
+    </v-app-bar-nav-icon>
+    <v-spacer></v-spacer>
     <v-toolbar-title>
       <v-container>
         <v-row no-gutters>
-          <!--<v-col class="my-auto">
+          <v-col class="my-auto">
             <v-img :src="require('../assets/logo.png')" width="60"></v-img>
-          </v-col>-->
+          </v-col>
           <v-col class="my-auto">
             <v-img :src="require('../assets/logo-name.png')" width="120"></v-img>
           </v-col>
@@ -37,22 +43,7 @@
 </template>
 
 <style scoped>
-.logo-img {
-  max-height: 40px;
-  margin-right: 6px;
-}
 
-.logo-h1 {
-  font-size: 28px;
-  font-weight: 700;
-  margin: 0;
-  font-family: var(--font-inter);
-  color: var(--color-primary);
-}
-
-.bg-navbar {
-  background: #39175c;
-}
 </style>
 
 <script>

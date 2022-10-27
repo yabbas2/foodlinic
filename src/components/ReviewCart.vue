@@ -86,13 +86,6 @@ export default {
     }
   },
   methods: {
-    collectInfo() {
-      let orderObj = [];
-      for (var idx = 0; idx < this.getTableItems.length; idx++) {
-        orderObj.push({id: this.getTableItems[idx].id, qty: this.getTableItems[idx].qty});
-      }
-      return orderObj;
-    },
     formatCurrency(val) {
       return currency(val, {symbol: ':-', pattern: '#!'}).format();
     },

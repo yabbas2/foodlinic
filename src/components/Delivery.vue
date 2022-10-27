@@ -71,8 +71,8 @@
         rows="1"
         prepend-icon="mdi-comment"
         auto-grow
-        counter
-        :rules="[val => validateNotes(val) || 'Max 100 characters']"
+        counter="100"
+        :rules="[val => validateNotes(val)]"
       >
         <template v-slot:label>
           <div>
@@ -91,25 +91,25 @@
 <script>
 import axios from 'axios'
 import { helpers } from 'gmap-vue';
+import validator from 'validator';
+
 const { googleMapsApiInitializer } = helpers;
 
 export default {
   name: "Delivery",
-  created() {
-    this.fetchDeliveryLocations();
-  },
   mounted() {
     googleMapsApiInitializer({
       key: 'AIzaSyDIljYPhN1rAHUwXpJmL2YTE6oMSOz4VgQ',
     }, false);
+    this.fetchDeliveryLocations();
   },
   data() {
     return {
       validForm: true,
-      delvySelected: null,
+      delvySelected: '',
       delvyOptions: [],
       showDateMenu: false,
-      delvyDate: null,
+      delvyDate: '',
       allowedDates: val => new Date(val).getDay() !== 0 && new Date(val).getDay() !== 6, /*Sundays and Saturdays are not allowed*/
       delvyNotes: '',
       validLocation: false,
@@ -119,8 +119,13 @@ export default {
     }
   },
   methods: {
-    collectInfo() {
-      return {location: this.delvySelected.name, date: this.delvyDate, notes: this.delvyNotes};
+    getForm() {
+      return {location: {lat: this.delvySelected.lat, lng: this.delvySelected.lng}, date: this.delvyDate, notes: this.delvyNotes};
+    },
+    resetForm() {
+      this.delvySelected = '';
+      this.delvyDate = '';
+      this.delvyNotes = '';
     },
     constructDeliveryObj(jsonData) {
       this.delvyOptions = [];
@@ -132,15 +137,14 @@ export default {
             lat: jsonData[idx].coor_lat,
             lng: jsonData[idx].coor_lng,
             zoom_lvl: jsonData[idx].zoom_lvl,
-            name: jsonData[idx].loc_name
+            name: jsonData[idx].name
           }, 
-          text: jsonData[idx].loc_name
+          text: jsonData[idx].name
         };
       }
-      console.log(this.delvyOptions);
     },
     async fetchDeliveryLocations() {
-      await axios.get('http://127.0.0.1:9000/foodapis/delivery')
+      await axios.get('http://127.0.0.1:9000/foodapis/location')
         .then(response => {
           this.constructDeliveryObj(response.data);
         })
@@ -149,30 +153,30 @@ export default {
         })
     },
     validateLocation(val) {
-      this.validLocation = (val !== null);
+      this.validLocation = val.hasOwnProperty('name');
       return this.validLocation;
     },
     validateDate(val) {
-      this.validDate = (val !== null);
+      this.validDate = !validator.isEmpty(val);
       return this.validDate;
     },
     validateNotes(val) {
-      this.validNotes = (val.length <= 100);
+      this.validNotes = validator.isLength(val, {min:0, max:100}) && (validator.isAlphanumeric(val, 'en-US', {ignore:"'-_!?()/&#*+,;:."}) || validator.isEmpty(val));
       return this.validNotes;
     },
   },
   computed: {
     delvyMarkerPos() {
-      if (this.delvySelected === null)  {return {lat: this.delvyDefault.lat, lng: this.delvyDefault.lng};}
-      else                              {return {lat: this.delvySelected.lat, lng: this.delvySelected.lng};}
+      if (this.delvySelected==='')  {return {lat: this.delvyDefault.lat, lng: this.delvyDefault.lng};}
+      else                          {return {lat: this.delvySelected.lat, lng: this.delvySelected.lng};}
     },
     delvyMapCenter() {
-      if (this.delvySelected === null)  {return {lat: this.delvyDefault.lat, lng: this.delvyDefault.lng};}
-      else                              {return {lat: this.delvySelected.lat, lng: this.delvySelected.lng};}
+      if (this.delvySelected==='')  {return {lat: this.delvyDefault.lat, lng: this.delvyDefault.lng};}
+      else                          {return {lat: this.delvySelected.lat, lng: this.delvySelected.lng};}
     },
     delvyMapZoomLvl() {
-      if (this.delvySelected === null)  {return this.delvyDefault.zoom_lvl;}
-      else                              {return this.delvySelected.zoom_lvl;}
+      if (this.delvySelected==='')  {return this.delvyDefault.zoom_lvl;}
+      else                          {return this.delvySelected.zoom_lvl;}
     },
     minDate() { /*TODO:include the orders time to determine the next available time for delivery - should not be next day only*/
       /* Next available day */

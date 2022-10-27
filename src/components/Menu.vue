@@ -29,7 +29,7 @@
             <v-row>
               <v-col 
                 v-for="(item, idx) in cartStore.menuItems"
-                v-show="item.menu_category_ref === catg.id"
+                v-show="item.menu_category_id === catg.id"
                 :key="item.name"
                 align-self="center"
               >
@@ -256,7 +256,7 @@ export default {
     async fetchMenuItems() {
       await axios.get('http://127.0.0.1:9000/foodapis/menu-item')
         .then(response => {
-          this.constructMenuItemsObj(response.data)
+          this.constructMenuItemsObj(response.data);
           this.eventSuccessCount++
         })
         .catch(error => {

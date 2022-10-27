@@ -3,20 +3,27 @@ import {defineStore} from 'pinia'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    username: '',
-    fullName: '',
+    firstname: '',
+    lastname: '',
+    email: '',
+    phone: '',
   }),
+  persist: true,
   getters: {
-    isLoggedIn: (state) => (state.username !== ''),
+    isLoggedIn: (state) => (state.email !== ''),
   },
   actions: {
-    login(username, fullName) {
-        this.username = username;
-        this.fullName = fullName;
+    login(backendForm) {
+      this.firstname = backendForm.firstname;
+      this.lastname = backendForm.lastname;
+      this.email = backendForm.email;
+      this.phone = backendForm.phone;
     },
     logout() {
-        this.username = '';
-        this.fullName = '';
+      this.firstname = '';
+      this.lastname = '';
+      this.email = '';
+      this.phone = '';
     }
   },
 })

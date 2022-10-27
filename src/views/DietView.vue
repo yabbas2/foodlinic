@@ -1,9 +1,8 @@
 <template>
   <div>
     <MainView></MainView>
-    <Intro h1="Menu" h2="Homemade, Safe, Tasty"></Intro>
-    <Menu></Menu>
-    <CartDialog></CartDialog>
+    <Intro h1="Diet" h2="Nutrition, Fitness"></Intro>
+    <Diet></Diet>
   </div>
 </template>
 
@@ -13,18 +12,17 @@
 
 <script>
 import Intro from "@/components/Intro.vue";
-import Menu from "@/components/Menu.vue";
-import CartDialog from "@/components/CartDialog.vue";
 import MainView from "@/views/MainView.vue";
+import Diet from "@/components/Diet.vue";
 
 
 export default {
-  name: "MenuView",
+  name: "DietView",
   components: {
     MainView,
     Intro,
-    Menu,
-    CartDialog,
+    Diet,
 },
 };
 </script>
+  

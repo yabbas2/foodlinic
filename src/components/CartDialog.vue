@@ -5,7 +5,7 @@
     max-width="800"
     @click:outside="closeDialog"
     @keydown.esc="closeDialog"
-    content-class="mx-0 mb-0 v-dialog--fullscreen cart-dialog"
+    :content-class="cartStore.cartItemsCount? mainClass : secondClass"
   ><!--:overlay-opacity="0.9"-->
     <v-card tile flat class="v-card--scroll" height="100%">
       <v-card-title>
@@ -28,10 +28,10 @@
       </v-card-title>
       <v-spacer></v-spacer>
       <!--start: cart dialog view-->
-      <v-card-subtitle v-show="!checkoutSuccess" class="justify-center py-0">
+      <v-card-subtitle class="justify-center py-0">
       </v-card-subtitle>
-      <v-spacer v-show="!checkoutSuccess"></v-spacer>
-      <v-card-text v-show="(cartStore.cartItemsCount>0)&&(!checkoutSuccess)" class="px-0 py-0 v-card-text--scroll">
+      <v-spacer></v-spacer>
+      <v-card-text v-show="cartStore.cartItemsCount>0" class="px-0 py-0 v-card-text--scroll">
         <v-stepper
           v-model="currStep"
           vertical
@@ -72,7 +72,7 @@
                 </div>
               </template>
               <template v-if="n == 2">
-                <Checkout ref="checkoutComp" :totalPrice="cartStore.totalPrice" @checkout="actOnCheckout($event)"></Checkout>
+                <Checkout ref="checkoutComp" :totalPrice="cartStore.totalPrice" @checkoutStart="overlay=true" @checkoutEnd="actOnCheckout($event)"></Checkout>
                 <v-divider class="my-4"></v-divider>
                 <div>
                   <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
@@ -82,25 +82,9 @@
           </template>
         </v-stepper>
       </v-card-text>
-      <v-card-text v-show="(cartStore.cartItemsCount==0)&&(!checkoutSuccess)" class="text-h6 justify-center">Your cart is empty!</v-card-text>
-      <v-spacer v-show="!checkoutSuccess"></v-spacer>
+      <v-card-text v-show="cartStore.cartItemsCount==0" class="text-h6 justify-center">Your cart is empty!</v-card-text>
+      <v-spacer></v-spacer>
       <!--end: cart dialog view-->
-      <!--start: checkout success view-->
-      <v-card-subtitle v-show="checkoutSuccess" class="justify-center py-0">
-        <v-img 
-          class="mx-auto my-auto" 
-          max-width="150" 
-          :src="require('../assets/op-completed.png')"
-        >
-        </v-img>
-        <div class="text-h5 text-center font-weight-bold">Order Successful</div>
-      </v-card-subtitle>
-      <v-card-text v-show="checkoutSuccess" class="text-body-1 text-center pt-8">
-        Thank you! Your order is currently being processed. You will receive an order confirmation email soon.
-      </v-card-text>
-      <!--end: checkout success view-->
-      <v-spacer></v-spacer>
-      <v-spacer></v-spacer>
     </v-card>
     <v-snackbar v-model="showSnackbar">
       {{msgSnackbar}}
@@ -113,14 +97,44 @@
         >Close</v-btn>
       </template>
     </v-snackbar>
+    <v-overlay 
+      :value="overlay" 
+      absolute
+    >
+      <v-img 
+        v-if="checkoutSuccess"
+        class="mx-auto my-auto" 
+        max-width="50" 
+        :src="require('../assets/op-completed.png')"
+      >
+      </v-img>
+      <v-progress-circular
+        v-else
+        indeterminate
+        size="40"
+        width="5"
+        color="#f25b47"
+      ></v-progress-circular>
+    </v-overlay>
   </v-dialog>
 </template>
 
 <style>
-.cart-dialog {
+.cart-dialog-large {
   border-radius: 30px 30px 0 0 !important;
   margin: 0 !important;
   height: 90% !important;
+  position: fixed !important;
+  overflow-y: auto !important;
+  bottom: 0 !important;
+  top: auto !important;
+  left: auto !important;
+}
+
+.cart-dialog-small {
+  border-radius: 30px 30px 0 0 !important;
+  margin: 0 !important;
+  height: 20% !important;
   position: fixed !important;
   overflow-y: auto !important;
   bottom: 0 !important;
@@ -142,22 +156,37 @@
 <script>
 import {useCartStore} from '@/store/cart'
 import {useVsbyStore} from '@/store/vsby'
+import {useUserStore} from '@/store/user'
 import ReviewCart from "@/components/ReviewCart.vue"
 import Delivery from "@/components/Delivery.vue"
 import Checkout from "@/components/Checkout.vue"
 import CartContBtn from "@/components/ui-elems/CartContBtn.vue";
 import CartOtherBtn from "@/components/ui-elems/CartOtherBtn.vue";
 import axios from 'axios'
+import sha256 from 'crypto-js/sha256';
 
 
 export default {
   name: "CartDialog",
+  mounted() {
+    let email = 'yousef.abbas.2@outlook.com'
+    const hashDigest = sha256(email);
+    axios.get('http://127.0.0.1:9000/foodapis/order/fetch/' + hashDigest + '/', {params: {email: email}})
+        .then(response => {
+          console.log(response);
+        })
+        .catch(error => {
+          console.log(error) /*TODO: better error handling*/
+        })
+  },
   setup() {
     const cartStore = useCartStore()
     const vsbyStore = useVsbyStore()
+    const userStore = useUserStore()
     return {
       cartStore,
       vsbyStore,
+      userStore,
     }
   },
   components: {
@@ -179,6 +208,9 @@ export default {
       showSnackbar: false,
       msgSnackbar: '',
       checkoutSuccess: false,
+      mainClass: 'v-dialog--fullscreen cart-dialog-large',
+      secondClass: 'v-dialog--fullscreen cart-dialog-small',
+      overlay: false,
     }
   },
   methods: {
@@ -186,30 +218,44 @@ export default {
       this.showSnackbar = true;
       this.msgSnackbar = errMsg;
     },
+    resetForm() {
+      this.$refs.deliveryComp[0].resetForm();
+      this.$refs.deliveryComp[0].$refs.delvyform.resetValidate();
+    },
+    handleServerCreateOrderSuccess() {
+      this.checkoutSuccess = true;
+      setTimeout(() => {
+        this.overlay = false;
+        this.vsbyStore.cartDiagVsby = false;
+        this.cartStore.clearCart();
+        this.resetForm();
+      }, 1500);
+    },
+    handleServerCreateOrderError() {
+      this.overlay = false;
+      this.showSnackbarError('Server Error! Please contact us.');
+    },
     async pushOrderData() {
-      let dataToPost = {
-        cartItems: this.$refs.reviewCartComp[0].collectInfo(),
-        delivery: this.$refs.deliveryComp[0].collectInfo(),
-        checkout: this.$refs.checkoutComp[0].collectInfo()
+      let orderData = {
+        userEmail: this.userStore.email,
+        cartItems: this.cartStore.cartItemsMin,
+        delivery: this.$refs.deliveryComp[0].getForm(),
+        checkout: this.$refs.checkoutComp[0].getForm()
       };
-      console.log(dataToPost);
-      await axios.post('http://127.0.0.1:9000/foodapis/order/', dataToPost)
+      const hashDigest = sha256(JSON.stringify(orderData));
+      await axios.post('http://127.0.0.1:9000/foodapis/order/create/' + hashDigest + '/', orderData)
         .then(response => {
           console.log(response);
+          this.handleServerCreateOrderSuccess();
         })
         .catch(error => {
-          console.log(error) /*TODO: better error handling*/
+          console.log(error);
+          this.handleServerCreateOrderError();
         })
     },
     actOnCheckout(result) {
-      this.checkoutSuccess = result;
-      if (this.checkoutSuccess) {
-        this.pushOrderData();
-        this.$emit('cartCleared');
-      }
-      else {
-        this.showSnackbarError('Transaction failed/cancelled!');
-      }
+      if (result) {this.pushOrderData();}
+      else        {this.showSnackbarError('Transaction failed/cancelled!');}
     },
     stepComplete(step) {
       return this.currStep > step;

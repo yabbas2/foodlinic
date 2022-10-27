@@ -40,13 +40,13 @@
           lazy-validation
         >
           <v-text-field
-            v-model="form.username"
+            v-model="form.email"
             color="#39175c"
-            label="Username"
+            label="Email"
             type="text"
             prepend-icon="mdi-account"
-            :rules="[val => validateUsername(val)]"
-            :success="validUsername"
+            :rules="[val => validateEmail(val)]"
+            :success="validEmail"
           ></v-text-field>
           <v-text-field
             v-model="form.password"
@@ -60,6 +60,10 @@
             @click:append="showPassword=!showPassword"
           ></v-text-field>
         </v-form>
+        <div class="d-flex justify-start">
+          &nbsp;Don't have an account?&nbsp;
+          <a @click="openSignupDialog">Sign up</a>
+        </div>
         <v-divider class="my-4"></v-divider>
         <v-btn
           color="#39175c"
@@ -143,9 +147,9 @@ export default {
   },
   data() {
     return {
-      form: {username:'', password:''},
+      form: {email:'', password:''},
       validForm: true,
-      validUsername: false,
+      validEmail: false,
       validPassword: false,
       showPassword: false,
       msgSnackbar: '',
@@ -155,9 +159,9 @@ export default {
     }
   },
   methods: {
-    validateUsername(val) {
-      this.validUsername = validator.isAlphanumeric(val) && validator.isLength(val, {min:6, max:8});
-      return this.validUsername;
+    validateEmail(val) {
+      this.validEmail = validator.isEmail(val);
+      return this.validEmail;
     },
     validatePassword(val) {
       this.validPassword = validator.isLength(val, {min:8, max:undefined});
@@ -167,7 +171,7 @@ export default {
       return this.$refs.signinform.validate();
     },
     resetForm() {
-      this.form.username = '';
+      this.form.email = '';
       this.form.password = '';
       this.$refs.signinform.resetValidation();
     },
@@ -180,7 +184,7 @@ export default {
       let errorMsg = errorJson.response.data.hasOwnProperty('reason')? errorJson.response.data['reason'] : 'unknown-error';
       if (errorMsg === 'non-existing-data') {
         this.showSnackbarError('This account does not exist!');
-        this.form.username = '';
+        this.form.email = '';
         this.form.password = '';
       }
       else if (errorMsg === 'failed-authorization') {
@@ -195,11 +199,10 @@ export default {
       this.signinSuccess = true;
       setTimeout(() => {
         this.vsbyStore.signinDiagVsby = false;
-        this.vsbyStore.navDrwrVsby = true;
         this.overlay = false;
         this.resetForm();
       }, 1500);
-      this.userStore.login(respJson.data[0].username, respJson.data[0].fullName);
+      this.userStore.login(respJson.data[0]);
     },
     async signinUser() {
       let isValid = this.validateForm();
@@ -224,7 +227,10 @@ export default {
       this.signinSuccess = false;
       this.vsbyStore.signinDiagVsby = false;
       this.resetForm();
-      if (this.userStore.isLoggedIn) {this.vsbyStore.navDrwrVsby = true;}
+    },
+    openSignupDialog() {
+      this.vsbyStore.signupDiagVsby = true;
+      this.vsbyStore.signinDiagVsby = false;
     },
   },
 }

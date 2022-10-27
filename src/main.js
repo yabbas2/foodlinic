@@ -22,9 +22,11 @@ Vue.use(Vuetify);
 
 /*--------------------IMPORT PINIA-------------------------*/
 import { createPinia, PiniaVuePlugin } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 Vue.use(PiniaVuePlugin)
 const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
 
 
 new Vue({

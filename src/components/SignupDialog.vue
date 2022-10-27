@@ -5,7 +5,7 @@
     max-width="800"
     @click:outside="closeDialog"
     @keydown.esc="closeDialog"
-    content-class="mx-0 mb-0 v-dialog--fullscreen signup-dialog"
+    content-class="v-dialog--fullscreen signup-dialog"
   ><!--:overlay-opacity="0.9"-->
     <v-card tile flat class="v-card--scroll" height="100%">
       <v-card-title>
@@ -40,14 +40,22 @@
           lazy-validation
         >
           <v-text-field
-            v-model="form.fullName"
+            v-model="form.firstname"
             color="#39175c"
-            label="Full name"
+            label="First name"
             type="text"
-            counter="30"
             prepend-icon="mdi-account"
-            :rules="[val => validateFullName(val)]"
-            :success="validFullName"
+            :rules="[val => validateFirstname(val)]"
+            :success="validFirstname"
+          ></v-text-field>
+          <v-text-field
+            v-model="form.lastname"
+            color="#39175c"
+            label="Last name"
+            type="text"
+            prepend-icon="mdi-account"
+            :rules="[val => validateLastname(val)]"
+            :success="validLastname"
           ></v-text-field>
           <v-text-field
             v-model="form.email"
@@ -96,6 +104,10 @@
             </template>
           </v-text-field>
         </v-form>
+        <div class="d-flex justify-start">
+          &nbsp;Already have an account?&nbsp;
+          <a @click="openSigninDialog">Sign in</a>
+        </div>
         <v-divider class="my-4"></v-divider>
         <v-btn
           color="#39175c"
@@ -146,7 +158,7 @@
 .signup-dialog {
   border-radius: 30px 30px 0 0 !important;
   margin: 0 !important;
-  height: 75% !important;
+  height: 85% !important;
   position: fixed !important;
   overflow-y: auto !important;
   bottom: 0 !important;
@@ -179,9 +191,10 @@ export default {
   },
   data() {
     return {
-      form: {fullName:'', phone:'', email:'', password:''},
+      form: {firstname:'', lastname:'', phone:'', email:'', password:''},
       validForm: true,
-      validFullName: false,
+      validFirstname: false,
+      validLastname: false,
       validEmail: false,
       validPhone: false,
       validPassword: false,
@@ -195,11 +208,13 @@ export default {
     }
   },
   methods: {
-    validateFullName(val) {
-      let whitespaceCharCount = val.length - val.replaceAll(' ', '').length;
-      let wordCount = val.split(' ').filter(word => word !== '').length;
-      this.validFullName = validator.isAlpha(val, 'en-US', {ignore:" '-"}) && validator.isLength(val, {min:3, max:30}) && (whitespaceCharCount == (wordCount - 1));
-      return this.validFullName;
+    validateFirstname(val) {
+      this.validFirstname = validator.isAlpha(val, 'en-US', {ignore:"'-"}) && validator.isLength(val, {min:3, max:10});
+      return this.validFirstname;
+    },
+    validateLastname(val) {
+      this.validLastname = validator.isAlpha(val, 'en-US', {ignore:"'-"}) && validator.isLength(val, {min:3, max:10});
+      return this.validLastname;
     },
     validateEmail(val) {
       this.validEmail = validator.isEmail(val);
@@ -220,7 +235,8 @@ export default {
       return this.$refs.signupform.validate();
     },
     resetForm() {
-      this.form.fullName = '';
+      this.form.firstname = '';
+      this.form.lastname = '';
       this.form.phone = '';
       this.form.email = '';
       this.form.password = '';
@@ -244,11 +260,10 @@ export default {
       this.signupSuccess = true;
       setTimeout(() => {
         this.vsbyStore.signupDiagVsby = false;
-        this.vsbyStore.navDrwrVsby = true;
         this.overlay = false;
         this.resetForm();
       }, 1500);
-      this.userStore.login(respJson.data[0].username, respJson.data[0].fullName);
+      this.userStore.login(respJson.data[0]);
     },
     async signupUser() {
       let isValid = this.validateForm();
@@ -273,7 +288,10 @@ export default {
       this.signupSuccess = false;
       this.vsbyStore.signupDiagVsby = false;
       this.resetForm();
-      if (this.userStore.isLoggedIn) {this.vsbyStore.navDrwrVsby = true;}
+    },
+    openSigninDialog() {
+      this.vsbyStore.signinDiagVsby = true;
+      this.vsbyStore.signupDiagVsby = false;
     },
   },
   computed: {

@@ -10,19 +10,14 @@
     class="nav-drawer"
   >
     <v-list v-show="userStore.isLoggedIn">
-      <v-list-item>
-        <v-list-item-avatar left>
-          <v-img :src="require('../assets/avatar.png')"></v-img>
-        </v-list-item-avatar>
-      </v-list-item>
       <v-list-group
         color="white"
         v-show="userStore.isLoggedIn"
       >
         <template v-slot:activator>
           <v-list-item-content class="text-start">
-            <v-list-item-title class="text-h6">{{userStore.fullName}}</v-list-item-title>
-            <v-list-item-subtitle class="text-subtitle-1">@{{userStore.username}}</v-list-item-subtitle>
+            <v-list-item-title class="text-h6">{{userStore.firstname}} {{userStore.lastname}}</v-list-item-title>
+            <v-list-item-subtitle class="text-subtitle-1">{{userStore.email}}</v-list-item-subtitle>
           </v-list-item-content>
         </template>
         <v-list-item link dense>
@@ -47,37 +42,22 @@
     <v-divider></v-divider>
 
     <v-list>
-      <v-list-group
-        prepend-icon="mdi-food"
-        color="white"
-      >
-        <template v-slot:activator>
-          <v-list-item-content class="text-start">
-            <v-list-item-title>Food</v-list-item-title>
-          </v-list-item-content>
-        </template>
-        <v-list-item link dense>
-          <v-list-item-content>
-            <v-list-item-title class="text-body-2">Menu</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list-group>
-      
-      <v-list-group
-        prepend-icon="mdi-nutrition"
-        color="white"
-      >
-        <template v-slot:activator>
-          <v-list-item-content class="text-start">
-            <v-list-item-title>Clinic</v-list-item-title>
-          </v-list-item-content>
-        </template>
-        <v-list-item link dense>
-          <v-list-item-content>
-            <v-list-item-title class="text-body-2">Nutrition Programs</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list-group>
+      <v-list-item link @click="checkRoute('/menu')">
+        <v-list-item-icon>
+          <v-icon>mdi-food</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content class="text-start">
+          <v-list-item-title class="text-body-1">Food: Menu</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item link @click="checkRoute('/diet')">
+        <v-list-item-icon>
+          <v-icon>mdi-nutrition</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content class="text-start">
+          <v-list-item-title class="text-body-1">Clinic: Diet Plans</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
     </v-list>
 
     <template v-slot:append>
@@ -155,7 +135,7 @@
   position:fixed;
   top:0;
   left:0;
-  overflow-y:scroll;
+  overflow:hidden;
 }
 </style>
 
@@ -204,6 +184,11 @@ export default {
         this.userStore.logout();
         this.overlay = false;
       }, 1000);
+    },
+    checkRoute(path) {
+      this.vsbyStore.navDrwrVsby = false;
+      if (this.$route.path !== path) {this.$router.push(path);}
+      else                           {}
     },
   },
 };
