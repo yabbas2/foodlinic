@@ -84,7 +84,7 @@ export default {
       this.availPromoCodes = jsonData;
     },
     async fetchPromoCodes() {
-      await axios.get('https://foodlinic.pythonanywhere.com/foodapis/promocode')
+      await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/promocode')
         .then(response => {
           this.constructPromoCodeObj(response.data);
         })

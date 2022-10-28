@@ -244,7 +244,7 @@ export default {
       }
     },
     async fetchMenuCatgs() {
-      await axios.get('https://foodlinic.pythonanywhere.com/foodapis/menu-category')
+      await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/menu-category')
         .then(response => {
           this.constructMenuCatgsObj(response.data)
           this.eventSuccessCount++
@@ -254,7 +254,7 @@ export default {
         })
     },
     async fetchMenuItems() {
-      await axios.get('https://foodlinic.pythonanywhere.com/foodapis/menu-item')
+      await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/menu-item')
         .then(response => {
           this.constructMenuItemsObj(response.data);
           this.eventSuccessCount++

@@ -12,7 +12,7 @@
         <v-img 
           class="mx-auto my-auto" 
           max-width="50" 
-          :src="require('../assets/cart.png')"
+          :src="require('../assets/cart.jpg')"
         />
         <v-spacer></v-spacer>
         <v-btn 
@@ -168,6 +168,17 @@ import sha256 from 'crypto-js/sha256';
 
 export default {
   name: "CartDialog",
+  /*mounted() {
+    let email = 'yousef.abbas.2@outlook.com'
+    const hashDigest = sha256(email);
+    axios.get((process.env.VUE_APP_BACKEND_SERVER + '/foodapis/order/fetch/' + hashDigest + '/'), {params: {email: email}})
+        .then(response => {
+          console.log(response);
+        })
+        .catch(error => {
+          console.log(error)
+        })
+  },*/
   setup() {
     const cartStore = useCartStore()
     const vsbyStore = useVsbyStore()
@@ -232,7 +243,7 @@ export default {
         checkout: this.$refs.checkoutComp[0].getForm()
       };
       const hashDigest = sha256(JSON.stringify(orderData));
-      await axios.post('https://foodlinic.pythonanywhere.com/foodapis/order/create/' + hashDigest + '/', orderData)
+      await axios.post((process.env.VUE_APP_BACKEND_SERVER + '/foodapis/order/create/' + hashDigest + '/'), orderData)
         .then(response => {
           console.log(response);
           this.handleServerCreateOrderSuccess();

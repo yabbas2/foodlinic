@@ -12,7 +12,7 @@
         <v-img 
           class="mx-auto my-auto" 
           max-width="35" 
-          :src="require('../assets/avatar.png')"
+          :src="require('../assets/avatar.jpg')"
         />
         <v-spacer></v-spacer>
         <v-btn 
@@ -270,7 +270,7 @@ export default {
       if (isValid) {
         this.overlay = true;
         const hashDigest = sha256(JSON.stringify(this.form));
-        await axios.post(('https://foodlinic.pythonanywhere.com/accountapis/signup/' + hashDigest + '/'), this.form)
+        await axios.post((process.env.VUE_APP_BACKEND_SERVER + '/accountapis/signup/' + hashDigest + '/'), this.form)
           .then(response => {
             console.log(response);
             this.handleServerSignupSuccess(response);
