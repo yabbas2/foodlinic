@@ -144,7 +144,7 @@ export default {
       }
     },
     async fetchDeliveryLocations() {
-      await axios.get('http://127.0.0.1:9000/foodapis/location')
+      await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/location')
         .then(response => {
           this.constructDeliveryObj(response.data);
         })

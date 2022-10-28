@@ -84,7 +84,7 @@ export default {
       this.availPromoCodes = jsonData;
     },
     async fetchPromoCodes() {
-      await axios.get('http://127.0.0.1:9000/foodapis/promocode')
+      await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/promocode')
         .then(response => {
           this.constructPromoCodeObj(response.data);
         })

@@ -17,10 +17,10 @@
       <v-container>
         <v-row no-gutters>
           <v-col class="my-auto">
-            <v-img :src="require('../assets/logo.png')" width="60"></v-img>
+            <v-img :src="require('../assets/logo.jpg')" width="60"></v-img>
           </v-col>
           <v-col class="my-auto">
-            <v-img :src="require('../assets/logo-name.png')" width="120"></v-img>
+            <v-img :src="require('../assets/logo-name-wbg.png')" width="120"></v-img>
           </v-col>
         </v-row>
       </v-container>
