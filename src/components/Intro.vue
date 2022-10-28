@@ -2,8 +2,9 @@
   <v-parallax
     height="300"
     :src="require('../assets/intro.jpg')"
+    class="mt-14"
   >
-    <v-container class="pt-16">
+    <v-container>
       <v-row
         align="center"
         justify="center"
