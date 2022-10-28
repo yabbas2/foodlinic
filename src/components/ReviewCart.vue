@@ -12,7 +12,8 @@
       </thead>
       <tbody name="fade" is="transition-group">
         <tr 
-          v-for="item in getTableItems"
+          v-for="item in cartStore.menuItems"
+          v-show="item.qty > 0"
           :key="item.id"
         >
           <td class="text-left">{{item.name}}</td>
@@ -21,7 +22,7 @@
               <v-btn
                 icon 
                 color="#f25b47" 
-                @click="itemCountChanged(item.id, 0)"
+                @click="item.qty=0;item.total_price=0"
               >
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
@@ -38,7 +39,7 @@
                 color="red"
                 solo
                 dense
-                @change="itemCountChanged(item.id, $event)"
+                @change="item.total_price=item.qty*item.price"
               ></v-select>
             </div>
           </td>
@@ -62,12 +63,17 @@
 </style>
 
 <script>
+import {useCartStore} from '@/store/cart'
 import currency from 'currency.js'
+
 
 export default {
   name: "ReviewCart",
-  props: {
-    value: Array,
+  setup() {
+    const cartStore = useCartStore()
+    return {
+      cartStore,
+    }
   },
   data() {
     return {
@@ -80,36 +86,8 @@ export default {
     }
   },
   methods: {
-    collectInfo() {
-      let orderObj = [];
-      for (var idx = 0; idx < this.getTableItems.length; idx++) {
-        orderObj.push({id: this.getTableItems[idx].id, qty: this.getTableItems[idx].qty});
-      }
-      return orderObj;
-    },
     formatCurrency(val) {
       return currency(val, {symbol: ':-', pattern: '#!'}).format();
-    },
-    itemCountChanged(itemId, value) {
-      for (var idx = 0; idx < this.items.length; idx++) {
-        if (this.items[idx].id == itemId) {
-          this.items[idx].qty = value;
-        }
-      }
-      this.$emit('cartChanged');
-    },
-  },
-  computed: {
-    getTableItems() {
-      return this.items.filter(item => item.qty > 0);
-    },
-    items: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit('input', value);
-      }
     },
   },
 }

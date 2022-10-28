@@ -1,6 +1,6 @@
 <template>
   <div class="mt-0">
-    <template v-if="!preloaderEnabled">
+    <div v-show="!preloaderEnabled">
       <v-tabs
         v-model="tab"
         align-with-title
@@ -28,15 +28,15 @@
           <v-container fluid class="my-10">
             <v-row>
               <v-col 
-                v-for="(item, idx) in menuItems"
-                v-if="item.menu_category_ref === catg.id"
+                v-for="(item, idx) in cartStore.menuItems"
+                v-show="item.menu_category_id === catg.id"
                 :key="item.name"
                 align-self="center"
               >
                 <v-card height="100%" class="text-left mx-auto my-1" max-width="300" max-height="450" elevation="5">
                   <v-img height="200" :src="item.imgSrc"></v-img>
-                  <v-card-title class="text-h5">{{item.name}}</v-card-title>
-                  <v-card-subtitle class="text-subtitle-1 red--text">{{formatCurrency(item.price)}}</v-card-subtitle>
+                  <v-card-title class="card-title-font">{{item.name}}</v-card-title>
+                  <v-card-subtitle class="red--text card-subtitle-font">{{formatCurrency(item.price)}}</v-card-subtitle>
                   <v-card-actions>
                     <v-btn
                       fab
@@ -61,7 +61,7 @@
                       color="#f25b47"
                       solo
                       dense
-                      @change="itemCountChangedEvent"
+                      @change="item.total_price=item.qty*item.price"
                     ></v-select>
                   </v-card-actions>
                   <v-expand-transition>
@@ -141,12 +141,16 @@
           </v-container>
         </v-tab-item>
       </v-tabs-items>
-    </template>
-    <Preloader v-else></Preloader>
+    </div>
+    <div class="mt-16">
+      <Preloader v-show="preloaderEnabled"></Preloader>
+    </div>
   </div>
 </template>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Pacifico&display=swap');
+
 .v-card--reveal {
   bottom: 0;
   opacity: 1 !important;
@@ -168,22 +172,40 @@
   position: absolute;
   bottom: 0.25rem;
 }
+
+.card-title-font {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 30px;
+}
+
+.card-subtitle-font {
+  font-family: 'Pacifico', cursive;
+  font-size: 20px;
+}
 </style>
 
 <script>
 import Preloader from "@/components/Preloader.vue";
+import {useCartStore} from '@/store/cart'
 import axios from 'axios'
 import currency from 'currency.js'
 
+
 export default {
   name: "Menu",
+  setup() {
+    const cartStore = useCartStore()
+    return {
+      cartStore,
+    }
+  },
   components: {
     Preloader,
   },
   created() {
     this.fetchMenuCatgs();
     this.fetchMenuItems();
-    this.revealNutFacts = Array(this.menuItems.length).fill(false);
+    this.revealNutFacts = Array(this.cartStore.menuItems.length).fill(false);
   },
   data() {
     return {
@@ -196,23 +218,18 @@ export default {
       preloaderEnabled: true,
     }
   },
-  props: {
-    value: Array,
-  },
   methods: {
     formatCurrency(val) {
       return currency(val, {symbol: ':-', pattern: '#!'}).format();
     },
-    itemCountChangedEvent() {
-      this.$emit('cartChanged');
-    },
     tabChangedEvent(val) {
-      console.log(val);
+      //console.log(val);
     },
     constructMenuCatgsObj(jsonData) {
       this.menuCatgs = jsonData;
     },
     constructMenuItemsObj(jsonData) {
+      this.cartStore.menuItems = [];
       for (var idx = 0; idx < jsonData.length; idx++) {
         var menuItemObj = jsonData[idx];
         menuItemObj['qty'] = 0;
@@ -223,7 +240,7 @@ export default {
         else                                      {menuItemObj['color'] = "dark";}*/
         try {menuItemObj['imgSrc'] = require('../assets/menu-items/' + menuItemObj.name.replaceAll(' ', '-') + '.png');}
         catch (e) {menuItemObj['imgSrc'] = require('../assets/no-image.png');}
-        this.menuItems.push(menuItemObj);
+        this.cartStore.menuItems.push(menuItemObj);
       }
     },
     async fetchMenuCatgs() {
@@ -231,7 +248,6 @@ export default {
         .then(response => {
           this.constructMenuCatgsObj(response.data)
           this.eventSuccessCount++
-          /*console.log(this.menuCatgs)*/
         })
         .catch(error => {
           console.log(error) /*TODO: better error handling*/
@@ -240,29 +256,18 @@ export default {
     async fetchMenuItems() {
       await axios.get('https://foodlinic.pythonanywhere.com/foodapis/menu-item')
         .then(response => {
-          this.constructMenuItemsObj(response.data)
+          this.constructMenuItemsObj(response.data);
           this.eventSuccessCount++
-          /*console.log(this.menuItems)*/
         })
         .catch(error => {
           console.log(error) /*TODO: better error handling*/
         })
     },
   },
-  computed: {
-    menuItems: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit('input', value);
-      }
-    },
-  },
   watch: {
     eventSuccessCount(newVal, oldVal) {
       if (newVal === 2) {
-        if ( (this.menuCatgs.length > 0) && (this.menuItems.length > 0) ) {
+        if ( (this.menuCatgs.length > 0) && (this.cartStore.menuItems.length > 0) ) {
           setTimeout(() => {
             this.preloaderEnabled = false
           }, 500);

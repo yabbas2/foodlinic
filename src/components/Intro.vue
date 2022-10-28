@@ -1,31 +1,50 @@
 <template>
-  <v-card 
-    class="mt-14"
-    min-height="200" 
-    :img="require('../assets/intro-bg.jpg')" 
-    tile 
-    elevation="0"
+  <v-parallax
+    height="300"
+    :src="require('../assets/intro.jpg')"
   >
-    <v-card-text>
-      <v-img 
-        class="mx-auto my-auto" 
-        width="150" 
-        :src="require('../assets/' + imgSrc)"
+    <v-container class="pt-16">
+      <v-row
+        align="center"
+        justify="center"
       >
-      </v-img>
-    </v-card-text>
-  </v-card>
+        <v-col
+          class="text-center"
+          cols="12"
+        >
+          <div class="intro-title">
+            {{h1}}
+          </div>
+          <div class="intro-subtitle">
+            {{h2}}
+          </div>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-parallax>
 </template>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Pacifico&display=swap');
 
+.intro-title {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 60px;
+  color: #f25b47;
+}
+
+.intro-subtitle {
+  font-family: 'Pacifico', cursive;
+  font-size: 20px;
+}
 </style>
 
 <script>
 export default {
   name: "Intro",
   props: {
-    imgSrc: String
+    h1: String,
+    h2: String
   }
 }
 </script>
