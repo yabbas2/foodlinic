@@ -1,7 +1,7 @@
 <template>
   <v-parallax
-    height="300"
-    :src="require('../assets/intro.jpg')"
+    height="200"
+    :src="require('../assets/intro.webp')"
     class="mt-14"
   >
     <v-container>

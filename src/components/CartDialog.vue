@@ -5,14 +5,14 @@
     max-width="800"
     @click:outside="closeDialog"
     @keydown.esc="closeDialog"
-    :content-class="cartStore.cartItemsCount? mainClass : secondClass"
-  ><!--:overlay-opacity="0.9"-->
+    fullscreen
+  >
     <v-card tile flat class="v-card--scroll" height="100%">
-      <v-card-title>
+      <v-card-title class="pt-6">
         <v-img 
           class="mx-auto my-auto" 
-          max-width="50" 
-          :src="require('../assets/cart.jpg')"
+          max-width="130" 
+          :src="require('../assets/logo-name-wbg.png')"
         />
         <v-spacer></v-spacer>
         <v-btn 
@@ -22,16 +22,17 @@
           :ripple="{class: 'red--text'}"
           @click="closeDialog"
         >
-          <v-icon>mdi-close</v-icon>
+          <v-icon>{{mdiCloseSvg}}</v-icon>
           Close
         </v-btn>
       </v-card-title>
-      <v-spacer></v-spacer>
+      <v-spacer style="min-height: 50px;"></v-spacer>
       <!--start: cart dialog view-->
-      <v-card-subtitle class="justify-center py-0">
+      <v-card-subtitle class="justify-center py-0 v-card__subtitle">
+        YOUR CART {{emptyCart}}
       </v-card-subtitle>
-      <v-spacer></v-spacer>
-      <v-card-text v-show="cartStore.cartItemsCount>0" class="px-0 py-0 v-card-text--scroll">
+      <v-spacer style="min-height: 50px;"></v-spacer>
+      <v-card-text v-show="menuStore.cartItemsCount>0" class="px-0 py-0 v-card-text--scroll">
         <v-stepper
           v-model="currStep"
           vertical
@@ -59,20 +60,20 @@
                 <ReviewCart ref="reviewCartComp"></ReviewCart>
                 <v-divider class="my-4"></v-divider>
                 <div>
-                  <CartContBtn :showLoading="totalPriceLoading" :totalPrice="cartStore.totalPrice" @btnClicked="step.validator"></CartContBtn>
-                  <CartOtherBtn :action="'clear'" @btnClicked="cartStore.clearCart"></CartOtherBtn>
+                  <CartContBtn :showLoading="totalPriceLoading" :totalPrice="menuStore.totalPrice" @btnClicked="step.validator"></CartContBtn>
+                  <CartOtherBtn :action="'clear'" @btnClicked="menuStore.clearCart"></CartOtherBtn>
                 </div>
               </template>
               <template v-if="n == 1">
                 <Delivery ref="deliveryComp"></Delivery>
                 <v-divider class="my-4"></v-divider>
                 <div>
-                  <CartContBtn :showLoading="totalPriceLoading" :totalPrice="cartStore.totalPrice" @btnClicked="step.validator"></CartContBtn>
+                  <CartContBtn :showLoading="totalPriceLoading" :totalPrice="menuStore.totalPrice" @btnClicked="step.validator"></CartContBtn>
                   <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
                 </div>
               </template>
               <template v-if="n == 2">
-                <Checkout ref="checkoutComp" :totalPrice="cartStore.totalPrice" @checkoutStart="overlay=true" @checkoutEnd="actOnCheckout($event)"></Checkout>
+                <Checkout ref="checkoutComp" :totalPrice="menuStore.totalPrice" @checkoutStart="overlay=true" @checkoutEnd="actOnCheckout($event)"></Checkout>
                 <v-divider class="my-4"></v-divider>
                 <div>
                   <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
@@ -82,7 +83,6 @@
           </template>
         </v-stepper>
       </v-card-text>
-      <v-card-text v-show="cartStore.cartItemsCount==0" class="text-h6 justify-center">Your cart is empty!</v-card-text>
       <v-spacer></v-spacer>
       <!--end: cart dialog view-->
     </v-card>
@@ -119,28 +119,8 @@
   </v-dialog>
 </template>
 
-<style>
-.cart-dialog-large {
-  border-radius: 30px 30px 0 0 !important;
-  margin: 0 !important;
-  height: 90% !important;
-  position: fixed !important;
-  overflow-y: auto !important;
-  bottom: 0 !important;
-  top: auto !important;
-  left: auto !important;
-}
-
-.cart-dialog-small {
-  border-radius: 30px 30px 0 0 !important;
-  margin: 0 !important;
-  height: 20% !important;
-  position: fixed !important;
-  overflow-y: auto !important;
-  bottom: 0 !important;
-  top: auto !important;
-  left: auto !important;
-}
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
 .v-card--scroll {
   display: flex !important;
@@ -151,10 +131,18 @@
   flex-grow: 1;
   overflow: auto;
 }
+
+.v-card__subtitle {
+  font-size: 50px !important;
+  color: #39175c !important;
+  line-height: 3rem !important;
+  font-family: 'Bebas Neue', cursive !important;
+}
 </style>
 
 <script>
-import {useCartStore} from '@/store/cart'
+import {mdiClose} from '@mdi/js'
+import {useMenuStore} from '@/store/menu'
 import {useVsbyStore} from '@/store/vsby'
 import {useUserStore} from '@/store/user'
 import ReviewCart from "@/components/ReviewCart.vue"
@@ -168,23 +156,12 @@ import sha256 from 'crypto-js/sha256';
 
 export default {
   name: "CartDialog",
-  /*mounted() {
-    let email = 'yousef.abbas.2@outlook.com'
-    const hashDigest = sha256(email);
-    axios.get((process.env.VUE_APP_BACKEND_SERVER + '/foodapis/order/fetch/' + hashDigest + '/'), {params: {email: email}})
-        .then(response => {
-          console.log(response);
-        })
-        .catch(error => {
-          console.log(error)
-        })
-  },*/
   setup() {
-    const cartStore = useCartStore()
+    const menuStore = useMenuStore()
     const vsbyStore = useVsbyStore()
     const userStore = useUserStore()
     return {
-      cartStore,
+      menuStore,
       vsbyStore,
       userStore,
     }
@@ -211,6 +188,7 @@ export default {
       mainClass: 'v-dialog--fullscreen cart-dialog-large',
       secondClass: 'v-dialog--fullscreen cart-dialog-small',
       overlay: false,
+      mdiCloseSvg: mdiClose,
     }
   },
   methods: {
@@ -227,7 +205,7 @@ export default {
       setTimeout(() => {
         this.overlay = false;
         this.vsbyStore.cartDiagVsby = false;
-        this.cartStore.clearCart();
+        this.menuStore.clearCart();
         this.resetForm();
       }, 1500);
     },
@@ -238,7 +216,7 @@ export default {
     async pushOrderData() {
       let orderData = {
         userEmail: this.userStore.email,
-        cartItems: this.cartStore.cartItemsMin,
+        cartItems: this.menuStore.cartItemsMin,
         delivery: this.$refs.deliveryComp[0].getForm(),
         checkout: this.$refs.checkoutComp[0].getForm()
       };
@@ -281,6 +259,11 @@ export default {
       this.currStep = 1;
       this.checkoutSuccess = false;
       this.vsbyStore.cartDiagVsby = false;
+    },
+  },
+  computed: {
+    emptyCart() {
+      return (this.menuStore.cartItemsCount == 0)? 'IS EMPTY' : '';
     },
   },
 };

@@ -12,7 +12,7 @@
       </thead>
       <tbody name="fade" is="transition-group">
         <tr 
-          v-for="item in cartStore.menuItems"
+          v-for="item in menuStore.menuItems"
           v-show="item.qty > 0"
           :key="item.id"
         >
@@ -24,7 +24,7 @@
                 color="#f25b47" 
                 @click="item.qty=0;item.total_price=0"
               >
-                <v-icon>mdi-delete</v-icon>
+                <v-icon>{{mdiDeleteSvg}}</v-icon>
               </v-btn>
               <v-select
                 v-model="item.qty"
@@ -63,16 +63,17 @@
 </style>
 
 <script>
-import {useCartStore} from '@/store/cart'
+import {mdiDelete} from '@mdi/js'
+import {useMenuStore} from '@/store/menu'
 import currency from 'currency.js'
 
 
 export default {
   name: "ReviewCart",
   setup() {
-    const cartStore = useCartStore()
+    const menuStore = useMenuStore()
     return {
-      cartStore,
+      menuStore,
     }
   },
   data() {
@@ -83,6 +84,7 @@ export default {
         {key: 'total_price', label: 'Price'}
       ],
       selectItems: [0,1,2,3,4,5,6,7,8,9,10],
+      mdiDeleteSvg: mdiDelete,
     }
   },
   methods: {

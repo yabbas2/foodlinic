@@ -7,6 +7,7 @@ export const useVsbyStore = defineStore('vsby', {
     signupDiagVsby: false,
     signinDiagVsby: false,
     cartDiagVsby: false,
+    orderDiagVsby: false,
   }),
   getters: {
     

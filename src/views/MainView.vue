@@ -4,6 +4,7 @@
     <NavDrwr></NavDrwr>
     <SignupDialog></SignupDialog>
     <SigninDialog></SigninDialog>
+    <OrderDialog></OrderDialog>
   </div>
 </template>
 
@@ -16,6 +17,7 @@ import TopBar from "@/components/TopBar.vue";
 import NavDrwr from "@/components/NavDrwr.vue";
 import SignupDialog from "@/components/SignupDialog.vue";
 import SigninDialog from "@/components/SigninDialog.vue";
+import OrderDialog from "@/components/OrderDialog.vue";
 
 
 export default {
@@ -25,6 +27,7 @@ export default {
     NavDrwr,
     SignupDialog,
     SigninDialog,
+    OrderDialog,
   },
 };
 </script>

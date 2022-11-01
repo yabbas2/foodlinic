@@ -7,7 +7,7 @@
     clipped-left
   >
     <v-app-bar-nav-icon @click.stop="vsbyStore.navDrwrVsby=!vsbyStore.navDrwrVsby" style="margin-left: 0rem;">
-      <v-icon v-show="!userStore.isLoggedIn">mdi-menu</v-icon>
+      <v-icon v-show="!userStore.isLoggedIn">{{mdiMenuSvg}}</v-icon>
       <v-avatar v-show="userStore.isLoggedIn" color="#f25b47" size="33">
         <span class="white--text text-substitle-1 text-uppercase">{{userStore.firstname[0]}}{{userStore.lastname[0]}}</span>
       </v-avatar>
@@ -27,8 +27,8 @@
     </v-toolbar-title>
     <v-spacer></v-spacer>
     <v-badge
-      :content="cartStore.cartItemsCount"
-      :value="cartStore.cartItemsCount"
+      :content="menuStore.cartItemsCount"
+      :value="menuStore.cartItemsCount"
       color="#f25b47"
       overlap
       bordered
@@ -36,7 +36,7 @@
       offset-y="22"
     >
       <v-btn icon @click="cartBtnClicked">
-        <v-icon size="30">mdi-cart</v-icon>
+        <v-icon size="30">{{mdiCartSvg}}</v-icon>
       </v-btn>
     </v-badge>
   </v-app-bar>
@@ -47,8 +47,9 @@
 </style>
 
 <script>
+import {mdiCart, mdiMenu} from '@mdi/js'
 import {useUserStore} from '@/store/user'
-import {useCartStore} from '@/store/cart'
+import {useMenuStore} from '@/store/menu'
 import {useVsbyStore} from '@/store/vsby'
 
 
@@ -56,17 +57,23 @@ export default {
   name: "TopBar",
   setup() {
     const userStore = useUserStore()
-    const cartStore = useCartStore()
+    const menuStore = useMenuStore()
     const vsbyStore = useVsbyStore()
     return {
       userStore,
-      cartStore,
+      menuStore,
       vsbyStore,
+    }
+  },
+  data() {
+    return {
+      mdiCartSvg: mdiCart,
+      mdiMenuSvg: mdiMenu,
     }
   },
   methods: {
     cartBtnClicked() {
-      if ( (this.cartStore.cartItemsCount > 0) && (!this.userStore.isLoggedIn) ) {
+      if ( (this.menuStore.cartItemsCount > 0) && (!this.userStore.isLoggedIn) ) {
         this.vsbyStore.signinDiagVsby = true;
       }
       else {

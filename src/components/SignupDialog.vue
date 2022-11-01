@@ -5,14 +5,14 @@
     max-width="800"
     @click:outside="closeDialog"
     @keydown.esc="closeDialog"
-    content-class="v-dialog--fullscreen signup-dialog"
-  ><!--:overlay-opacity="0.9"-->
+    fullscreen
+  >
     <v-card tile flat class="v-card--scroll" height="100%">
-      <v-card-title>
+      <v-card-title class="pt-6">
         <v-img 
           class="mx-auto my-auto" 
-          max-width="35" 
-          :src="require('../assets/avatar.jpg')"
+          max-width="130" 
+          :src="require('../assets/logo-name-wbg.png')"
         />
         <v-spacer></v-spacer>
         <v-btn 
@@ -22,15 +22,14 @@
           :ripple="{class: 'red--text'}"
           @click="closeDialog"
         >
-          <v-icon>mdi-close</v-icon>
+          <v-icon>{{mdiCloseSvg}}</v-icon>
           Close
         </v-btn>
       </v-card-title>
       <v-spacer></v-spacer>
       <!--start: signup view-->
-      <v-card-subtitle class="justify-center py-0">
-        <span><pre class="text-h6 font-weight-bold" style="color: #39175c;">WELCOME TO</pre></span>
-        <v-img :src="require('../assets/logo-name-wbg.png')" width="200" class="mx-auto"></v-img>
+      <v-card-subtitle class="justify-center py-0 v-card__subtitle">
+        SIGN UP
       </v-card-subtitle>
       <v-spacer></v-spacer>
       <v-card-text>
@@ -44,37 +43,48 @@
             color="#39175c"
             label="First name"
             type="text"
-            prepend-icon="mdi-account"
             :rules="[val => validateFirstname(val)]"
             :success="validFirstname"
-          ></v-text-field>
+          >
+            <template v-slot:prepend>
+              <v-icon>{{mdiAccountSvg}}</v-icon>
+            </template>
+          </v-text-field>
           <v-text-field
             v-model="form.lastname"
             color="#39175c"
             label="Last name"
             type="text"
-            prepend-icon="mdi-account"
             :rules="[val => validateLastname(val)]"
             :success="validLastname"
-          ></v-text-field>
+          >
+            <template v-slot:prepend>
+              <v-icon>{{mdiAccountSvg}}</v-icon>
+            </template>
+          </v-text-field>
           <v-text-field
             v-model="form.email"
             color="#39175c"
             label="Email"
             type="text"
-            prepend-icon="mdi-email"
             :rules="[val => validateEmail(val)]"
             :success="validEmail"
-          ></v-text-field>
+          >
+            <template v-slot:prepend>
+              <v-icon>{{mdiEmailSvg}}</v-icon>
+            </template>
+          </v-text-field>
           <v-text-field
             v-model="form.phone"
             color="#39175c"
             label="Phone number"
             type="text"
-            prepend-icon="mdi-cellphone"
             :rules="[val => validatePhone(val)]"
             :success="validPhone"
           >
+            <template v-slot:prepend>
+              <v-icon>{{mdiCellphoneSvg}}</v-icon>
+            </template>
             <template v-slot:label>
               <div>
                 Phone number <small>(include country code)</small>
@@ -86,7 +96,6 @@
             color="#39175c"
             label="Password"
             hint="Minimum length: 8"
-            prepend-icon="mdi-lock"
             :loading="showPasswordProgress"
             :type="showPassword? 'text' : 'password'"
             :append-icon="showPassword? 'mdi-eye' : 'mdi-eye-off'"
@@ -94,6 +103,9 @@
             :success="validPassword"
             @click:append="showPassword=!showPassword"
           >
+            <template v-slot:prepend>
+              <v-icon>{{mdiLockSvg}}</v-icon>
+            </template>
             <template v-slot:progress>
               <v-progress-linear
                 :value="progress"
@@ -154,25 +166,24 @@
   </v-dialog>
 </template>
 
-<style>
-.signup-dialog {
-  border-radius: 30px 30px 0 0 !important;
-  margin: 0 !important;
-  height: 85% !important;
-  position: fixed !important;
-  overflow-y: auto !important;
-  bottom: 0 !important;
-  top: auto !important;
-  left: auto !important;
-}
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
 .v-card--scroll {
   display: flex !important;
   flex-direction: column;
 }
+
+.v-card__subtitle {
+  font-size: 50px !important;
+  color: #39175c !important;
+  line-height: 3rem !important;
+  font-family: 'Bebas Neue', cursive !important;
+}
 </style>
 
 <script>
+import {mdiClose, mdiAccount, mdiEmail, mdiCellphone, mdiLock} from '@mdi/js'
 import {useUserStore} from '@/store/user'
 import {useVsbyStore} from '@/store/vsby'
 import validator from 'validator';
@@ -205,6 +216,11 @@ export default {
       showSnackbar: false,
       overlay: false,
       signupSuccess: false,
+      mdiCloseSvg: mdiClose,
+      mdiAccountSvg: mdiAccount,
+      mdiEmailSvg: mdiEmail,
+      mdiCellphoneSvg: mdiCellphone,
+      mdiLockSvg: mdiLock,
     }
   },
   methods: {
@@ -292,6 +308,9 @@ export default {
     openSigninDialog() {
       this.vsbyStore.signinDiagVsby = true;
       this.vsbyStore.signupDiagVsby = false;
+    },
+    swipe(val) {
+      console.log(val);
     },
   },
   computed: {

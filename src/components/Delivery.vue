@@ -10,12 +10,15 @@
         :items="delvyOptions"
         menu-props="auto"
         label="Select Meeting Point"
-        prepend-icon="mdi-map-marker"
         class="mx-auto my-auto"
         color="#39175c"
         :rules="[val => validateLocation(val)]"
         :success="validLocation"
-      ></v-select>
+      >
+        <template v-slot:prepend>
+          <v-icon>{{mdiMapMarkerSvg}}</v-icon>
+        </template>
+      </v-select>
       <v-card class="mt-0 mb-6">
         <GmapMap
           :center="delvyMapCenter"
@@ -42,7 +45,6 @@
           <v-text-field
             v-model="delvyDate"
             label="Select Date"
-            prepend-icon="mdi-calendar"
             readonly
             color="#39175c"
             v-bind="attrs"
@@ -50,6 +52,9 @@
             :rules="[val => validateDate(val)]"
             :success="validDate"
           >
+            <template v-slot:prepend>
+              <v-icon>{{mdiCalendarSvg}}</v-icon>
+            </template>
           </v-text-field>
         </template>
         <v-date-picker
@@ -69,7 +74,6 @@
         color="#39175c"
         clear-icon="mdi-close-circle"
         rows="1"
-        prepend-icon="mdi-comment"
         auto-grow
         counter="100"
         :rules="[val => validateNotes(val)]"
@@ -78,6 +82,9 @@
           <div>
             Delivery notes <small>(optional)</small>
           </div>
+        </template>
+        <template v-slot:prepend>
+          <v-icon>{{mdiCommentSvg}}</v-icon>
         </template>
       </v-textarea>
     </v-form>
@@ -89,6 +96,7 @@
 </style>
 
 <script>
+import {mdiMapMarker, mdiCalendar, mdiComment} from '@mdi/js'
 import axios from 'axios'
 import { helpers } from 'gmap-vue';
 import validator from 'validator';
@@ -116,6 +124,9 @@ export default {
       validDate:     false,
       validNotes:    false,
       delvyDefault: {lat:57.71778786574879, lng:11.972795513941245, zoom_lvl:10},
+      mdiMapMarkerSvg: mdiMapMarker,
+      mdiCalendarSvg: mdiCalendar,
+      mdiCommentSvg: mdiComment,
     }
   },
   methods: {

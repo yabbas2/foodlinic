@@ -28,7 +28,7 @@
           <v-container fluid class="my-10">
             <v-row>
               <v-col 
-                v-for="(item, idx) in cartStore.menuItems"
+                v-for="(item, idx) in menuStore.menuItems"
                 v-show="item.menu_category_id === catg.id"
                 :key="item.name"
                 align-self="center"
@@ -46,7 +46,7 @@
                       color="red lighten-1"
                       @click="revealNutFacts[idx]=true;revealNutFacts=[...revealNutFacts]"
                     >
-                      <v-icon dark>mdi-information-variant</v-icon>
+                      <v-icon dark>{{mdiInformationVariantSvg}}</v-icon>
                     </v-btn>
                     <v-select
                       v-model="item.qty"
@@ -83,8 +83,8 @@
                             <v-col>
                               <div class="text--secondary">
                                 {{item.portion}} 
-                                <v-icon small v-if="item.portion > 1">mdi-account-multiple</v-icon>
-                                <v-icon small v-else>mdi-account</v-icon>
+                                <v-icon small v-if="item.portion > 1">{{mdiAccountMultipleSvg}}</v-icon>
+                                <v-icon small v-else>{{mdiAccountSvg}}</v-icon>
                               </div>
                             </v-col>
                           </v-row>
@@ -130,7 +130,7 @@
                           color="red lighten-1"
                           @click="revealNutFacts[idx]=false;revealNutFacts=[...revealNutFacts]"
                         >
-                          <v-icon dark>mdi-chevron-down</v-icon>
+                          <v-icon dark>{{mdiChevronDownSvg}}</v-icon>
                         </v-btn>
                       </v-card-actions>
                     </v-card>
@@ -142,7 +142,7 @@
         </v-tab-item>
       </v-tabs-items>
     </div>
-    <div class="mt-16">
+    <div class="mt-16 d-flex justify-center">
       <Preloader v-show="preloaderEnabled"></Preloader>
     </div>
   </div>
@@ -185,8 +185,9 @@
 </style>
 
 <script>
+import {mdiInformationVariant, mdiAccountMultiple, mdiAccount, mdiChevronDown} from '@mdi/js'
 import Preloader from "@/components/Preloader.vue";
-import {useCartStore} from '@/store/cart'
+import {useMenuStore} from '@/store/menu'
 import axios from 'axios'
 import currency from 'currency.js'
 
@@ -194,9 +195,9 @@ import currency from 'currency.js'
 export default {
   name: "Menu",
   setup() {
-    const cartStore = useCartStore()
+    const menuStore = useMenuStore()
     return {
-      cartStore,
+      menuStore,
     }
   },
   components: {
@@ -205,7 +206,7 @@ export default {
   created() {
     this.fetchMenuCatgs();
     this.fetchMenuItems();
-    this.revealNutFacts = Array(this.cartStore.menuItems.length).fill(false);
+    this.revealNutFacts = Array(this.menuStore.menuItems.length).fill(false);
   },
   data() {
     return {
@@ -216,6 +217,10 @@ export default {
       menuCatgs: [],
       eventSuccessCount: 0,
       preloaderEnabled: true,
+      mdiInformationVariantSvg: mdiInformationVariant,
+      mdiAccountMultipleSvg: mdiAccountMultiple,
+      mdiAccountSvg: mdiAccount,
+      mdiChevronDownSvg: mdiChevronDown,
     }
   },
   methods: {
@@ -229,7 +234,7 @@ export default {
       this.menuCatgs = jsonData;
     },
     constructMenuItemsObj(jsonData) {
-      this.cartStore.menuItems = [];
+      const menuItems = [];
       for (var idx = 0; idx < jsonData.length; idx++) {
         var menuItemObj = jsonData[idx];
         menuItemObj['qty'] = 0;
@@ -238,10 +243,11 @@ export default {
         else if (menuItemObj.status == 'Try It')  {menuItemObj['color'] = "info";}
         else if (menuItemObj.status == 'Popular') {menuItemObj['color'] = "success";}
         else                                      {menuItemObj['color'] = "dark";}*/
-        try {menuItemObj['imgSrc'] = require('../assets/menu-items/' + menuItemObj.name.replaceAll(' ', '-') + '.png');}
-        catch (e) {menuItemObj['imgSrc'] = require('../assets/no-image.png');}
-        this.cartStore.menuItems.push(menuItemObj);
+        try {menuItemObj['imgSrc'] = require('../assets/menu-items/' + menuItemObj.name.replaceAll(' ', '-') + '.webp');}
+        catch (e) {menuItemObj['imgSrc'] = require('../assets/no-image.webp');}
+        menuItems.push(menuItemObj);
       }
+      this.menuStore.updateMenu(menuItems);
     },
     async fetchMenuCatgs() {
       await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/menu-category')
@@ -267,7 +273,7 @@ export default {
   watch: {
     eventSuccessCount(newVal, oldVal) {
       if (newVal === 2) {
-        if ( (this.menuCatgs.length > 0) && (this.cartStore.menuItems.length > 0) ) {
+        if ( (this.menuCatgs.length > 0) && (this.menuStore.menuItems.length > 0) ) {
           setTimeout(() => {
             this.preloaderEnabled = false
           }, 500);

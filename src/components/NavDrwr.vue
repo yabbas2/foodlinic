@@ -22,18 +22,26 @@
         </template>
         <v-list-item link dense>
           <v-list-item-icon>
-            <v-icon size="20">mdi-cog</v-icon>
+            <v-icon size="20">{{mdiCogSvg}}</v-icon>
           </v-list-item-icon>
           <v-list-item-content class="text-start">
-            <v-list-item-title class="text-body-2">Settings</v-list-item-title>
+            <v-list-item-title class="text-body-2">Account Settings</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item link dense @click="openOrderDialog">
+          <v-list-item-icon>
+            <v-icon size="20">{{mdiFoodOutlineSvg}}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content class="text-start">
+            <v-list-item-title class="text-body-2">My Food Orders</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link dense>
           <v-list-item-icon>
-            <v-icon size="20">mdi-view-dashboard</v-icon>
+            <v-icon size="20">{{mdiFoodAppleOutlineSvg}}</v-icon>
           </v-list-item-icon>
           <v-list-item-content class="text-start">
-            <v-list-item-title class="text-body-2">Dashboard</v-list-item-title>
+            <v-list-item-title class="text-body-2">My Diet Plans</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list-group>
@@ -44,7 +52,7 @@
     <v-list>
       <v-list-item link @click="checkRoute('/menu')">
         <v-list-item-icon>
-          <v-icon>mdi-food</v-icon>
+          <v-icon>{{mdiFoodSvg}}</v-icon>
         </v-list-item-icon>
         <v-list-item-content class="text-start">
           <v-list-item-title class="text-body-1">Food: Menu</v-list-item-title>
@@ -52,7 +60,7 @@
       </v-list-item>
       <v-list-item link @click="checkRoute('/diet')">
         <v-list-item-icon>
-          <v-icon>mdi-nutrition</v-icon>
+          <v-icon>{{mdiNutritionSvg}}</v-icon>
         </v-list-item-icon>
         <v-list-item-content class="text-start">
           <v-list-item-title class="text-body-1">Clinic: Diet Plans</v-list-item-title>
@@ -72,9 +80,7 @@
               <v-icon
                 left
                 dark
-              >
-                mdi-logout
-              </v-icon>
+              >{{mdiLogoutSvg}}</v-icon>
               Sign out
             </v-btn>
           </v-list-item-content>
@@ -90,9 +96,7 @@
               <v-icon
                 left
                 dark
-              >
-                mdi-login
-              </v-icon>
+              >{{mdiLoginSvg}}</v-icon>
               Sign in
             </v-btn>
           </v-list-item-content>
@@ -106,13 +110,19 @@
               <v-icon
                 left
                 dark
-              >
-                mdi-account-plus
-              </v-icon>
+              >{{mdiAccountPlusSvg}}</v-icon>
               Sign up
             </v-btn>
           </v-list-item-content>
         </v-list-item>
+      </v-list>
+      <v-divider></v-divider>
+      <v-list dense>
+      <v-list-item>
+        <v-list-item-content>
+          <span style="font-size:small;">&copy;&nbsp;2022&nbsp;Foodlinic.&nbsp;All&nbsp;rights&nbsp;reserved.</span>
+        </v-list-item-content>
+      </v-list-item>
       </v-list>
     </template>
     <v-overlay 
@@ -140,6 +150,7 @@
 </style>
 
 <script>
+import {mdiCog, mdiFoodOutline, mdiFoodAppleOutline, mdiFood, mdiNutrition, mdiLogout, mdiLogin, mdiAccountPlus} from '@mdi/js'
 import {useUserStore} from '@/store/user'
 import {useVsbyStore} from '@/store/vsby'
 
@@ -164,6 +175,14 @@ export default {
       windowHeight: window.innerHeight,
       signoutSuccess: false,
       overlay: false,
+      mdiCogSvg: mdiCog,
+      mdiFoodOutlineSvg: mdiFoodOutline,
+      mdiFoodAppleOutlineSvg: mdiFoodAppleOutline,
+      mdiFoodSvg: mdiFood,
+      mdiNutritionSvg: mdiNutrition,
+      mdiLogoutSvg: mdiLogout,
+      mdiLoginSvg: mdiLogin,
+      mdiAccountPlusSvg: mdiAccountPlus,
     }
   },
   methods: {  
@@ -190,6 +209,10 @@ export default {
       if (this.$route.path !== path) {this.$router.push(path);}
       else                           {}
     },
+    openOrderDialog() {
+      this.vsbyStore.orderDiagVsby = true;
+      this.vsbyStore.navDrwrVsby = false;
+    }
   },
 };
 </script>
