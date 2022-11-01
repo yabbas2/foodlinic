@@ -9,10 +9,10 @@
     :height="windowHeight"
     class="nav-drawer"
   >
-    <v-list v-show="userStore.isLoggedIn">
+    <v-list v-if="userStore.isLoggedIn">
       <v-list-group
         color="white"
-        v-show="userStore.isLoggedIn"
+        :append-icon="mdiChevronDownSvg"
       >
         <template v-slot:activator>
           <v-list-item-content class="text-start">
@@ -70,7 +70,7 @@
 
     <template v-slot:append>
       <v-divider></v-divider>
-      <v-list dense v-show="userStore.isLoggedIn">
+      <v-list dense v-if="userStore.isLoggedIn">
         <v-list-item>
           <v-list-item-content>
             <v-btn 
@@ -86,7 +86,7 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
-      <v-list dense v-show="!userStore.isLoggedIn">
+      <v-list dense v-else>
         <v-list-item>
           <v-list-item-content>
             <v-btn 
@@ -150,7 +150,7 @@
 </style>
 
 <script>
-import {mdiCog, mdiFoodOutline, mdiFoodAppleOutline, mdiFood, mdiNutrition, mdiLogout, mdiLogin, mdiAccountPlus} from '@mdi/js'
+import {mdiCog, mdiFoodOutline, mdiFoodAppleOutline, mdiFood, mdiNutrition, mdiLogout, mdiLogin, mdiAccountPlus, mdiChevronDown} from '@mdi/js'
 import {useUserStore} from '@/store/user'
 import {useVsbyStore} from '@/store/vsby'
 
@@ -183,6 +183,7 @@ export default {
       mdiLogoutSvg: mdiLogout,
       mdiLoginSvg: mdiLogin,
       mdiAccountPlusSvg: mdiAccountPlus,
+      mdiChevronDownSvg: mdiChevronDown,
     }
   },
   methods: {  

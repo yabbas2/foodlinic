@@ -1,6 +1,6 @@
 <template>
   <div>
-    <MainView></MainView>
+    <MainComp></MainComp>
     <Intro h1="Diet" h2="Nutrition, Fitness"></Intro>
     <Diet></Diet>
   </div>
@@ -12,14 +12,14 @@
 
 <script>
 import Intro from "@/components/Intro.vue";
-import MainView from "@/views/MainView.vue";
+import MainComp from "@/components/MainComp.vue";
 import Diet from "@/components/Diet.vue";
 
 
 export default {
   name: "DietView",
   components: {
-    MainView,
+    MainComp,
     Intro,
     Diet,
 },

@@ -1,25 +1,27 @@
 <template>
   <div class="mt-0">
-    <div v-show="!preloaderEnabled">
-      <v-tabs
-        v-model="tab"
-        align-with-title
-        show-arrows="always"
-        centered
-        background-color="white"
-        color="red"
-        center-active
-        light
+    <v-tabs
+      v-model="tab"
+      align-with-title
+      show-arrows="always"
+      centered
+      background-color="white"
+      color="red"
+      center-active
+      light
+      :next-icon="mdiChevronRightSvg"
+      :prev-icon="mdiChevronLeftSvg"
+    >
+      <v-tabs-slider color="red"></v-tabs-slider>
+      <v-tab 
+        v-for="catg in menuCatgs" 
+        :key="catg.id" 
+        @click="tabChangedEvent(catg.id)"
       >
-        <v-tabs-slider color="red"></v-tabs-slider>
-        <v-tab 
-          v-for="catg in menuCatgs" 
-          :key="catg.id" 
-          @click="tabChangedEvent(catg.id)"
-        >
-          {{catg.name}}
-        </v-tab>
-      </v-tabs>
+        {{catg.name}}
+      </v-tab>
+    </v-tabs>
+    <div v-show="!loader">
       <v-tabs-items v-model="tab">
         <v-tab-item
           v-for="catg in menuCatgs"
@@ -29,7 +31,7 @@
             <v-row>
               <v-col 
                 v-for="(item, idx) in menuStore.menuItems"
-                v-show="item.menu_category_id === catg.id"
+                v-if="item.menu_category_id === catg.id"
                 :key="item.name"
                 align-self="center"
               >
@@ -54,7 +56,6 @@
                       menu-props="auto"
                       label="Select"
                       hide-details
-                      append-icon="mdi-cart"
                       single-line
                       class="mr-auto ml-5 my-0 py-0"
                       style="max-width:5rem;"
@@ -62,7 +63,11 @@
                       solo
                       dense
                       @change="item.total_price=item.qty*item.price"
-                    ></v-select>
+                    >
+                      <template v-slot:append>
+                        <v-icon>{{mdiCartSvg}}</v-icon>
+                      </template>
+                    </v-select>
                   </v-card-actions>
                   <v-expand-transition>
                     <v-card
@@ -142,9 +147,13 @@
         </v-tab-item>
       </v-tabs-items>
     </div>
-    <div class="mt-16 d-flex justify-center">
-      <Preloader v-show="preloaderEnabled"></Preloader>
-    </div>
+    <v-progress-circular
+      indeterminate
+      size="50"
+      color="#f25b47"
+      class="mt-16"
+      v-if="loader"
+    ></v-progress-circular>
   </div>
 </template>
 
@@ -185,8 +194,7 @@
 </style>
 
 <script>
-import {mdiInformationVariant, mdiAccountMultiple, mdiAccount, mdiChevronDown} from '@mdi/js'
-import Preloader from "@/components/Preloader.vue";
+import {mdiInformationVariant, mdiAccountMultiple, mdiAccount, mdiChevronDown, mdiCart, mdiChevronRight, mdiChevronLeft} from '@mdi/js'
 import {useMenuStore} from '@/store/menu'
 import axios from 'axios'
 import currency from 'currency.js'
@@ -200,13 +208,8 @@ export default {
       menuStore,
     }
   },
-  components: {
-    Preloader,
-  },
-  created() {
-    this.fetchMenuCatgs();
-    this.fetchMenuItems();
-    this.revealNutFacts = Array(this.menuStore.menuItems.length).fill(false);
+  mounted() {
+    this.fetchMenuCatgs();    
   },
   data() {
     return {
@@ -215,12 +218,16 @@ export default {
       revealNutFacts: [],
       selectItems: [0,1,2,3,4,5,6,7,8,9,10],
       menuCatgs: [],
-      eventSuccessCount: 0,
-      preloaderEnabled: true,
+      menuCatgsCache: [],
+      menuItemsCache: [],
+      loader: true,
       mdiInformationVariantSvg: mdiInformationVariant,
       mdiAccountMultipleSvg: mdiAccountMultiple,
       mdiAccountSvg: mdiAccount,
       mdiChevronDownSvg: mdiChevronDown,
+      mdiCartSvg: mdiCart,
+      mdiChevronRightSvg: mdiChevronRight,
+      mdiChevronLeftSvg: mdiChevronLeft,
     }
   },
   methods: {
@@ -228,13 +235,18 @@ export default {
       return currency(val, {symbol: ':-', pattern: '#!'}).format();
     },
     tabChangedEvent(val) {
-      //console.log(val);
+      console.log(val);
+      this.fetchMenuItems(val);
     },
-    constructMenuCatgsObj(jsonData) {
+    handleServerMenuCatgSuccess(jsonData) {
       this.menuCatgs = jsonData;
+      this.fetchMenuItems(this.menuCatgs[0].id); // fetch menu items of first menu category
+      this.revealNutFacts = Array(this.menuStore.menuItemsCount).fill(false);
+      setTimeout(() => {
+        this.loader = false;
+      }, 500);
     },
-    constructMenuItemsObj(jsonData) {
-      const menuItems = [];
+    handleServerMenuItemSuccess(jsonData, catgId) {
       for (var idx = 0; idx < jsonData.length; idx++) {
         var menuItemObj = jsonData[idx];
         menuItemObj['qty'] = 0;
@@ -245,43 +257,34 @@ export default {
         else                                      {menuItemObj['color'] = "dark";}*/
         try {menuItemObj['imgSrc'] = require('../assets/menu-items/' + menuItemObj.name.replaceAll(' ', '-') + '.webp');}
         catch (e) {menuItemObj['imgSrc'] = require('../assets/no-image.webp');}
-        menuItems.push(menuItemObj);
+        this.menuItemsCache.push(menuItemObj);
       }
-      this.menuStore.updateMenu(menuItems);
+      this.menuStore.updateMenu(this.menuItemsCache);
+      this.menuCatgsCache.push(catgId);
+      setTimeout(() => {
+        this.loader = false;
+      }, 300);
     },
     async fetchMenuCatgs() {
-      await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/menu-category')
+      this.loader = true;
+      await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/menu-category/')
         .then(response => {
-          this.constructMenuCatgsObj(response.data)
-          this.eventSuccessCount++
+          this.handleServerMenuCatgSuccess(response.data);
         })
         .catch(error => {
           console.log(error) /*TODO: better error handling*/
         })
     },
-    async fetchMenuItems() {
-      await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/menu-item')
+    async fetchMenuItems(catgId) {
+      if (this.menuCatgsCache.includes(catgId)) return;
+      this.loader = true;
+      await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/menu-item/' + String(catgId))
         .then(response => {
-          this.constructMenuItemsObj(response.data);
-          this.eventSuccessCount++
+          this.handleServerMenuItemSuccess(response.data, catgId);
         })
         .catch(error => {
           console.log(error) /*TODO: better error handling*/
         })
-    },
-  },
-  watch: {
-    eventSuccessCount(newVal, oldVal) {
-      if (newVal === 2) {
-        if ( (this.menuCatgs.length > 0) && (this.menuStore.menuItems.length > 0) ) {
-          setTimeout(() => {
-            this.preloaderEnabled = false
-          }, 500);
-        }
-        else {
-          /*TODO: better error handling */
-        }
-      }
     },
   },
 };

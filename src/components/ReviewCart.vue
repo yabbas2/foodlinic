@@ -13,7 +13,7 @@
       <tbody name="fade" is="transition-group">
         <tr 
           v-for="item in menuStore.menuItems"
-          v-show="item.qty > 0"
+          v-if="item.qty > 0"
           :key="item.id"
         >
           <td class="text-left">{{item.name}}</td>
@@ -40,7 +40,11 @@
                 solo
                 dense
                 @change="item.total_price=item.qty*item.price"
-              ></v-select>
+              >
+                <template v-slot:append>
+                  <v-icon>{{mdiCartSvg}}</v-icon>
+                </template>
+              </v-select>
             </div>
           </td>
           <td class="text-right">{{formatCurrency(item.total_price)}}</td>
@@ -63,7 +67,7 @@
 </style>
 
 <script>
-import {mdiDelete} from '@mdi/js'
+import {mdiCart, mdiDelete} from '@mdi/js'
 import {useMenuStore} from '@/store/menu'
 import currency from 'currency.js'
 
@@ -85,6 +89,7 @@ export default {
       ],
       selectItems: [0,1,2,3,4,5,6,7,8,9,10],
       mdiDeleteSvg: mdiDelete,
+      mdiCartSvg: mdiCart,
     }
   },
   methods: {

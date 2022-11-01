@@ -7,8 +7,8 @@
     clipped-left
   >
     <v-app-bar-nav-icon @click.stop="vsbyStore.navDrwrVsby=!vsbyStore.navDrwrVsby" style="margin-left: 0rem;">
-      <v-icon v-show="!userStore.isLoggedIn">{{mdiMenuSvg}}</v-icon>
-      <v-avatar v-show="userStore.isLoggedIn" color="#f25b47" size="33">
+      <v-icon v-if="!userStore.isLoggedIn">{{mdiMenuSvg}}</v-icon>
+      <v-avatar v-else color="#f25b47" size="33">
         <span class="white--text text-substitle-1 text-uppercase">{{userStore.firstname[0]}}{{userStore.lastname[0]}}</span>
       </v-avatar>
     </v-app-bar-nav-icon>

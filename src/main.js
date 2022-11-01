@@ -20,7 +20,7 @@ import 'vuetify/dist/vuetify.min.css'
 Vue.use(Vuetify);
 
 /*--------------------IMPORT PINIA-------------------------*/
-import { createPinia, PiniaVuePlugin } from 'pinia'
+import {createPinia, PiniaVuePlugin} from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 Vue.use(PiniaVuePlugin)

@@ -11,6 +11,7 @@ export const useMenuStore = defineStore('menu', {
     cartItemsMin: (state) => (state.menuItems.map(item => (item.qty > 0)? {id: item.id, qty: item.qty} : {}).filter(newItem => Object.keys(newItem).length !== 0)),
     cartItemsCount: (state) => (state.cartItems.reduce((acc, obj) => acc + obj.qty, 0)),
     totalPrice: (state) => (state.cartItems.reduce((acc, obj) => acc + obj.total_price, 0)),
+    menuItemsCount: (state) => (state.menuItems.length),
   },
   actions: {
     clearCart() {

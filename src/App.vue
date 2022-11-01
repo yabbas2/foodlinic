@@ -1,6 +1,6 @@
 <template>
   <v-app id="app">
-    <router-view v-show="!showScreenFitDialog"></router-view>
+    <router-view v-if="!showScreenFitDialog"></router-view>
     <ScreenFitDialog v-model="showScreenFitDialog"></ScreenFitDialog>
   </v-app>
 </template>

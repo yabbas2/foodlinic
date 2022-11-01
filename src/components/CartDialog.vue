@@ -32,7 +32,7 @@
         YOUR CART {{emptyCart}}
       </v-card-subtitle>
       <v-spacer style="min-height: 50px;"></v-spacer>
-      <v-card-text v-show="menuStore.cartItemsCount>0" class="px-0 py-0 v-card-text--scroll">
+      <v-card-text v-if="menuStore.cartItemsCount>0" class="px-0 py-0 v-card-text--scroll">
         <v-stepper
           v-model="currStep"
           vertical
@@ -48,7 +48,10 @@
               :complete="stepComplete(n+1)"
               :step="n+1"
               :rules="[value => step.valid]" 
-              :color="stepStatus(n+1)">
+              :color="stepStatus(n+1)"
+              :complete-icon="mdiCheckSvg"
+              :error-icon="mdiAlertCircleSvg"
+            >
               {{step.name}}
             </v-stepper-step>
             <v-stepper-content
@@ -56,29 +59,29 @@
               :step="n+1" 
               :key="'step-content-'+String(n)"
             >
-              <template v-if="n == 0">
+              <div v-if="n === 0">
                 <ReviewCart ref="reviewCartComp"></ReviewCart>
                 <v-divider class="my-4"></v-divider>
                 <div>
                   <CartContBtn :showLoading="totalPriceLoading" :totalPrice="menuStore.totalPrice" @btnClicked="step.validator"></CartContBtn>
                   <CartOtherBtn :action="'clear'" @btnClicked="menuStore.clearCart"></CartOtherBtn>
                 </div>
-              </template>
-              <template v-if="n == 1">
+              </div>
+              <div v-if="n === 1">
                 <Delivery ref="deliveryComp"></Delivery>
                 <v-divider class="my-4"></v-divider>
                 <div>
                   <CartContBtn :showLoading="totalPriceLoading" :totalPrice="menuStore.totalPrice" @btnClicked="step.validator"></CartContBtn>
                   <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
                 </div>
-              </template>
-              <template v-if="n == 2">
+              </div>
+              <div v-if="n === 2">
                 <Checkout ref="checkoutComp" :totalPrice="menuStore.totalPrice" @checkoutStart="overlay=true" @checkoutEnd="actOnCheckout($event)"></Checkout>
                 <v-divider class="my-4"></v-divider>
                 <div>
                   <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
                 </div>
-              </template>
+              </div>
             </v-stepper-content>
           </template>
         </v-stepper>
@@ -141,7 +144,7 @@
 </style>
 
 <script>
-import {mdiClose} from '@mdi/js'
+import {mdiClose, mdiCheck, mdiAlertCircle} from '@mdi/js'
 import {useMenuStore} from '@/store/menu'
 import {useVsbyStore} from '@/store/vsby'
 import {useUserStore} from '@/store/user'
@@ -166,6 +169,12 @@ export default {
       userStore,
     }
   },
+  mounted() {
+    console.log(this.$options.name + ' is mounted!');
+  },
+  created() {
+    console.log(this.$options.name + ' is created!');
+  },
   components: {
     ReviewCart,
     Delivery,
@@ -189,6 +198,8 @@ export default {
       secondClass: 'v-dialog--fullscreen cart-dialog-small',
       overlay: false,
       mdiCloseSvg: mdiClose,
+      mdiCheckSvg: mdiCheck,
+      mdiAlertCircleSvg: mdiAlertCircle,
     }
   },
   methods: {
