@@ -29,67 +29,83 @@
       <v-spacer style="min-height: 50px;"></v-spacer>
       <!--start: cart dialog view-->
       <v-card-subtitle class="justify-center py-0 v-card__subtitle">
-        YOUR CART {{emptyCart}}
+        CART & CHECKOUT
       </v-card-subtitle>
       <v-spacer style="min-height: 50px;"></v-spacer>
-      <v-card-text v-if="menuStore.cartItemsCount>0" class="px-0 py-0 v-card-text--scroll">
+      <v-card-text v-if="menuStore.cartItemsCount>0" class="px-0 pt-0 pb-16 v-card-text--scroll">
         <v-stepper
           v-model="currStep"
-          vertical
+          alt-labels
           tile
           flat
         >
-          <template
-            v-for="(step, n) in steps"
-          >
+          <v-stepper-header class="v-stepper__header">
             <v-stepper-step 
-              v-if="true"
-              :key="'step-'+String(n)"
-              :complete="stepComplete(n+1)"
-              :step="n+1"
-              :rules="[value => step.valid]" 
-              :color="stepStatus(n+1)"
+              step="1"
+              :complete="stepComplete(1)"
+              :rules="[value => steps[0].valid]" 
+              :color="stepStatus(1)"
               :complete-icon="mdiCheckSvg"
               :error-icon="mdiAlertCircleSvg"
             >
-              {{step.name}}
+              Review Order
             </v-stepper-step>
-            <v-stepper-content
-              v-if="true"
-              :step="n+1" 
-              :key="'step-content-'+String(n)"
+            <v-divider></v-divider>
+            <v-stepper-step 
+              step="2"
+              :complete="stepComplete(2)"
+              :rules="[value => steps[1].valid]" 
+              :color="stepStatus(2)"
+              :complete-icon="mdiCheckSvg"
+              :error-icon="mdiAlertCircleSvg"
             >
-              <div v-if="n === 0">
-                <ReviewCart ref="reviewCartComp"></ReviewCart>
-                <v-divider class="my-4"></v-divider>
-                <div>
-                  <CartContBtn :showLoading="totalPriceLoading" :totalPrice="menuStore.totalPrice" @btnClicked="step.validator"></CartContBtn>
-                  <CartOtherBtn :action="'clear'" @btnClicked="menuStore.clearCart"></CartOtherBtn>
-                </div>
-              </div>
-              <div v-if="n === 1">
-                <Delivery ref="deliveryComp"></Delivery>
-                <v-divider class="my-4"></v-divider>
-                <div>
-                  <CartContBtn :showLoading="totalPriceLoading" :totalPrice="menuStore.totalPrice" @btnClicked="step.validator"></CartContBtn>
-                  <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
-                </div>
-              </div>
-              <div v-if="n === 2">
-                <Checkout ref="checkoutComp" :totalPrice="menuStore.totalPrice" @checkoutStart="overlay=true" @checkoutEnd="actOnCheckout($event)"></Checkout>
-                <v-divider class="my-4"></v-divider>
-                <div>
-                  <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
-                </div>
+              Delivery
+            </v-stepper-step>
+            <v-divider></v-divider>
+            <v-stepper-step 
+              step="3"
+              :complete="stepComplete(3)"
+              :rules="[value => steps[2].valid]" 
+              :color="stepStatus(3)"
+              :complete-icon="mdiCheckSvg"
+              :error-icon="mdiAlertCircleSvg"
+            >
+              Payment
+            </v-stepper-step>
+          </v-stepper-header>
+
+          <v-stepper-items>
+            <v-stepper-content step="1">
+              <ReviewCart ref="reviewCartComp"></ReviewCart>
+              <v-divider class="my-4"></v-divider>
+              <div>
+                <CartContBtn :showLoading="totalPriceLoading" :totalPrice="menuStore.totalPrice" @btnClicked="steps[0].validator"></CartContBtn>
+                <CartOtherBtn :action="'clear'" @btnClicked="menuStore.clearCart"></CartOtherBtn>
               </div>
             </v-stepper-content>
-          </template>
+
+            <v-stepper-content step="2">
+              <Delivery ref="deliveryComp"></Delivery>
+              <v-divider class="my-4"></v-divider>
+              <div>
+                <CartContBtn :showLoading="totalPriceLoading" :totalPrice="menuStore.totalPrice" @btnClicked="steps[1].validator"></CartContBtn>
+                <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
+              </div>
+            </v-stepper-content>
+
+            <v-stepper-content step="3">
+              <Payment ref="paymentComp" :totalPrice="menuStore.totalPrice" @paymentStart="overlay=true" @paymentEnd="actOnPayment($event)"></Payment>
+              <v-divider class="my-4"></v-divider>
+              <div>
+                <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
+              </div>
+            </v-stepper-content>
+          </v-stepper-items>
         </v-stepper>
       </v-card-text>
-      <v-spacer></v-spacer>
       <!--end: cart dialog view-->
     </v-card>
-    <v-snackbar v-model="showSnackbar">
+    <v-snackbar v-model="showSnackbar" top>
       {{msgSnackbar}}
       <template v-slot:action="{attrs}">
         <v-btn
@@ -129,17 +145,33 @@
   display: flex !important;
   flex-direction: column;
 }
-
 .v-card-text--scroll {
   flex-grow: 1;
   overflow: auto;
 }
-
 .v-card__subtitle {
   font-size: 50px !important;
   color: #39175c !important;
   line-height: 3rem !important;
   font-family: 'Bebas Neue', cursive !important;
+}
+.v-stepper__header {
+  align-items: stretch !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  box-shadow: none !important;
+}
+.v-stepper__label {
+  display: block !important;
+}
+</style>
+
+<style>
+@media only screen and (min-width: 375px) {
+  .v-stepper:not(.v-stepper--vertical) .v-stepper__label {
+    display: flex;
+  }
 }
 </style>
 
@@ -150,7 +182,7 @@ import {useVsbyStore} from '@/store/vsby'
 import {useUserStore} from '@/store/user'
 import ReviewCart from "@/components/ReviewCart.vue"
 import Delivery from "@/components/Delivery.vue"
-import Checkout from "@/components/Checkout.vue"
+import Payment from "@/components/Payment.vue"
 import CartContBtn from "@/components/ui-elems/CartContBtn.vue";
 import CartOtherBtn from "@/components/ui-elems/CartOtherBtn.vue";
 import axios from 'axios'
@@ -169,16 +201,10 @@ export default {
       userStore,
     }
   },
-  mounted() {
-    console.log(this.$options.name + ' is mounted!');
-  },
-  created() {
-    console.log(this.$options.name + ' is created!');
-  },
   components: {
     ReviewCart,
     Delivery,
-    Checkout,
+    Payment,
     CartContBtn,
     CartOtherBtn,
   },
@@ -188,7 +214,7 @@ export default {
       steps: [
         {name: "Review Order" , valid: true, validator: () => {this.checkReviewForm(0);}},
         {name: "Delivery"     , valid: true, validator: () => {this.checkDeliveryForm(1);}},
-        {name: "Checkout"     , valid: true, validator: () => {this.checkCheckoutForm(2);}},
+        {name: "Payment"     , valid: true, validator: () => {this.checkPaymentForm(2);}},
       ],
       totalPriceLoading: false,
       showSnackbar: false,
@@ -208,14 +234,14 @@ export default {
       this.msgSnackbar = errMsg;
     },
     resetForm() {
-      this.$refs.deliveryComp[0].resetForm();
-      this.$refs.deliveryComp[0].$refs.delvyform.resetValidate();
+      this.$refs.deliveryComp.resetForm();
+      this.$refs.deliveryComp.resetValidateForm();
     },
     handleServerCreateOrderSuccess() {
       this.checkoutSuccess = true;
       setTimeout(() => {
         this.overlay = false;
-        this.vsbyStore.cartDiagVsby = false;
+        this.vsbyStore.closeCartDialog();
         this.menuStore.clearCart();
         this.resetForm();
       }, 1500);
@@ -228,8 +254,8 @@ export default {
       let orderData = {
         userEmail: this.userStore.email,
         cartItems: this.menuStore.cartItemsMin,
-        delivery: this.$refs.deliveryComp[0].getForm(),
-        checkout: this.$refs.checkoutComp[0].getForm()
+        delivery: this.$refs.deliveryComp.getForm(),
+        payment: this.$refs.paymentComp.getForm()
       };
       const hashDigest = sha256(JSON.stringify(orderData));
       await axios.post((process.env.VUE_APP_BACKEND_SERVER + '/foodapis/order/create/' + hashDigest + '/'), orderData)
@@ -242,7 +268,7 @@ export default {
           this.handleServerCreateOrderError();
         })
     },
-    actOnCheckout(result) {
+    actOnPayment(result) {
       if (result) {this.pushOrderData();}
       else        {this.showSnackbarError('Transaction failed/cancelled!');}
     },
@@ -259,22 +285,17 @@ export default {
       return true;
     },
     checkDeliveryForm(stepIdx) {
-      let isValid = this.$refs.deliveryComp[0].$refs.delvyform.validate();
+      let isValid = this.$refs.deliveryComp.validateForm();
       if (isValid)  {this.currStep++;this.steps[stepIdx].valid = true;}
       else          {this.showSnackbarError('Required field(s) missing/invalid!');this.steps[stepIdx].valid = false;}
     },
-    checkCheckoutForm(stepIdx) {
+    checkPaymentForm(stepIdx) {
       return true;
     },
     closeDialog() {
       this.currStep = 1;
       this.checkoutSuccess = false;
-      this.vsbyStore.cartDiagVsby = false;
-    },
-  },
-  computed: {
-    emptyCart() {
-      return (this.menuStore.cartItemsCount == 0)? 'IS EMPTY' : '';
+      this.vsbyStore.closeCartDialog();
     },
   },
 };

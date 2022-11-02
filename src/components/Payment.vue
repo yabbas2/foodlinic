@@ -54,7 +54,7 @@ import axios from 'axios'
 import currency from 'currency.js'
 
 export default {
-  name: "Checkout",
+  name: "Payment",
   mounted() {
     const script = document.createElement("script");
     script.src = "https://www.paypal.com/sdk/js?client-id=Afypn0F0ftWe0TzZ7w_MEF-h7p3kT-0bfsgULFkpf5qKy9K3o9arN84xlIwOw0Kw7HSKShpDrJjvzQKa&currency=SEK";
@@ -122,7 +122,7 @@ export default {
           },
           // Set up the transaction
           createOrder: (data, actions) => {
-            this.$emit('checkoutStart');
+            this.$emit('paymentStart');
             return actions.order.create({
               purchase_units: [{
                 amount: {
@@ -136,13 +136,13 @@ export default {
           onApprove: async (data, actions) => {
             let order = await actions.order.capture();
             console.log(order);
-            if (order) {this.$emit('checkoutEnd', true);}
+            if (order) {this.$emit('paymentEnd', true);}
           },
           onCancel: async (data) => {
-            this.$emit('checkoutEnd', false);
+            this.$emit('paymentEnd', false);
           },
           onError: async (err) => {
-            this.$emit('checkoutEnd', false);
+            this.$emit('paymentEnd', false);
           },
         }).render(this.$refs.paypal);
     },

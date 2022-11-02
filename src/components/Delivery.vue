@@ -130,6 +130,12 @@ export default {
     }
   },
   methods: {
+    validateForm() {
+      return this.$refs.delvyform.validate();
+    },
+    resetValidateForm() {
+      this.$refs.delvyform.resetValidation();
+    },
     getForm() {
       return {location: {lat: this.delvySelected.lat, lng: this.delvySelected.lng}, date: this.delvyDate, notes: this.delvyNotes};
     },

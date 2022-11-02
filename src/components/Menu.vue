@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-0">
+  <div class="mt-0 mb-10">
     <v-tabs
       v-model="tab"
       align-with-title
@@ -76,9 +76,9 @@
                       class="transition-fast-in-fast-out v-card--reveal v-card--scroll"
                       height="100%"
                     >
-                      <v-card-title>
+                      <!--<v-card-title>
                         <p class="text-h5 text--primary">Details</p>
-                      </v-card-title>
+                      </v-card-title>-->
                       <v-card-text class="v-card-text--scroll">
                         <v-container>
                           <v-row no-gutters>
@@ -166,27 +166,22 @@
   position: absolute;
   width: 100%;
 }
-
 .v-card--scroll {
   display: flex !important;
   flex-direction: column;
 }
-
 .v-card-text--scroll {
   flex-grow: 1;
   overflow: auto;
 }
-
 .card-actions {
   position: absolute;
   bottom: 0.25rem;
 }
-
 .card-title-font {
   font-family: 'Bebas Neue', cursive;
   font-size: 30px;
 }
-
 .card-subtitle-font {
   font-family: 'Pacifico', cursive;
   font-size: 20px;
@@ -209,7 +204,8 @@ export default {
     }
   },
   mounted() {
-    this.fetchMenuCatgs();    
+    this.loader = true;
+    this.fetchMenuCatgs();
   },
   data() {
     return {
@@ -218,8 +214,6 @@ export default {
       revealNutFacts: [],
       selectItems: [0,1,2,3,4,5,6,7,8,9,10],
       menuCatgs: [],
-      menuCatgsCache: [],
-      menuItemsCache: [],
       loader: true,
       mdiInformationVariantSvg: mdiInformationVariant,
       mdiAccountMultipleSvg: mdiAccountMultiple,
@@ -235,18 +229,15 @@ export default {
       return currency(val, {symbol: ':-', pattern: '#!'}).format();
     },
     tabChangedEvent(val) {
-      console.log(val);
-      this.fetchMenuItems(val);
+      //console.log(val);
     },
     handleServerMenuCatgSuccess(jsonData) {
       this.menuCatgs = jsonData;
-      this.fetchMenuItems(this.menuCatgs[0].id); // fetch menu items of first menu category
+      this.fetchMenuItems();
       this.revealNutFacts = Array(this.menuStore.menuItemsCount).fill(false);
-      setTimeout(() => {
-        this.loader = false;
-      }, 500);
     },
-    handleServerMenuItemSuccess(jsonData, catgId) {
+    handleServerMenuItemSuccess(jsonData) {
+      let menuItemsCache = [];
       for (var idx = 0; idx < jsonData.length; idx++) {
         var menuItemObj = jsonData[idx];
         menuItemObj['qty'] = 0;
@@ -257,33 +248,27 @@ export default {
         else                                      {menuItemObj['color'] = "dark";}*/
         try {menuItemObj['imgSrc'] = require('../assets/menu-items/' + menuItemObj.name.replaceAll(' ', '-') + '.webp');}
         catch (e) {menuItemObj['imgSrc'] = require('../assets/no-image.webp');}
-        this.menuItemsCache.push(menuItemObj);
+        menuItemsCache.push(menuItemObj);
       }
-      this.menuStore.updateMenu(this.menuItemsCache);
-      this.menuCatgsCache.push(catgId);
-      setTimeout(() => {
-        this.loader = false;
-      }, 300);
+      this.menuStore.updateMenu(menuItemsCache);
+      this.loader = false;
     },
     async fetchMenuCatgs() {
-      this.loader = true;
       await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/menu-category/')
         .then(response => {
           this.handleServerMenuCatgSuccess(response.data);
         })
         .catch(error => {
-          console.log(error) /*TODO: better error handling*/
+          console.log(error); /*TODO: better error handling*/
         })
     },
-    async fetchMenuItems(catgId) {
-      if (this.menuCatgsCache.includes(catgId)) return;
-      this.loader = true;
-      await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/menu-item/' + String(catgId))
+    async fetchMenuItems() {
+      await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/menu-item/')
         .then(response => {
-          this.handleServerMenuItemSuccess(response.data, catgId);
+          this.handleServerMenuItemSuccess(response.data);
         })
         .catch(error => {
-          console.log(error) /*TODO: better error handling*/
+          console.log(error); /*TODO: better error handling*/
         })
     },
   },

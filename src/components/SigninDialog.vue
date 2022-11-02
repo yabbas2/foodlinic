@@ -32,7 +32,7 @@
         SIGN IN
       </v-card-subtitle>
       <v-spacer></v-spacer>
-      <v-card-text>
+      <v-card-text class="px-0 pt-0 pb-16">
         <v-form
           ref="signinform"
           v-model="validForm"
@@ -67,7 +67,7 @@
         </v-form>
         <div class="d-flex justify-start">
           &nbsp;Don't have an account?&nbsp;
-          <a @click="openSignupDialog">Sign up</a>
+          <a @click="vsbyStore.openSignupDialog">Sign up</a>
         </div>
         <v-divider class="my-4"></v-divider>
         <v-btn
@@ -207,7 +207,7 @@ export default {
     handleServerSigninSuccess(respJson) {
       this.signinSuccess = true;
       setTimeout(() => {
-        this.vsbyStore.signinDiagVsby = false;
+        this.vsbyStore.closeSigninDialog();
         this.overlay = false;
         this.resetForm();
       }, 1500);
@@ -234,12 +234,8 @@ export default {
     },
     closeDialog() {
       this.signinSuccess = false;
-      this.vsbyStore.signinDiagVsby = false;
+      this.vsbyStore.closeSigninDialog();
       this.resetForm();
-    },
-    openSignupDialog() {
-      this.vsbyStore.signupDiagVsby = true;
-      this.vsbyStore.signinDiagVsby = false;
     },
   },
 }

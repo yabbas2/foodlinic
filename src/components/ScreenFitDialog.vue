@@ -13,19 +13,9 @@
         <v-img :src="require('../assets/logo-name-wbg.png')" width="150" class="mx-auto"></v-img>
       </v-card-subtitle>
       <v-card-text class="text-start">
-        This website is designed best for mobile phone browsers. For better experience, please switch to a mobile phone.
+        This website is optimized for mobile phone browsers. For better experience, please switch to a mobile phone.
       </v-card-text>
       <v-divider></v-divider>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn
-          color="#f25b47"
-          text
-          @click="showDialog=false"
-        >
-          Continue Anyway
-        </v-btn>
-      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>

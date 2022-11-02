@@ -32,7 +32,7 @@
         YOUR ORDER LIST {{emptyOrder}}
       </v-card-subtitle>
       <v-spacer style="min-height: 50px;"></v-spacer>
-      <v-card-text class="px-0 py-0 v-card-text--scroll">
+      <v-card-text class="px-0 pt-0 pb-16 v-card-text--scroll">
       </v-card-text>
       <v-spacer></v-spacer>
       <!--end: order dialog view-->
@@ -98,7 +98,7 @@ export default {
   },
   methods: {
     closeDialog() {
-      this.vsbyStore.orderDiagVsby = false;
+      this.vsbyStore.closeOrderDialog();
     },
   },
   computed: {
