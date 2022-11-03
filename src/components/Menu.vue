@@ -1,25 +1,27 @@
 <template>
-  <div class="mt-0">
-    <div v-show="!preloaderEnabled">
-      <v-tabs
-        v-model="tab"
-        align-with-title
-        show-arrows="always"
-        centered
-        background-color="white"
-        color="red"
-        center-active
-        light
+  <div class="mt-0" style="margin-bottom: 80px;">
+    <v-tabs
+      v-model="tab"
+      align-with-title
+      show-arrows="always"
+      centered
+      background-color="white"
+      color="red"
+      center-active
+      light
+      :next-icon="mdiChevronRightSvg"
+      :prev-icon="mdiChevronLeftSvg"
+    >
+      <v-tabs-slider color="red"></v-tabs-slider>
+      <v-tab 
+        v-for="catg in menuCatgs" 
+        :key="catg.id" 
+        @click="tabChangedEvent(catg.id)"
       >
-        <v-tabs-slider color="red"></v-tabs-slider>
-        <v-tab 
-          v-for="catg in menuCatgs" 
-          :key="catg.id" 
-          @click="tabChangedEvent(catg.id)"
-        >
-          {{catg.name}}
-        </v-tab>
-      </v-tabs>
+        {{catg.name}}
+      </v-tab>
+    </v-tabs>
+    <div v-show="!loader">
       <v-tabs-items v-model="tab">
         <v-tab-item
           v-for="catg in menuCatgs"
@@ -28,8 +30,8 @@
           <v-container fluid class="my-10">
             <v-row>
               <v-col 
-                v-for="(item, idx) in cartStore.menuItems"
-                v-show="item.menu_category_id === catg.id"
+                v-for="(item, idx) in menuStore.menuItems"
+                v-if="item.menu_category_id === catg.id"
                 :key="item.name"
                 align-self="center"
               >
@@ -46,7 +48,7 @@
                       color="red lighten-1"
                       @click="revealNutFacts[idx]=true;revealNutFacts=[...revealNutFacts]"
                     >
-                      <v-icon dark>mdi-information-variant</v-icon>
+                      <v-icon dark>{{mdiInformationVariantSvg}}</v-icon>
                     </v-btn>
                     <v-select
                       v-model="item.qty"
@@ -54,7 +56,6 @@
                       menu-props="auto"
                       label="Select"
                       hide-details
-                      append-icon="mdi-cart"
                       single-line
                       class="mr-auto ml-5 my-0 py-0"
                       style="max-width:5rem;"
@@ -62,7 +63,11 @@
                       solo
                       dense
                       @change="item.total_price=item.qty*item.price"
-                    ></v-select>
+                    >
+                      <template v-slot:append>
+                        <v-icon>{{mdiCartSvg}}</v-icon>
+                      </template>
+                    </v-select>
                   </v-card-actions>
                   <v-expand-transition>
                     <v-card
@@ -71,9 +76,9 @@
                       class="transition-fast-in-fast-out v-card--reveal v-card--scroll"
                       height="100%"
                     >
-                      <v-card-title>
+                      <!--<v-card-title>
                         <p class="text-h5 text--primary">Details</p>
-                      </v-card-title>
+                      </v-card-title>-->
                       <v-card-text class="v-card-text--scroll">
                         <v-container>
                           <v-row no-gutters>
@@ -83,8 +88,8 @@
                             <v-col>
                               <div class="text--secondary">
                                 {{item.portion}} 
-                                <v-icon small v-if="item.portion > 1">mdi-account-multiple</v-icon>
-                                <v-icon small v-else>mdi-account</v-icon>
+                                <v-icon small v-if="item.portion > 1">{{mdiAccountMultipleSvg}}</v-icon>
+                                <v-icon small v-else>{{mdiAccountSvg}}</v-icon>
                               </div>
                             </v-col>
                           </v-row>
@@ -130,7 +135,7 @@
                           color="red lighten-1"
                           @click="revealNutFacts[idx]=false;revealNutFacts=[...revealNutFacts]"
                         >
-                          <v-icon dark>mdi-chevron-down</v-icon>
+                          <v-icon dark>{{mdiChevronDownSvg}}</v-icon>
                         </v-btn>
                       </v-card-actions>
                     </v-card>
@@ -142,9 +147,13 @@
         </v-tab-item>
       </v-tabs-items>
     </div>
-    <div class="mt-16">
-      <Preloader v-show="preloaderEnabled"></Preloader>
-    </div>
+    <v-progress-circular
+      indeterminate
+      size="50"
+      color="#f25b47"
+      class="mt-16"
+      v-if="loader"
+    ></v-progress-circular>
   </div>
 </template>
 
@@ -157,27 +166,22 @@
   position: absolute;
   width: 100%;
 }
-
 .v-card--scroll {
   display: flex !important;
   flex-direction: column;
 }
-
 .v-card-text--scroll {
   flex-grow: 1;
   overflow: auto;
 }
-
 .card-actions {
   position: absolute;
   bottom: 0.25rem;
 }
-
 .card-title-font {
   font-family: 'Bebas Neue', cursive;
   font-size: 30px;
 }
-
 .card-subtitle-font {
   font-family: 'Pacifico', cursive;
   font-size: 20px;
@@ -185,8 +189,8 @@
 </style>
 
 <script>
-import Preloader from "@/components/Preloader.vue";
-import {useCartStore} from '@/store/cart'
+import {mdiInformationVariant, mdiAccountMultiple, mdiAccount, mdiChevronDown, mdiCart, mdiChevronRight, mdiChevronLeft} from '@mdi/js'
+import {useMenuStore} from '@/store/menu'
 import axios from 'axios'
 import currency from 'currency.js'
 
@@ -194,18 +198,14 @@ import currency from 'currency.js'
 export default {
   name: "Menu",
   setup() {
-    const cartStore = useCartStore()
+    const menuStore = useMenuStore()
     return {
-      cartStore,
+      menuStore,
     }
   },
-  components: {
-    Preloader,
-  },
-  created() {
+  mounted() {
+    this.loader = true;
     this.fetchMenuCatgs();
-    this.fetchMenuItems();
-    this.revealNutFacts = Array(this.cartStore.menuItems.length).fill(false);
   },
   data() {
     return {
@@ -214,8 +214,14 @@ export default {
       revealNutFacts: [],
       selectItems: [0,1,2,3,4,5,6,7,8,9,10],
       menuCatgs: [],
-      eventSuccessCount: 0,
-      preloaderEnabled: true,
+      loader: true,
+      mdiInformationVariantSvg: mdiInformationVariant,
+      mdiAccountMultipleSvg: mdiAccountMultiple,
+      mdiAccountSvg: mdiAccount,
+      mdiChevronDownSvg: mdiChevronDown,
+      mdiCartSvg: mdiCart,
+      mdiChevronRightSvg: mdiChevronRight,
+      mdiChevronLeftSvg: mdiChevronLeft,
     }
   },
   methods: {
@@ -225,11 +231,13 @@ export default {
     tabChangedEvent(val) {
       //console.log(val);
     },
-    constructMenuCatgsObj(jsonData) {
+    handleServerMenuCatgSuccess(jsonData) {
       this.menuCatgs = jsonData;
+      this.fetchMenuItems();
+      this.revealNutFacts = Array(this.menuStore.menuItemsCount).fill(false);
     },
-    constructMenuItemsObj(jsonData) {
-      this.cartStore.menuItems = [];
+    handleServerMenuItemSuccess(jsonData) {
+      let menuItemsCache = [];
       for (var idx = 0; idx < jsonData.length; idx++) {
         var menuItemObj = jsonData[idx];
         menuItemObj['qty'] = 0;
@@ -238,44 +246,30 @@ export default {
         else if (menuItemObj.status == 'Try It')  {menuItemObj['color'] = "info";}
         else if (menuItemObj.status == 'Popular') {menuItemObj['color'] = "success";}
         else                                      {menuItemObj['color'] = "dark";}*/
-        try {menuItemObj['imgSrc'] = require('../assets/menu-items/' + menuItemObj.name.replaceAll(' ', '-') + '.png');}
-        catch (e) {menuItemObj['imgSrc'] = require('../assets/no-image.png');}
-        this.cartStore.menuItems.push(menuItemObj);
+        try {menuItemObj['imgSrc'] = require('../assets/menu-items/' + menuItemObj.name.replaceAll(' ', '-') + '.webp');}
+        catch (e) {menuItemObj['imgSrc'] = require('../assets/no-image.webp');}
+        menuItemsCache.push(menuItemObj);
       }
+      this.menuStore.updateMenu(menuItemsCache);
+      this.loader = false;
     },
     async fetchMenuCatgs() {
-      await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/menu-category')
+      await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/menu-category/')
         .then(response => {
-          this.constructMenuCatgsObj(response.data)
-          this.eventSuccessCount++
+          this.handleServerMenuCatgSuccess(response.data);
         })
         .catch(error => {
-          console.log(error) /*TODO: better error handling*/
+          console.log(error); /*TODO: better error handling*/
         })
     },
     async fetchMenuItems() {
-      await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/menu-item')
+      await axios.get(process.env.VUE_APP_BACKEND_SERVER + '/foodapis/menu-item/')
         .then(response => {
-          this.constructMenuItemsObj(response.data);
-          this.eventSuccessCount++
+          this.handleServerMenuItemSuccess(response.data);
         })
         .catch(error => {
-          console.log(error) /*TODO: better error handling*/
+          console.log(error); /*TODO: better error handling*/
         })
-    },
-  },
-  watch: {
-    eventSuccessCount(newVal, oldVal) {
-      if (newVal === 2) {
-        if ( (this.menuCatgs.length > 0) && (this.cartStore.menuItems.length > 0) ) {
-          setTimeout(() => {
-            this.preloaderEnabled = false
-          }, 500);
-        }
-        else {
-          /*TODO: better error handling */
-        }
-      }
     },
   },
 };

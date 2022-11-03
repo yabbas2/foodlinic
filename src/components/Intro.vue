@@ -1,28 +1,35 @@
 <template>
-  <v-parallax
-    height="300"
-    :src="require('../assets/intro.jpg')"
-    class="mt-14"
-  >
-    <v-container>
-      <v-row
-        align="center"
-        justify="center"
+  <v-container>
+    <v-row
+      align="start"
+      justify="start"
+    >
+      <v-col
+        class="text-start"
+        cols="12"
       >
-        <v-col
-          class="text-center"
-          cols="12"
-        >
-          <div class="intro-title">
-            {{h1}}
-          </div>
-          <div class="intro-subtitle">
-            {{h2}}
-          </div>
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-parallax>
+        <div class="intro-welcome pl-2">
+          {{welcomeMsg}}
+        </div>
+      </v-col>
+    </v-row>
+    <v-row
+      align="center"
+      justify="center"
+    >
+      <v-col
+        class="text-center"
+        cols="12"
+      >
+        <div class="intro-title">
+          {{h1}}
+        </div>
+        <div class="intro-subtitle">
+          {{h2}}
+        </div>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <style scoped>
@@ -30,8 +37,14 @@
 
 .intro-title {
   font-family: 'Bebas Neue', cursive;
-  font-size: 60px;
+  font-size: 45px;
   color: #f25b47;
+}
+
+.intro-welcome {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 50px;
+  color: #39175c;
 }
 
 .intro-subtitle {
@@ -41,11 +54,24 @@
 </style>
 
 <script>
+import {useUserStore} from '@/store/user'
+
 export default {
   name: "Intro",
+  setup() {
+    const userStore = useUserStore()
+    return {
+      userStore,
+    }
+  },
   props: {
     h1: String,
     h2: String
-  }
+  },
+  computed: {
+    welcomeMsg() {
+      return (this.userStore.isLoggedIn)? ('Hi ' + this.userStore.firstname + '!') : ('Hi there!')
+    }
+  } 
 }
 </script>

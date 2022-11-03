@@ -16,12 +16,11 @@ Vue.use(GmapVue, {
 /*--------------------IMPORT VUETIFY-------------------------*/
 import Vuetify from 'vuetify';
 import 'vuetify/dist/vuetify.min.css'
-import '@mdi/font/css/materialdesignicons.css'
 
 Vue.use(Vuetify);
 
 /*--------------------IMPORT PINIA-------------------------*/
-import { createPinia, PiniaVuePlugin } from 'pinia'
+import {createPinia, PiniaVuePlugin} from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 Vue.use(PiniaVuePlugin)
@@ -30,9 +29,7 @@ pinia.use(piniaPluginPersistedstate)
 
 
 new Vue({
-  vuetify: new Vuetify({
-    icons: {iconfont: 'mdi'},
-  }),
+  vuetify: new Vuetify(),
   router,
   pinia,
   render: h => h(App),

@@ -1,9 +1,10 @@
 <template>
   <div>
-    <MainView></MainView>
+    <TopBar></TopBar>
     <Intro h1="Menu" h2="Homemade, Safe, Tasty"></Intro>
     <Menu></Menu>
-    <CartDialog></CartDialog>
+    <BottomBar></BottomBar>
+    <LazyComps v-if="vsbyStore.lazyLoad"></LazyComps>
   </div>
 </template>
 
@@ -12,19 +13,27 @@
 </style>
 
 <script>
-import Intro from "@/components/Intro.vue";
-import Menu from "@/components/Menu.vue";
-import CartDialog from "@/components/CartDialog.vue";
-import MainView from "@/views/MainView.vue";
+import {useVsbyStore} from '@/store/vsby'
+import Intro from "@/components/Intro.vue"
+import Menu from "@/components/Menu.vue"
+import TopBar from "@/components/TopBar.vue"
+import BottomBar from "@/components/BottomBar.vue"
 
 
 export default {
   name: "MenuView",
+  setup() {
+    const vsbyStore = useVsbyStore()
+    return {
+      vsbyStore,
+    }
+  },
   components: {
-    MainView,
+    TopBar,
     Intro,
     Menu,
-    CartDialog,
-},
+    BottomBar,
+    LazyComps: ()=>import("@/components/LazyComps.vue"),
+  },
 };
 </script>

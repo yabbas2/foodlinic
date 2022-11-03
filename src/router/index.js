@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import MenuView from "../views/MenuView.vue";
-import DietView from "../views/DietView.vue";
+
+const MenuView = () => import('../views/MenuView.vue')
+const DietView = () => import('../views/DietView.vue')
 
 Vue.use(VueRouter)
 

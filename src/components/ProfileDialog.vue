@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    v-model="vsbyStore.signupDiagVsby"
+    v-model="vsbyStore.profileDiagVsby"
     transition="dialog-bottom-transition"
     max-width="800"
     @click:outside="closeDialog"
@@ -26,18 +26,45 @@
           Close
         </v-btn>
       </v-card-title>
-      <!--start: signup view-->
-      <v-card-text class="pt-16 v-card-text--scroll">
+      <!--start: profile dialog view-->
+      <v-card-subtitle class="pt-16 pb-0">
         <v-container>
           <v-row>
             <v-col cols="12">
-              <span class="v-card__subtitle">SIGN UP</span>
+              <span class="v-card__subtitle">PROFILE</span>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-avatar
+                size="100"
+                class="mx-auto"
+              >
+                <v-img :src="require('@/assets/avatar.webp')" width="100"></v-img>
+              </v-avatar>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-subtitle>
+      <v-card-text class="pt-1 v-card-text--scroll">
+        <v-container>
+          <v-row>
+            <v-col cols="12">
+              <v-btn 
+                outlined
+                width="150"
+                color="#f25b47"
+                @click="doSignout"
+              >
+                Sign out
+                <v-icon right light>{{mdiLogoutSvg}}</v-icon>
+              </v-btn>
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="12">
               <v-form
-                ref="signupform"
+                ref="profileform"
                 v-model="validForm"
                 lazy-validation
               >
@@ -46,11 +73,17 @@
                   color="#39175c"
                   label="First name"
                   type="text"
+                  disabled
                   :rules="[val => validateFirstname(val)]"
                   :success="validFirstname"
                 >
                   <template v-slot:prepend>
                     <v-icon>{{mdiAccountSvg}}</v-icon>
+                  </template>
+                  <template v-slot:append-outer>
+                    <v-btn icon>
+                      <v-icon>{{mdiPencilSvg}}</v-icon>
+                    </v-btn>
                   </template>
                 </v-text-field>
                 <v-text-field
@@ -58,11 +91,17 @@
                   color="#39175c"
                   label="Last name"
                   type="text"
+                  disabled
                   :rules="[val => validateLastname(val)]"
                   :success="validLastname"
                 >
                   <template v-slot:prepend>
                     <v-icon>{{mdiAccountSvg}}</v-icon>
+                  </template>
+                  <template v-slot:append-outer>
+                    <v-btn icon>
+                      <v-icon>{{mdiPencilSvg}}</v-icon>
+                    </v-btn>
                   </template>
                 </v-text-field>
                 <v-text-field
@@ -70,11 +109,17 @@
                   color="#39175c"
                   label="Email"
                   type="text"
+                  disabled
                   :rules="[val => validateEmail(val)]"
                   :success="validEmail"
                 >
                   <template v-slot:prepend>
                     <v-icon>{{mdiEmailSvg}}</v-icon>
+                  </template>
+                  <template v-slot:append-outer>
+                    <v-btn icon>
+                      <v-icon>{{mdiPencilSvg}}</v-icon>
+                    </v-btn>
                   </template>
                 </v-text-field>
                 <v-text-field
@@ -82,6 +127,7 @@
                   color="#39175c"
                   label="Phone number"
                   type="text"
+                  disabled
                   :rules="[val => validatePhone(val)]"
                   :success="validPhone"
                 >
@@ -93,36 +139,13 @@
                       Phone number <small>(include country code)</small>
                     </div>
                   </template>
-                </v-text-field>
-                <v-text-field
-                  v-model="form.password"
-                  color="#39175c"
-                  label="Password"
-                  hint="Minimum length: 8"
-                  :loading="showPasswordProgress"
-                  :type="showPassword? 'text' : 'password'"
-                  :append-icon="showPassword? mdiEyeSvg : mdiEyeOffSvg"
-                  :rules="[val => validatePassword(val)]"
-                  :success="validPassword"
-                  @click:append="showPassword=!showPassword"
-                >
-                  <template v-slot:prepend>
-                    <v-icon>{{mdiLockSvg}}</v-icon>
-                  </template>
-                  <template v-slot:progress>
-                    <v-progress-linear
-                      :value="progress"
-                      :color="color"
-                      absolute
-                      height="3"
-                    ></v-progress-linear>
+                  <template v-slot:append-outer>
+                    <v-btn icon>
+                      <v-icon>{{mdiPencilSvg}}</v-icon>
+                    </v-btn>
                   </template>
                 </v-text-field>
               </v-form>
-              <div class="d-flex justify-start">
-                &nbsp;Already have an account?&nbsp;
-                <a @click="vsbyStore.openSigninDialog">Sign in</a>
-              </div>
             </v-col>
           </v-row>
         </v-container>
@@ -131,38 +154,28 @@
         <v-container>
           <v-row>
             <v-col cols="12">
-              <v-btn
+              <!--dark is assigned to boolean var -> refer to bug report #4482-->
+              <v-btn 
                 color="#39175c"
-                dark
-                @click="signupUser"
+                :dark="saveBtnEnabled"
                 class="mx-1"
                 width="200"
+                :disabled="!saveBtnEnabled"
               >
-                Create My Account
+                Save
               </v-btn>
             </v-col>
           </v-row>
         </v-container>
       </v-card-actions>
-      <!--end: signup view-->
+      <!--end: profile dialog view-->
     </v-card>
-    <v-snackbar v-model="showSnackbar" top>
-      {{msgSnackbar}}
-      <template v-slot:action="{attrs}">
-        <v-btn
-          color="#f25b47"
-          text
-          v-bind="attrs"
-          @click="showSnackbar=false"
-        >Close</v-btn>
-      </template>
-    </v-snackbar>
     <v-overlay 
       :value="overlay" 
       absolute
     >
       <v-img 
-        v-if="signupSuccess"
+        v-if="opSuccess"
         class="mx-auto my-auto" 
         max-width="50" 
         :src="require('../assets/op-completed.png')"
@@ -178,7 +191,7 @@
     </v-overlay>
   </v-dialog>
 </template>
-
+  
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
@@ -199,46 +212,46 @@
 </style>
 
 <script>
-import {mdiClose, mdiAccount, mdiEmail, mdiCellphone, mdiLock, mdiEye, mdiEyeOff} from '@mdi/js'
-import {useUserStore} from '@/store/user'
+import {mdiClose, mdiAccount, mdiEmail, mdiCellphone, mdiEye, mdiEyeOff, mdiPencil, mdiLogout} from '@mdi/js'
 import {useVsbyStore} from '@/store/vsby'
+import {useUserStore} from '@/store/user'
 import validator from 'validator'
-import axios from 'axios'
 import sha256 from 'crypto-js/sha256'
+import axios from 'axios'
+
 
 export default {
-  name: "SignupDialog",
+  name: 'ProfileDialog',
   setup() {
-    const userStore = useUserStore()
     const vsbyStore = useVsbyStore()
+    const userStore = useUserStore()
     return {
-      userStore,
       vsbyStore,
+      userStore,
     }
+  },
+  mounted() {
+    this.fetchUserInfo();
   },
   data() {
     return {
-      form: {firstname:'', lastname:'', phone:'', email:'', password:''},
+      form: {firstname:'', lastname:'', phone:'', email:''},
       validForm: true,
       validFirstname: false,
       validLastname: false,
       validEmail: false,
       validPhone: false,
-      validPassword: false,
-      showPassword: false,
-      strongLevelPassword: 0,
-      showPasswordProgress: false,
-      msgSnackbar: '',
-      showSnackbar: false,
       overlay: false,
-      signupSuccess: false,
+      saveBtnEnabled: false,
+      opSuccess: false,
       mdiCloseSvg: mdiClose,
       mdiAccountSvg: mdiAccount,
       mdiEmailSvg: mdiEmail,
       mdiCellphoneSvg: mdiCellphone,
-      mdiLockSvg: mdiLock,
       mdiEyeSvg: mdiEye,
       mdiEyeOffSvg: mdiEyeOff,
+      mdiPencilSvg: mdiPencil,
+      mdiLogoutSvg: mdiLogout,
     }
   },
   methods: {
@@ -258,79 +271,43 @@ export default {
       this.validPhone = validator.isMobilePhone(val, 'any', {strictMode:true});
       return this.validPhone;
     },
-    validatePassword(val) {
-      if (val.length > 0) {this.showPasswordProgress = true;}
-      else                {this.showPasswordProgress = false;}
-      this.strongLevelPassword = validator.isStrongPassword(val, {minLength:8, minLowercase:1, minUppercase:1, minNumbers:1, minSymbols:1, returnScore:true, pointsPerUnique:2, pointsPerRepeat:1, pointsForContainingLower:10, pointsForContainingUpper:10, pointsForContainingNumber:10, pointsForContainingSymbol:10});
-      this.validPassword = validator.isLength(val, {min:8, max:undefined}) && (this.strongLevelPassword >= 50);
-      return this.validPassword;
+    handleServerFetchSuccess(data) {
+      this.form.email = data.email;
+      this.form.firstname = data.firstname;
+      this.form.lastname = data.lastname;
+      this.form.phone = data.phone;
     },
-    validateForm() {
-      return this.$refs.signupform.validate();
-    },
-    resetForm() {
-      this.form.firstname = '';
-      this.form.lastname = '';
-      this.form.phone = '';
-      this.form.email = '';
-      this.form.password = '';
-      this.$refs.signupform.resetValidation();
-    },
-    showSnackbarError(errMsg) {
-      this.msgSnackbar = errMsg;
-      this.showSnackbar = true;
-    },
-    handleServerSignupError(errorJson) {
-      this.overlay = false;
-      let errorMsg = errorJson.response.data.hasOwnProperty('reason')? errorJson.response.data['reason'] : 'unknown-error';
-      if (errorMsg === 'existing-data') {
-        this.showSnackbarError('This account already exists!');
-      }
-      else {
-        this.showSnackbarError('Server Error! Please contact us.');
-      }
-    },
-    handleServerSignupSuccess(data) {
-      this.signupSuccess = true;
-      setTimeout(() => {
-        this.vsbyStore.closeSignupDialog();
-        this.overlay = false;
-        this.resetForm();
-      }, 1500);
-      this.userStore.login(data);
-    },
-    async signupUser() {
-      let isValid = this.validateForm();
-      if (isValid) {
-        this.overlay = true;
-        const hashDigest = sha256(JSON.stringify(this.form));
-        await axios.post((process.env.VUE_APP_BACKEND_SERVER + '/accountapis/signup/' + hashDigest + '/'), this.form)
+    async fetchUserInfo() {
+      if (this.userStore.isLoggedIn) {
+        const hashDigest = sha256(this.userStore.email);
+        await axios.get((process.env.VUE_APP_BACKEND_SERVER + '/accountapis/fetch/' + hashDigest + '/'), {params: {email: this.userStore.email}}) 
           .then(response => {
             console.log(response);
-            this.handleServerSignupSuccess(response.data[0]);
+            this.handleServerFetchSuccess(response.data[0]);
           })
           .catch(error => {
-            console.log(error);
-            this.handleServerSignupError(error);
+            console.log(error)
           })
-      }
-      else {
-        this.showSnackbarError('Required field(s) missing/invalid!');
       }
     },
     closeDialog() {
-      this.signupSuccess = false;
-      this.vsbyStore.closeSignupDialog();
-      this.resetForm();
+      this.vsbyStore.closeProfileDialog();
+    },
+    handleSignoutSuccess() {
+      setTimeout(() => {
+        this.overlay = false;
+        this.opSuccess = false;
+        this.vsbyStore.closeProfileDialog();
+      }, 500);
+    },
+    doSignout() {
+      this.overlay = true;
+      setTimeout(() => {
+        this.userStore.logout();
+        this.opSuccess = true;
+        this.handleSignoutSuccess();
+      }, 500);
     },
   },
-  computed: {
-    progress () {
-      return Math.min(100, this.strongLevelPassword)
-    },
-    color () {
-      return ['error', 'warning', 'success'][Math.floor(this.progress / 40)]
-    },
-  },
-}
+};
 </script>
