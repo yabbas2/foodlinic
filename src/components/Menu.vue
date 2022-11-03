@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-0 mb-10">
+  <div class="mt-0" style="margin-bottom: 80px;">
     <v-tabs
       v-model="tab"
       align-with-title

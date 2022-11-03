@@ -26,114 +26,127 @@
           Close
         </v-btn>
       </v-card-title>
-      <v-spacer></v-spacer>
       <!--start: signup view-->
-      <v-card-subtitle class="justify-center py-0 v-card__subtitle">
-        SIGN UP
-      </v-card-subtitle>
-      <v-spacer></v-spacer>
-      <v-card-text class="px-0 pt-0 pb-16">
-        <v-form
-          ref="signupform"
-          v-model="validForm"
-          lazy-validation
-        >
-          <v-text-field
-            v-model="form.firstname"
-            color="#39175c"
-            label="First name"
-            type="text"
-            :rules="[val => validateFirstname(val)]"
-            :success="validFirstname"
-          >
-            <template v-slot:prepend>
-              <v-icon>{{mdiAccountSvg}}</v-icon>
-            </template>
-          </v-text-field>
-          <v-text-field
-            v-model="form.lastname"
-            color="#39175c"
-            label="Last name"
-            type="text"
-            :rules="[val => validateLastname(val)]"
-            :success="validLastname"
-          >
-            <template v-slot:prepend>
-              <v-icon>{{mdiAccountSvg}}</v-icon>
-            </template>
-          </v-text-field>
-          <v-text-field
-            v-model="form.email"
-            color="#39175c"
-            label="Email"
-            type="text"
-            :rules="[val => validateEmail(val)]"
-            :success="validEmail"
-          >
-            <template v-slot:prepend>
-              <v-icon>{{mdiEmailSvg}}</v-icon>
-            </template>
-          </v-text-field>
-          <v-text-field
-            v-model="form.phone"
-            color="#39175c"
-            label="Phone number"
-            type="text"
-            :rules="[val => validatePhone(val)]"
-            :success="validPhone"
-          >
-            <template v-slot:prepend>
-              <v-icon>{{mdiCellphoneSvg}}</v-icon>
-            </template>
-            <template v-slot:label>
-              <div>
-                Phone number <small>(include country code)</small>
+      <v-card-text class="pt-16 v-card-text--scroll">
+        <v-container>
+          <v-row>
+            <v-col cols="12">
+              <span class="v-card__subtitle">SIGN UP</span>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-form
+                ref="signupform"
+                v-model="validForm"
+                lazy-validation
+              >
+                <v-text-field
+                  v-model="form.firstname"
+                  color="#39175c"
+                  label="First name"
+                  type="text"
+                  :rules="[val => validateFirstname(val)]"
+                  :success="validFirstname"
+                >
+                  <template v-slot:prepend>
+                    <v-icon>{{mdiAccountSvg}}</v-icon>
+                  </template>
+                </v-text-field>
+                <v-text-field
+                  v-model="form.lastname"
+                  color="#39175c"
+                  label="Last name"
+                  type="text"
+                  :rules="[val => validateLastname(val)]"
+                  :success="validLastname"
+                >
+                  <template v-slot:prepend>
+                    <v-icon>{{mdiAccountSvg}}</v-icon>
+                  </template>
+                </v-text-field>
+                <v-text-field
+                  v-model="form.email"
+                  color="#39175c"
+                  label="Email"
+                  type="text"
+                  :rules="[val => validateEmail(val)]"
+                  :success="validEmail"
+                >
+                  <template v-slot:prepend>
+                    <v-icon>{{mdiEmailSvg}}</v-icon>
+                  </template>
+                </v-text-field>
+                <v-text-field
+                  v-model="form.phone"
+                  color="#39175c"
+                  label="Phone number"
+                  type="text"
+                  :rules="[val => validatePhone(val)]"
+                  :success="validPhone"
+                >
+                  <template v-slot:prepend>
+                    <v-icon>{{mdiCellphoneSvg}}</v-icon>
+                  </template>
+                  <template v-slot:label>
+                    <div>
+                      Phone number <small>(include country code)</small>
+                    </div>
+                  </template>
+                </v-text-field>
+                <v-text-field
+                  v-model="form.password"
+                  color="#39175c"
+                  label="Password"
+                  hint="Minimum length: 8"
+                  :loading="showPasswordProgress"
+                  :type="showPassword? 'text' : 'password'"
+                  :append-icon="showPassword? mdiEyeSvg : mdiEyeOffSvg"
+                  :rules="[val => validatePassword(val)]"
+                  :success="validPassword"
+                  @click:append="showPassword=!showPassword"
+                >
+                  <template v-slot:prepend>
+                    <v-icon>{{mdiLockSvg}}</v-icon>
+                  </template>
+                  <template v-slot:progress>
+                    <v-progress-linear
+                      :value="progress"
+                      :color="color"
+                      absolute
+                      height="3"
+                    ></v-progress-linear>
+                  </template>
+                </v-text-field>
+              </v-form>
+              <div class="d-flex justify-start">
+                &nbsp;Already have an account?&nbsp;
+                <a @click="vsbyStore.openSigninDialog">Sign in</a>
               </div>
-            </template>
-          </v-text-field>
-          <v-text-field
-            v-model="form.password"
-            color="#39175c"
-            label="Password"
-            hint="Minimum length: 8"
-            :loading="showPasswordProgress"
-            :type="showPassword? 'text' : 'password'"
-            :append-icon="showPassword? 'mdi-eye' : 'mdi-eye-off'"
-            :rules="[val => validatePassword(val)]"
-            :success="validPassword"
-            @click:append="showPassword=!showPassword"
-          >
-            <template v-slot:prepend>
-              <v-icon>{{mdiLockSvg}}</v-icon>
-            </template>
-            <template v-slot:progress>
-              <v-progress-linear
-                :value="progress"
-                :color="color"
-                absolute
-                height="3"
-              ></v-progress-linear>
-            </template>
-          </v-text-field>
-        </v-form>
-        <div class="d-flex justify-start">
-          &nbsp;Already have an account?&nbsp;
-          <a @click="vsbyStore.openSigninDialog">Sign in</a>
-        </div>
-        <v-divider class="my-4"></v-divider>
-        <v-btn
-          color="#39175c"
-          dark
-          @click="signupUser"
-          class="mx-1"
-        >
-          Create My Account
-        </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
       </v-card-text>
-      <v-spacer></v-spacer>
+      <v-card-actions style="padding-bottom: 80px;">
+        <v-container>
+          <v-row>
+            <v-col cols="12">
+              <v-btn
+                color="#39175c"
+                dark
+                @click="signupUser"
+                class="mx-1"
+                width="200"
+              >
+                Create My Account
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-actions>
       <!--end: signup view-->
     </v-card>
-    <v-snackbar v-model="showSnackbar">
+    <v-snackbar v-model="showSnackbar" top>
       {{msgSnackbar}}
       <template v-slot:action="{attrs}">
         <v-btn
@@ -173,22 +186,25 @@
   display: flex !important;
   flex-direction: column;
 }
-
 .v-card__subtitle {
   font-size: 50px !important;
   color: #39175c !important;
   line-height: 3rem !important;
   font-family: 'Bebas Neue', cursive !important;
 }
+.v-card-text--scroll {
+  flex-grow: 1;
+  overflow: auto;
+}
 </style>
 
 <script>
-import {mdiClose, mdiAccount, mdiEmail, mdiCellphone, mdiLock} from '@mdi/js'
+import {mdiClose, mdiAccount, mdiEmail, mdiCellphone, mdiLock, mdiEye, mdiEyeOff} from '@mdi/js'
 import {useUserStore} from '@/store/user'
 import {useVsbyStore} from '@/store/vsby'
-import validator from 'validator';
+import validator from 'validator'
 import axios from 'axios'
-import sha256 from 'crypto-js/sha256';
+import sha256 from 'crypto-js/sha256'
 
 export default {
   name: "SignupDialog",
@@ -221,6 +237,8 @@ export default {
       mdiEmailSvg: mdiEmail,
       mdiCellphoneSvg: mdiCellphone,
       mdiLockSvg: mdiLock,
+      mdiEyeSvg: mdiEye,
+      mdiEyeOffSvg: mdiEyeOff,
     }
   },
   methods: {
@@ -272,14 +290,14 @@ export default {
         this.showSnackbarError('Server Error! Please contact us.');
       }
     },
-    handleServerSignupSuccess(respJson) {
+    handleServerSignupSuccess(data) {
       this.signupSuccess = true;
       setTimeout(() => {
         this.vsbyStore.closeSignupDialog();
         this.overlay = false;
         this.resetForm();
       }, 1500);
-      this.userStore.login(respJson.data[0]);
+      this.userStore.login(data);
     },
     async signupUser() {
       let isValid = this.validateForm();
@@ -289,7 +307,7 @@ export default {
         await axios.post((process.env.VUE_APP_BACKEND_SERVER + '/accountapis/signup/' + hashDigest + '/'), this.form)
           .then(response => {
             console.log(response);
-            this.handleServerSignupSuccess(response);
+            this.handleServerSignupSuccess(response.data[0]);
           })
           .catch(error => {
             console.log(error);

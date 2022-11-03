@@ -26,83 +26,93 @@
           Close
         </v-btn>
       </v-card-title>
-      <v-spacer style="min-height: 50px;"></v-spacer>
       <!--start: cart dialog view-->
-      <v-card-subtitle class="justify-center py-0 v-card__subtitle">
-        CART & CHECKOUT
-      </v-card-subtitle>
-      <v-spacer style="min-height: 50px;"></v-spacer>
-      <v-card-text v-if="menuStore.cartItemsCount>0" class="px-0 pt-0 pb-16 v-card-text--scroll">
-        <v-stepper
-          v-model="currStep"
-          alt-labels
-          tile
-          flat
-        >
-          <v-stepper-header class="v-stepper__header">
-            <v-stepper-step 
-              step="1"
-              :complete="stepComplete(1)"
-              :rules="[value => steps[0].valid]" 
-              :color="stepStatus(1)"
-              :complete-icon="mdiCheckSvg"
-              :error-icon="mdiAlertCircleSvg"
-            >
-              Review Order
-            </v-stepper-step>
-            <v-divider></v-divider>
-            <v-stepper-step 
-              step="2"
-              :complete="stepComplete(2)"
-              :rules="[value => steps[1].valid]" 
-              :color="stepStatus(2)"
-              :complete-icon="mdiCheckSvg"
-              :error-icon="mdiAlertCircleSvg"
-            >
-              Delivery
-            </v-stepper-step>
-            <v-divider></v-divider>
-            <v-stepper-step 
-              step="3"
-              :complete="stepComplete(3)"
-              :rules="[value => steps[2].valid]" 
-              :color="stepStatus(3)"
-              :complete-icon="mdiCheckSvg"
-              :error-icon="mdiAlertCircleSvg"
-            >
-              Payment
-            </v-stepper-step>
-          </v-stepper-header>
+      <v-card-text class="pt-16 px-0 v-card-text--scroll">
+        <v-container>
+          <v-row>
+            <v-col cols="12">
+              <span class="v-card__subtitle">CART & CHECKOUT</span>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-stepper
+                v-model="currStep"
+                alt-labels
+                tile
+                flat
+                class="stepper"
+              >
+                <v-stepper-header class="v-stepper__header white sticky">
+                  <v-stepper-step 
+                    step="1"
+                    :complete="stepComplete(1)"
+                    :rules="[value => steps[0].valid]" 
+                    :color="stepStatus(1)"
+                    :complete-icon="mdiCheckSvg"
+                    :error-icon="mdiAlertCircleSvg"
+                  >
+                    Review Order
+                  </v-stepper-step>
+                  <v-divider></v-divider>
+                  <v-stepper-step 
+                    step="2"
+                    :complete="stepComplete(2)"
+                    :rules="[value => steps[1].valid]" 
+                    :color="stepStatus(2)"
+                    :complete-icon="mdiCheckSvg"
+                    :error-icon="mdiAlertCircleSvg"
+                  >
+                    Delivery
+                  </v-stepper-step>
+                  <v-divider></v-divider>
+                  <v-stepper-step 
+                    step="3"
+                    :complete="stepComplete(3)"
+                    :rules="[value => steps[2].valid]" 
+                    :color="stepStatus(3)"
+                    :complete-icon="mdiCheckSvg"
+                    :error-icon="mdiAlertCircleSvg"
+                  >
+                    Payment
+                  </v-stepper-step>
+                </v-stepper-header>
 
-          <v-stepper-items>
-            <v-stepper-content step="1">
-              <ReviewCart ref="reviewCartComp"></ReviewCart>
-              <v-divider class="my-4"></v-divider>
-              <div>
+                <v-stepper-items>
+                  <v-stepper-content step="1">
+                    <ReviewCart ref="reviewCartComp"></ReviewCart>
+                  </v-stepper-content>
+                  <v-stepper-content step="2">
+                    <Delivery ref="deliveryComp"></Delivery>
+                  </v-stepper-content>
+                  <v-stepper-content step="3">
+                    <Payment ref="paymentComp" :totalPrice="menuStore.totalPrice" @paymentStart="overlay=true" @paymentEnd="actOnPayment($event)"></Payment>
+                  </v-stepper-content>
+                </v-stepper-items>
+              </v-stepper>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-card-actions style="padding-bottom: 80px;">
+        <v-container>
+          <v-row>
+            <v-col cols="12">
+              <div v-if="currStep === 1">
                 <CartContBtn :showLoading="totalPriceLoading" :totalPrice="menuStore.totalPrice" @btnClicked="steps[0].validator"></CartContBtn>
                 <CartOtherBtn :action="'clear'" @btnClicked="menuStore.clearCart"></CartOtherBtn>
               </div>
-            </v-stepper-content>
-
-            <v-stepper-content step="2">
-              <Delivery ref="deliveryComp"></Delivery>
-              <v-divider class="my-4"></v-divider>
-              <div>
+              <div v-if="currStep === 2">
                 <CartContBtn :showLoading="totalPriceLoading" :totalPrice="menuStore.totalPrice" @btnClicked="steps[1].validator"></CartContBtn>
                 <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
               </div>
-            </v-stepper-content>
-
-            <v-stepper-content step="3">
-              <Payment ref="paymentComp" :totalPrice="menuStore.totalPrice" @paymentStart="overlay=true" @paymentEnd="actOnPayment($event)"></Payment>
-              <v-divider class="my-4"></v-divider>
-              <div>
+              <div v-if="currStep === 3">
                 <CartOtherBtn :action="'back'" @btnClicked="currStep--"></CartOtherBtn>
               </div>
-            </v-stepper-content>
-          </v-stepper-items>
-        </v-stepper>
-      </v-card-text>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-actions>
       <!--end: cart dialog view-->
     </v-card>
     <v-snackbar v-model="showSnackbar" top>
@@ -141,6 +151,15 @@
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
+.stepper {
+  overflow: visible;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
 .v-card--scroll {
   display: flex !important;
   flex-direction: column;
@@ -183,10 +202,10 @@ import {useUserStore} from '@/store/user'
 import ReviewCart from "@/components/ReviewCart.vue"
 import Delivery from "@/components/Delivery.vue"
 import Payment from "@/components/Payment.vue"
-import CartContBtn from "@/components/ui-elems/CartContBtn.vue";
-import CartOtherBtn from "@/components/ui-elems/CartOtherBtn.vue";
+import CartContBtn from "@/components/ui-elems/CartContBtn.vue"
+import CartOtherBtn from "@/components/ui-elems/CartOtherBtn.vue"
 import axios from 'axios'
-import sha256 from 'crypto-js/sha256';
+import sha256 from 'crypto-js/sha256'
 
 
 export default {

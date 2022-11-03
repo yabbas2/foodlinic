@@ -3,12 +3,8 @@
     <TopBar></TopBar>
     <Intro h1="Menu" h2="Homemade, Safe, Tasty"></Intro>
     <Menu></Menu>
-    <CartDialog></CartDialog>
-    <OrderDialog></OrderDialog>
-    <SignupDialog></SignupDialog>
-    <SigninDialog></SigninDialog>
-    <ProfileDialog></ProfileDialog>
     <BottomBar></BottomBar>
+    <LazyComps v-if="vsbyStore.lazyLoad"></LazyComps>
   </div>
 </template>
 
@@ -17,29 +13,27 @@
 </style>
 
 <script>
-import Intro from "@/components/Intro.vue";
-import Menu from "@/components/Menu.vue";
-import CartDialog from "@/components/CartDialog.vue";
-import TopBar from "@/components/TopBar.vue";
-import OrderDialog from "@/components/OrderDialog.vue";
-import BottomBar from "@/components/BottomBar.vue";
-import SigninDialog from "@/components/SigninDialog.vue";
-import SignupDialog from "@/components/SignupDialog.vue";
-import ProfileDialog from "@/components/ProfileDialog.vue";
+import {useVsbyStore} from '@/store/vsby'
+import Intro from "@/components/Intro.vue"
+import Menu from "@/components/Menu.vue"
+import TopBar from "@/components/TopBar.vue"
+import BottomBar from "@/components/BottomBar.vue"
 
 
 export default {
   name: "MenuView",
+  setup() {
+    const vsbyStore = useVsbyStore()
+    return {
+      vsbyStore,
+    }
+  },
   components: {
     TopBar,
     Intro,
     Menu,
-    CartDialog,
-    OrderDialog,
-    SignupDialog,
-    SigninDialog,
-    ProfileDialog,
     BottomBar,
+    LazyComps: ()=>import("@/components/LazyComps.vue"),
   },
 };
 </script>

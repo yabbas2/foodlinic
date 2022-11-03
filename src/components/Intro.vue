@@ -9,7 +9,7 @@
         cols="12"
       >
         <div class="intro-welcome pl-2">
-          Hi {{userStore.firstname}},
+          {{welcomeMsg}}
         </div>
       </v-col>
     </v-row>
@@ -67,6 +67,11 @@ export default {
   props: {
     h1: String,
     h2: String
-  }
+  },
+  computed: {
+    welcomeMsg() {
+      return (this.userStore.isLoggedIn)? ('Hi ' + this.userStore.firstname + '!') : ('Hi there!')
+    }
+  } 
 }
 </script>

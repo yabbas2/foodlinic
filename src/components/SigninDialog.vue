@@ -26,65 +26,76 @@
           Close
         </v-btn>
       </v-card-title>
-      <v-spacer></v-spacer>
       <!--start: signin view-->
-      <v-card-subtitle class="justify-center py-0 v-card__subtitle">
-        SIGN IN
-      </v-card-subtitle>
-      <v-spacer></v-spacer>
-      <v-card-text class="px-0 pt-0 pb-16">
-        <v-form
-          ref="signinform"
-          v-model="validForm"
-          lazy-validation
-        >
-          <v-text-field
-            v-model="form.email"
-            color="#39175c"
-            label="Email"
-            type="text"
-            :rules="[val => validateEmail(val)]"
-            :success="validEmail"
-          >
-            <template v-slot:prepend>
-              <v-icon>{{mdiAccountSvg}}</v-icon>
-            </template>
-          </v-text-field>
-          <v-text-field
-            v-model="form.password"
-            color="#39175c"
-            label="Password"
-            :type="showPassword? 'text' : 'password'"
-            :append-icon="showPassword? 'mdi-eye' : 'mdi-eye-off'"
-            :rules="[val => validatePassword(val)]"
-            :success="validPassword"
-            @click:append="showPassword=!showPassword"
-          >
-            <template v-slot:prepend>
-              <v-icon>{{mdiLockSvg}}</v-icon>
-            </template>
-          </v-text-field>
-        </v-form>
-        <div class="d-flex justify-start">
-          &nbsp;Don't have an account?&nbsp;
-          <a @click="vsbyStore.openSignupDialog">Sign up</a>
-        </div>
-        <v-divider class="my-4"></v-divider>
-        <v-btn
-          color="#39175c"
-          dark
-          @click="signinUser"
-          class="mx-1"
-        >
-          Sign in
-        </v-btn>
+      <v-card-text class="pt-16 v-card-text--scroll">
+        <v-container>
+          <v-row>
+            <v-col cols="12">
+              <span class="v-card__subtitle">SIGN IN</span>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-form
+                ref="signinform"
+                v-model="validForm"
+                lazy-validation
+              >
+                <v-text-field
+                  v-model="form.email"
+                  color="#39175c"
+                  label="Email"
+                  type="text"
+                  :rules="[val => validateEmail(val)]"
+                  :success="validEmail"
+                >
+                  <template v-slot:prepend>
+                    <v-icon>{{mdiAccountSvg}}</v-icon>
+                  </template>
+                </v-text-field>
+                <v-text-field
+                  v-model="form.password"
+                  color="#39175c"
+                  label="Password"
+                  :type="showPassword? 'text' : 'password'"
+                  :append-icon="showPassword? 'mdi-eye' : 'mdi-eye-off'"
+                  :rules="[val => validatePassword(val)]"
+                  :success="validPassword"
+                  @click:append="showPassword=!showPassword"
+                >
+                  <template v-slot:prepend>
+                    <v-icon>{{mdiLockSvg}}</v-icon>
+                  </template>
+                </v-text-field>
+              </v-form>
+              <div class="d-flex justify-start">
+                &nbsp;Don't have an account?&nbsp;
+                <a @click="openSignupDialogClicked">Sign up</a>
+              </div>
+            </v-col>
+          </v-row>
+        </v-container>
       </v-card-text>
-      <v-spacer></v-spacer>
-      <v-spacer></v-spacer>
-      <v-spacer></v-spacer>
+      <v-card-actions style="padding-bottom: 80px;">
+        <v-container>
+          <v-row>
+            <v-col cols="12">
+              <v-btn
+                color="#39175c"
+                dark
+                @click="signinUser"
+                class="mx-1"
+                width="200"
+              >
+                Sign in
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-actions>
       <!--end: signin view-->
     </v-card>
-    <v-snackbar v-model="showSnackbar">
+    <v-snackbar v-model="showSnackbar" top>
       {{msgSnackbar}}
       <template v-slot:action="{attrs}">
         <v-btn
@@ -124,12 +135,15 @@
   display: flex !important;
   flex-direction: column;
 }
-
 .v-card__subtitle {
   font-size: 50px !important;
   color: #39175c !important;
   line-height: 3rem !important;
   font-family: 'Bebas Neue', cursive !important;
+}
+.v-card-text--scroll {
+  flex-grow: 1;
+  overflow: auto;
 }
 </style>
 
@@ -137,9 +151,9 @@
 import {mdiClose, mdiAccount, mdiLock} from '@mdi/js'
 import {useUserStore} from '@/store/user'
 import {useVsbyStore} from '@/store/vsby'
-import validator from 'validator';
+import validator from 'validator'
 import axios from 'axios'
-import sha256 from 'crypto-js/sha256';
+import sha256 from 'crypto-js/sha256'
 
 export default {
   name: "SigninDialog",
@@ -183,6 +197,10 @@ export default {
       this.form.email = '';
       this.form.password = '';
       this.$refs.signinform.resetValidation();
+    },
+    openSignupDialogClicked() {
+      this.vsbyStore.openSignupDialog();
+      this.resetForm();
     },
     showSnackbarError(errMsg) {
       this.msgSnackbar = errMsg;

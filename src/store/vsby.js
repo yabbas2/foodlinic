@@ -3,6 +3,7 @@ import {defineStore} from 'pinia'
 
 export const useVsbyStore = defineStore('vsby', {
   state: () => ({
+    oneTimeLazyLoad: false,
     signupDiagVsby: false,
     signinDiagVsby: false,
     cartDiagVsby: false,
@@ -10,7 +11,7 @@ export const useVsbyStore = defineStore('vsby', {
     profileDiagVsby: false,
   }),
   getters: {
-    
+    lazyLoad: (state) => (state.signupDiagVsby || state.signinDiagVsby || state.cartDiagVsby || state.orderDiagVsby || state.profileDiagVsby || state.oneTimeLazyLoad),
   },
   actions: {
     openSignupDialog() {
@@ -19,6 +20,7 @@ export const useVsbyStore = defineStore('vsby', {
       this.cartDiagVsby = false;
       this.orderDiagVsby = false;
       this.profileDiagVsby = false;
+      this.oneTimeLazyLoad = true;
     },
     openSigninDialog() {
       this.signupDiagVsby = false;
@@ -26,6 +28,7 @@ export const useVsbyStore = defineStore('vsby', {
       this.cartDiagVsby = false;
       this.orderDiagVsby = false;
       this.profileDiagVsby = false;
+      this.oneTimeLazyLoad = true;
     },
     openCartDialog() {
       this.signupDiagVsby = false;
@@ -33,6 +36,7 @@ export const useVsbyStore = defineStore('vsby', {
       this.cartDiagVsby = true;
       this.orderDiagVsby = false;
       this.profileDiagVsby = false;
+      this.oneTimeLazyLoad = true;
     },
     openOrderDialog() {
       this.signupDiagVsby = false;
@@ -40,6 +44,7 @@ export const useVsbyStore = defineStore('vsby', {
       this.cartDiagVsby = false;
       this.orderDiagVsby = true;
       this.profileDiagVsby = false;
+      this.oneTimeLazyLoad = true;
     },
     openProfileDialog() {
       this.signupDiagVsby = false;
@@ -47,6 +52,7 @@ export const useVsbyStore = defineStore('vsby', {
       this.cartDiagVsby = false;
       this.orderDiagVsby = false;
       this.profileDiagVsby = true;
+      this.oneTimeLazyLoad = true;
     },
     closeSignupDialog() {
       this.signupDiagVsby = false;
