@@ -277,7 +277,6 @@ import {
   outlinedPlace,
   outlinedEvent,
   outlinedModeComment,
-  outlinedDone,
 } from "@quasar/extras/material-icons-outlined";
 import { date } from "quasar";
 

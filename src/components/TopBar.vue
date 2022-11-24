@@ -66,9 +66,7 @@ function cartBtnClicked() {
   Router.push("/cart");
 }
 
-function profileBtnClicked() {
-  Router.push("/user");
-}
+function profileBtnClicked() {}
 
 function leftBtnClicked() {
   switch (props.leftBtn) {
