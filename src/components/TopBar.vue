@@ -20,7 +20,7 @@
     <q-btn round flat :color="iconColor" @click="profileBtnClicked">
       <q-icon
         :size="iconSize"
-        :name="outlinedPerson"
+        :name="outlinedPersonOutline"
         :color="iconColor"
       ></q-icon>
     </q-btn>
@@ -50,7 +50,7 @@
 <script setup>
 import {
   outlinedShoppingBag,
-  outlinedPerson,
+  outlinedPersonOutline,
   outlinedMenu,
   outlinedArrowBackIos,
 } from "@quasar/extras/material-icons-outlined";
@@ -66,7 +66,9 @@ function cartBtnClicked() {
   Router.push("/cart");
 }
 
-function profileBtnClicked() {}
+function profileBtnClicked() {
+  Router.push("/user");
+}
 
 function leftBtnClicked() {
   switch (props.leftBtn) {

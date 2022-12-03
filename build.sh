@@ -3,7 +3,6 @@
 set -o errexit
 
 npm i -g @quasar/cli
-npm init quasar
 quasar clean
 quasar build
 echo "Workaround: creating src folder to handle assets.."

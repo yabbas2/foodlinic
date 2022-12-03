@@ -71,7 +71,7 @@
                   <q-icon
                     size="35px"
                     v-if="nutFactsReveal[idx]"
-                    :name="matExpandLess"
+                    :name="outlinedExpandLess"
                   ></q-icon>
                   <q-icon size="35px" v-else :name="outlinedInfo"></q-icon>
                 </q-btn>
@@ -157,8 +157,8 @@ import { useMenuStore } from "src/stores/menu";
 import {
   outlinedShoppingBag,
   outlinedInfo,
+  outlinedExpandLess,
 } from "@quasar/extras/material-icons-outlined";
-import { matExpandLess } from "@quasar/extras/material-icons";
 
 let nutFactsReveal = reactive([]);
 let menuCatgs = reactive([]);
@@ -234,7 +234,7 @@ function handleServerMenuItemSuccess(jsonData) {
     else if (menuItemObj.status == 'Popular') {menuItemObj['color'] = "success";}
     else                                      {menuItemObj['color'] = "dark";}*/
     menuItemObj["imgSrc"] =
-      "src/assets/" + menuItemObj.name.replaceAll(" ", "-") + ".webp";
+      "/src/assets/" + menuItemObj.name.replaceAll(" ", "-") + ".webp";
     locArry.push(menuItemObj);
   }
   locArry.forEach((elm) => nutFactsReveal.push(false));

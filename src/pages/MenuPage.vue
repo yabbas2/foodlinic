@@ -2,9 +2,13 @@
   <q-page class="flex flex-center">
     <div class="column flex-center absolute-top">
       <div class="col q-my-md">
-        <IntroSection h1="Menu" h2="Homemade, Safe, Tasty"></IntroSection>
+        <IntroSection
+          h1="Menu"
+          h2="Homemade, Safe, Tasty"
+          img=""
+        ></IntroSection>
       </div>
-      <div class="col q-mt-md q-mb-xl">
+      <div class="col q-mt-md">
         <MenuSection></MenuSection>
       </div>
     </div>

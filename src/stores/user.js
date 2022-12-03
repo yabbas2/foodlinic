@@ -6,17 +6,17 @@ export const useUserStore = defineStore("user", {
   state: () => ({
     [key]: null,
   }),
-  persist: true,
+  persist: {
+    storage: sessionStorage,
+    key: "x-access-token",
+  },
   getters: {},
   actions: {
     login(backendForm) {
       this[key] = backendForm[key];
     },
     logout() {
-      window.localStorage.removeItem("user");
-    },
-    checkLogin() {
-      return window.localStorage.getItem("user") !== null && this[key] !== null;
+      window.sessionStorage.removeItem("x-access-token");
     },
   },
 });

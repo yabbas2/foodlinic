@@ -1,14 +1,17 @@
 <template>
-  <div class="column" v-if="props.h1 !== ''">
-    <div class="col text-center">
+  <div class="column">
+    <div v-if="props.h1 !== ''" class="col text-center">
       <div class="intro-title">
         {{ props.h1 }}
       </div>
     </div>
-    <div class="col text-center">
+    <div v-if="props.h2 !== ''" class="col text-center">
       <div class="intro-subtitle">
         {{ props.h2 }}
       </div>
+    </div>
+    <div v-if="props.img !== ''" class="col text-center">
+      <q-img :src="'/src/assets/' + props.img"></q-img>
     </div>
   </div>
 </template>
@@ -28,5 +31,5 @@
 </style>
 
 <script setup>
-const props = defineProps(["h1", "h2"]);
+const props = defineProps(["h1", "h2", "img"]);
 </script>

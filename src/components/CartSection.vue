@@ -9,8 +9,14 @@
     error-color="red"
     flat
     style="width: 370px"
+    @transition="handlePanelTransEvt"
   >
-    <q-step :name="1" color="primary" title="Review cart" :done="step > 1">
+    <q-step
+      :name="steps.step1.id"
+      color="primary"
+      :title="steps.step1.name"
+      :done="step > 1"
+    >
       <div class="column">
         <template v-for="item in menuStore.menuItems" :key="item.id">
           <div v-if="item.qty > 0" class="col q-mt-xs q-mb-xs flex-center">
@@ -78,7 +84,12 @@
       </q-stepper-navigation>
     </q-step>
 
-    <q-step :name="2" color="primary" title="Delivery" :done="step > 2">
+    <q-step
+      :name="steps.step2.id"
+      color="primary"
+      :title="steps.step2.name"
+      :done="step > 2"
+    >
       <div class="column">
         <q-form ref="delvyForm">
           <q-select
@@ -162,7 +173,12 @@
       </q-stepper-navigation>
     </q-step>
 
-    <q-step :name="3" color="secondary" title="Payment" :done="step > 3">
+    <q-step
+      :name="steps.step3.id"
+      color="primary"
+      :title="steps.step3.name"
+      :done="step > 3"
+    >
       <q-card flat bordered>
         <q-card-section>
           <div class="row subtotal-text q-mb-sm">
@@ -233,6 +249,9 @@
   <div v-else class="row flex-center">
     <q-img width="280px" src="~/assets/cart-empty.png"></q-img>
   </div>
+  <q-inner-loading :showing="isLoading">
+    <q-spinner-gears size="50px" color="secondary" />
+  </q-inner-loading>
 </template>
 
 <style scoped>
@@ -268,7 +287,7 @@
 
 <script setup>
 import axios from "axios";
-import { onMounted, reactive, ref, computed } from "vue";
+import { onMounted, reactive, ref, computed, onBeforeMount } from "vue";
 import util from "src/plugins/util";
 import { useMenuStore } from "src/stores/menu";
 import {
@@ -278,16 +297,20 @@ import {
   outlinedEvent,
   outlinedModeComment,
 } from "@quasar/extras/material-icons-outlined";
-import { date } from "quasar";
+import { date, useQuasar } from "quasar";
 
 onMounted(() => {
-  const script = document.createElement("script");
-  script.src =
-    "https://www.paypal.com/sdk/js?client-id=Afypn0F0ftWe0TzZ7w_MEF-h7p3kT-0bfsgULFkpf5qKy9K3o9arN84xlIwOw0Kw7HSKShpDrJjvzQKa&currency=SEK";
-  script.addEventListener("load", setLoaded);
-  document.body.appendChild(script);
   fetchDelvyLocations();
   fetchPromoCodes();
+});
+
+onBeforeMount(() => {
+  const script = document.createElement("script");
+  script.id = "paypal-script";
+  script.src =
+    "https://www.paypal.com/sdk/js?client-id=Afypn0F0ftWe0TzZ7w_MEF-h7p3kT-0bfsgULFkpf5qKy9K3o9arN84xlIwOw0Kw7HSKShpDrJjvzQKa&currency=SEK";
+  //script.addEventListener("load", loadPaypal);
+  document.body.appendChild(script);
 });
 
 const totalToPay = computed(() => {
@@ -297,16 +320,41 @@ const totalToPay = computed(() => {
 });
 
 const menuStore = useMenuStore();
+const $q = useQuasar();
 const selectItems = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const delvyForm = ref(null);
 const promoCodeForm = ref(null);
 const paypal = ref(null);
+const steps = {
+  step1: { id: 1, name: "Review cart" },
+  step2: { id: 2, name: "Delivery" },
+  step3: { id: 3, name: "Payment" },
+};
 
 let discount = ref(0.0);
-let step = ref(3);
+let step = ref(1);
 let form = reactive({ location: null, date: "", notes: "", promocode: "" });
 let locations = [];
 let availPromoCodes = [];
+let isLoading = ref(false);
+
+function notifyError(errMsg) {
+  $q.notify({
+    type: "negative",
+    message: errMsg,
+    position: "bottom",
+  });
+}
+
+function handlePanelTransEvt(newVal, oldVal) {
+  switch (newVal) {
+    case steps.step3.id:
+      loadPaypal();
+      break;
+    default:
+      break;
+  }
+}
 
 async function validdateDelvyForm() {
   await delvyForm.value.validate().then((result) => {
@@ -393,7 +441,54 @@ function getAllowedDates(dateStr) {
   );
 }
 
-function setLoaded() {
+function handleOrderCreateSuccess(respData) {
+  isLoading.value = false;
+}
+
+function handleOrderCreateError(errorCode) {
+  isLoading.value = false;
+  switch (errorCode) {
+    case 401:
+      notifyError("Invalid order data");
+      break;
+    case 401:
+      notifyError("Invalid account credentials");
+      break;
+    case 500:
+    default:
+      notifyError("Error! Please contact us");
+      break;
+  }
+}
+
+async function submitOrder() {
+  let orderData = {
+    token: window.sessionStorage.getItem("x-access-token"),
+    cart: menuStore.cartItemsMin,
+    delivery: {
+      location: form.location.value,
+      date: form.date,
+      notes: form.notes,
+    },
+    payment: totalToPay.value,
+  };
+  isLoading.value = true;
+  await axios
+    .post(
+      import.meta.env.VITE_BACKEND_SERVER + "/foodapis/order/create/",
+      orderData
+    )
+    .then((response) => {
+      console.log(response);
+      handleOrderCreateSuccess(response.data);
+    })
+    .catch((error) => {
+      console.log(error.response);
+      handleOrderCreateError(error.response.status);
+    });
+}
+
+function loadPaypal() {
   window.paypal
     .Buttons({
       style: {
@@ -420,10 +515,15 @@ function setLoaded() {
         let order = await actions.order.capture();
         console.log(order);
         if (order) {
+          submitOrder();
         }
       },
-      onCancel: async (data) => {},
-      onError: async (err) => {},
+      onCancel: async (data) => {
+        notifyError("Transaction cancelled");
+      },
+      onError: async (err) => {
+        notifyError("Transaction failed");
+      },
     })
     .render(paypal.value);
 }
