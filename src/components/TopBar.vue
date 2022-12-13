@@ -1,6 +1,12 @@
 <template>
-  <q-toolbar class="q-mt-md">
-    <q-btn round flat :color="iconColor" @click="leftBtnClicked">
+  <q-toolbar class="q-mt-sm">
+    <q-btn
+      round
+      flat
+      :ripple="false"
+      :color="iconColor"
+      @click="leftBtnClicked"
+    >
       <q-icon
         v-if="props.leftBtn === 'nav-btn'"
         :size="iconSize"
@@ -17,17 +23,23 @@
     <q-toolbar-title>
       <q-img src="~assets/logo-name-wbg.png" class="logo-img" />
     </q-toolbar-title>
-    <q-btn round flat :color="iconColor" @click="profileBtnClicked">
+    <!--<q-btn round flat :color="iconColor" @click="profileBtnClicked">
       <q-icon
         :size="iconSize"
         :name="outlinedPersonOutline"
         :color="iconColor"
       ></q-icon>
     </q-btn>
-    <div class="icon-sep q-mx-sm">|</div>
-    <q-btn round flat :color="iconColor" @click="cartBtnClicked">
+    <div class="icon-sep q-mx-sm">|</div>-->
+    <q-btn
+      round
+      flat
+      :ripple="false"
+      :color="iconColor"
+      @click="cartBtnClicked"
+    >
       <q-badge floating rounded :color="iconColor">{{
-        menuStore.cartItemsCount
+        cartStore.cartItemsCount
       }}</q-badge>
       <q-icon
         :size="iconSize"
@@ -42,33 +54,33 @@
 .logo-img {
   width: 130px;
 }
-.icon-sep {
-  font-size: 25px;
-}
+//.icon-sep {
+//  font-size: 25px;
+//}
 </style>
 
 <script setup>
 import {
   outlinedShoppingBag,
-  outlinedPersonOutline,
+  /*outlinedPersonOutline,*/
   outlinedMenu,
   outlinedArrowBackIos,
 } from "@quasar/extras/material-icons-outlined";
-import Router from "src/router/index";
-import { useMenuStore } from "src/stores/menu";
+import Router from "../router";
+import { useCartStore } from "../stores/cart";
 
 const iconSize = "30px";
 const iconColor = "secondary";
 const props = defineProps(["leftBtn"]);
-const menuStore = useMenuStore();
+const cartStore = useCartStore();
 
 function cartBtnClicked() {
   Router.push("/cart");
 }
 
-function profileBtnClicked() {
-  Router.push("/user");
-}
+//function profileBtnClicked() {
+//  Router.push("/user");
+//}
 
 function leftBtnClicked() {
   switch (props.leftBtn) {

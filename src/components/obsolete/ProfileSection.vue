@@ -131,7 +131,7 @@ import {
   outlinedPhone,
 } from "@quasar/extras/material-icons-outlined";
 import { useQuasar } from "quasar";
-import Router from "src/router/index";
+import Router from "src/router";
 
 const userStore = useUserStore();
 const $q = useQuasar();

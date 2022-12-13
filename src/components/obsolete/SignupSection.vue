@@ -7,7 +7,7 @@
           label="Full name"
           rounded
           outlined
-          v-model="form_fullname"
+          v-model="form.fullname"
           class="q-mb-md"
           type="text"
           hint="e.g. John Alber"
@@ -38,7 +38,7 @@
             <q-icon size="23px" :name="outlinedEmail" @click.stop.prevent />
           </template>
         </q-input>
-        <q-input
+        <!--<q-input
           color="primary"
           label="Phone"
           rounded
@@ -53,7 +53,7 @@
           <template v-slot:prepend>
             <q-icon size="23px" :name="outlinedPhone" @click.stop.prevent />
           </template>
-        </q-input>
+        </q-input>-->
         <q-input
           color="primary"
           label="Password"
@@ -126,30 +126,27 @@
 
 <script setup>
 import { reactive, ref, computed } from "vue";
-import axios from "axios";
-import { useUserStore } from "src/stores/user";
 import validator from "validator";
 import {
   outlinedEmail,
   outlinedVpnKey,
   outlinedAddCircleOutline,
   outlinedPersonOutline,
-  outlinedPhone,
+  /*outlinedPhone,*/
   outlinedVisibility,
   outlinedVisibilityOff,
 } from "@quasar/extras/material-icons-outlined";
 import { useQuasar } from "quasar";
-import Router from "src/router/index";
+import Router from "../router";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "../firebase";
 
-const userStore = useUserStore();
 const $q = useQuasar();
 const signupForm = ref(null);
 let showPassword = ref(false);
 
-let form_fullname = ref("");
 let form = reactive({
-  firstname: "",
-  lastname: "",
+  fullname: "",
   email: "",
   phone: "",
   password: "",
@@ -213,46 +210,45 @@ function validatePassword(val) {
 function handleUserSignupError(errCode) {
   isLoading.value = false;
   switch (errCode) {
-    case 302:
+    case "auth/email-already-in-use":
       notifyError("This account already exists");
       break;
-    case 400:
+    case "auth/invalid-email":
       notifyError("Invalid account info");
       break;
-    case 500:
     default:
       notifyError("Error! Please contact us");
       break;
   }
 }
 
-function handleUserSignupSuccess(respData) {
-  let tokenData = JSON.parse(respData["token"]);
-  userStore.login(tokenData);
+function handleUserSignupSuccess() {
   isLoading.value = false;
   Router.replace("/");
 }
 
 async function signupUser() {
   isLoading.value = true;
-  let formToPost = {
-    firstname: form_fullname.value.split(" ")[0],
-    lastname: form_fullname.value.split(" ")[1],
-    email: form.email,
-    phone: form.phone,
-    password: form.password,
-  };
-  await axios
-    .post(import.meta.env.VITE_BACKEND_SERVER + "/accountapis/signup/", {
-      data: JSON.stringify(formToPost),
-    })
-    .then((response) => {
-      console.log(response);
-      handleUserSignupSuccess(response.data);
+  createUserWithEmailAndPassword(auth, form.email, form.password)
+    .then((userCredential) => {
+      // signed in
+      const user = userCredential.user;
+      // update display name
+      updateProfile(user, { displayName: form.fullname })
+        .then(() => {
+          // success
+          handleUserSignupSuccess();
+        })
+        .catch((error) => {
+          // failure, print error
+          console.log(error);
+        });
     })
     .catch((error) => {
-      console.log(error.response);
-      handleUserSignupError(error.response.status);
+      // failure, print error
+      console.log(error);
+      // show error notification based on error code
+      handleUserSignupError(error.code);
     });
 }
 </script>

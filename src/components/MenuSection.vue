@@ -16,42 +16,39 @@
       :label="catg.name"
     />
   </q-tabs>
+
   <q-tab-panels v-model="tab" animated>
     <q-tab-panel v-for="catg in menuCatgs" :key="catg.id" :name="catg.name">
       <div class="column">
-        <template v-for="(item, idx) in menuStore.menuItems" :key="item.id">
+        <template v-for="(item, idx) in menuStore.menu" :key="item.id">
           <div
-            v-if="item.menu_category_id === catg.id"
+            v-if="item.menu_catg_ref.id === catg.id"
             class="col q-mt-md q-mb-md flex-center"
           >
             <q-card class="item-card bg-white">
-              <q-img :src="item.imgSrc" height="200px">
+              <q-img :src="item.img_src" height="200px">
                 <div class="absolute-bottom row justify-between">
                   <div class="col-8 text-left card-title-font">
                     {{ item.name }}
                   </div>
-                  <div class="col-4 text-right card-subtitle-font">
+                  <div class="col-4 text-right card-title-font">
                     {{ util.formatCurrency(item.price) }}
                   </div>
                 </div>
               </q-img>
-              <!--<q-card-section>
-                <div class="card-title-font">{{ item.name }}</div>
-                <div class="card-subtitle-font">
-                  {{ util.formatCurrency(item.price) }}
-                </div>
-              </q-card-section>-->
               <q-card-actions>
                 <q-select
+                  :model-value="cartStore.cartItemById(item.id)"
                   color="secondary"
                   rounded
                   outlined
-                  v-model="item.qty"
                   :options="selectItems"
                   dense
                   options-dense
                   behavior="menu"
-                  @update:model-value="item.total_price = item.qty * item.price"
+                  @update:model-value="
+                    (val) => cartStore.updateCart(item.id, val)
+                  "
                 >
                   <template v-slot:prepend>
                     <q-icon
@@ -64,8 +61,9 @@
                 <q-space />
                 <q-btn
                   color="secondary"
-                  round
+                  rounded
                   flat
+                  :ripple="false"
                   @click="nutFactsReveal[idx] = !nutFactsReveal[idx]"
                 >
                   <q-icon
@@ -124,20 +122,16 @@
 </template>
 
 <style lang="scss" scoped>
-@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Pacifico&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
 
 .card-title-font {
   font-family: "Bebas Neue", cursive;
   font-size: 25px;
 }
-.card-subtitle-font {
-  font-family: "Pacifico", cursive;
-  font-size: 23px;
-  /*color: $secondary !important;*/
-}
 .item-card {
   border-radius: 30px;
   width: 280px;
+  min-height: 260px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -150,21 +144,23 @@
 </style>
 
 <script setup>
-import axios from "axios";
-import { onBeforeMount, reactive, ref } from "vue";
+import { reactive, ref, onBeforeMount } from "vue";
 import util from "src/plugins/util";
-import { useMenuStore } from "src/stores/menu";
+import { useCartStore } from "../stores/cart";
+import { useMenuStore } from "../stores/menu";
 import {
   outlinedShoppingBag,
   outlinedInfo,
   outlinedExpandLess,
 } from "@quasar/extras/material-icons-outlined";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
 
 let nutFactsReveal = reactive([]);
-let menuCatgs = reactive([]);
-let tab = ref(null);
-let loader = ref(true);
+let tab = ref("Salads");
+let menuCatgs = ref([]);
 
+const cartStore = useCartStore();
 const menuStore = useMenuStore();
 const selectItems = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const nutDetailsColumns = [
@@ -214,54 +210,45 @@ const nutDetailsRows = [
 
 onBeforeMount(() => {
   fetchMenuCatgs();
+  fetchMenuItems();
 });
 
-function handleServerMenuCatgSuccess(jsonData) {
-  jsonData.forEach((elm) => menuCatgs.push(elm));
-  // default selected tab is the first tab
-  tab.value = menuCatgs[0].name;
-  fetchMenuItems();
-}
-
-function handleServerMenuItemSuccess(jsonData) {
-  let locArry = [];
-  for (var idx = 0; idx < jsonData.length; idx++) {
-    var menuItemObj = jsonData[idx];
-    menuItemObj["qty"] = 0;
-    menuItemObj["total_price"] = 0;
-    /*if      (menuItemObj.status == 'New')     {menuItemObj['color'] = "danger";}
-    else if (menuItemObj.status == 'Try It')  {menuItemObj['color'] = "info";}
-    else if (menuItemObj.status == 'Popular') {menuItemObj['color'] = "success";}
-    else                                      {menuItemObj['color'] = "dark";}*/
-    menuItemObj["imgSrc"] =
-      "/src/assets/" + menuItemObj.name.replaceAll(" ", "-") + ".webp";
-    locArry.push(menuItemObj);
-  }
-  locArry.forEach((elm) => nutFactsReveal.push(false));
-  //locArry.forEach(elm => menuStore.menuItems.push(elm));
-  menuStore.updateMenu(locArry);
-  loader.value = false;
-}
-
 async function fetchMenuCatgs() {
-  await axios
-    .get(import.meta.env.VITE_BACKEND_SERVER + "/foodapis/menu-category/")
-    .then((response) => {
-      handleServerMenuCatgSuccess(response.data);
-    })
-    .catch((error) => {
-      console.log(error); /*TODO: better error handling*/
+  const menuCatgQ = query(
+    collection(db, "menu-catg"),
+    where("enabled", "==", true)
+  );
+  // unsubscribe can be called as a function to stop listening to db changes
+  const unsubscribe = onSnapshot(menuCatgQ, (menuCatgSnapshot) => {
+    const updatedMenuCatgs = [];
+    menuCatgSnapshot.forEach((doc) => {
+      updatedMenuCatgs.push({ id: doc.id, name: doc.data().name });
     });
+    menuCatgs.value = updatedMenuCatgs;
+  });
 }
 
 async function fetchMenuItems() {
-  await axios
-    .get(import.meta.env.VITE_BACKEND_SERVER + "/foodapis/menu-item/")
-    .then((response) => {
-      handleServerMenuItemSuccess(response.data);
-    })
-    .catch((error) => {
-      console.log(error); /*TODO: better error handling*/
+  const menuItemQ = query(
+    collection(db, "menu-item"),
+    where("enabled", "==", true)
+  );
+  // unsubscribe can be called as a function to stop listening to db changes
+  const unsubscribe = onSnapshot(menuItemQ, (menuItemSnapshot) => {
+    const updatedMenuItems = [];
+    menuItemSnapshot.forEach((doc) => {
+      updatedMenuItems.push({
+        id: doc.id,
+        name: doc.data().name,
+        portion: doc.data().portion,
+        ingredients: doc.data().ingredients,
+        menu_catg_ref: doc.data().menu_catg_ref,
+        price: doc.data().price,
+        img_src: `/src/assets/mi-${doc.id}.webp`,
+      });
     });
+    menuStore.menu = updatedMenuItems;
+    /*TODO:some items might be removed, so remove them from cart as well*/
+  });
 }
 </script>

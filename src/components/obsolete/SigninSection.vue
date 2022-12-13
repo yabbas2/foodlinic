@@ -79,8 +79,6 @@
 
 <script setup>
 import { reactive, ref } from "vue";
-import axios from "axios";
-import { useUserStore } from "src/stores/user";
 import validator from "validator";
 import {
   outlinedEmail,
@@ -90,9 +88,10 @@ import {
   outlinedLogin,
 } from "@quasar/extras/material-icons-outlined";
 import { useQuasar } from "quasar";
-import Router from "src/router/index";
+import Router from "../router";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
-const userStore = useUserStore();
 const $q = useQuasar();
 const signinForm = ref(null);
 
@@ -126,8 +125,6 @@ function clearForm(email = true, password = true) {
 }
 
 function handleServerSigninSuccess(respData) {
-  let tokenData = JSON.parse(respData["token"]);
-  userStore.login(tokenData);
   isLoading.value = false;
   Router.replace("/");
 }
@@ -157,17 +154,16 @@ function handleServerSigninError(errorCode) {
 
 async function signinUser() {
   isLoading.value = true;
-  await axios
-    .post(import.meta.env.VITE_BACKEND_SERVER + "/accountapis/signin/", {
-      data: JSON.stringify(form),
-    })
-    .then((response) => {
-      console.log(response);
-      handleServerSigninSuccess(response.data);
+  signInWithEmailAndPassword(auth, form.email, form.password)
+    .then((userCredential) => {
+      // Signed in
+      const user = userCredential.user;
+      console.log(user);
+      // ...
     })
     .catch((error) => {
-      console.log(error.response);
-      handleServerSigninError(error.response.status);
+      const errorCode = error.code;
+      const errorMessage = error.message;
     });
 }
 </script>

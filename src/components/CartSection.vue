@@ -1,11 +1,11 @@
 <template>
   <q-stepper
-    v-if="menuStore.cartItemsCount > 0"
+    v-if="cartStore.cartItemsCount > 0"
     v-model="step"
     vertical
     animated
     keep-alive
-    done-color="green"
+    done-color="positive"
     error-color="red"
     flat
     style="width: 370px"
@@ -18,24 +18,25 @@
       :done="step > 1"
     >
       <div class="column">
-        <template v-for="item in menuStore.menuItems" :key="item.id">
+        <template v-for="item in cartStore.cart" :key="item.id">
           <div v-if="item.qty > 0" class="col q-mt-xs q-mb-xs flex-center">
             <q-card class="item-card bg-white">
               <q-card-section>
                 <div class="row justify-start items-center">
-                  <!--<div class="col">
-                    <q-img
-                      :src="item.imgSrc"
-                      height="80px"
-                      width="80px"
-                    ></q-img>
-                  </div>-->
                   <div class="col">
                     <div class="row">
-                      <div class="card-title-font">{{ item.name }}</div>
+                      <div class="card-title-font">
+                        {{ menuStore.menuProp(item.id, "name") }}
+                      </div>
                     </div>
                     <div class="row justify-start items-center">
-                      <q-btn color="red" round flat @click="item.qty = 0">
+                      <q-btn
+                        :ripple="false"
+                        color="red"
+                        round
+                        flat
+                        @click="item.qty = 0"
+                      >
                         <q-icon size="35px" :name="outlinedDelete"></q-icon>
                       </q-btn>
                       <q-select
@@ -48,9 +49,6 @@
                         options-dense
                         behavior="menu"
                         hide-hint
-                        @update:model-value="
-                          item.total_price = item.qty * item.price
-                        "
                       >
                         <template v-slot:prepend>
                           <q-icon
@@ -60,9 +58,13 @@
                           />
                         </template>
                       </q-select>
-                      <div class="q-ml-md">x</div>
-                      <div class="card-subtitle-font q-ml-md">
-                        {{ util.formatCurrency(item.price) }}
+                      <div class="q-ml-sm">x</div>
+                      <div class="card-subtitle-font q-ml-sm">
+                        {{
+                          util.formatCurrency(
+                            menuStore.menuProp(item.id, "price")
+                          )
+                        }}
                       </div>
                     </div>
                   </div>
@@ -76,7 +78,7 @@
         <q-btn @click="step++" color="primary" label="Continue" />
         <q-btn
           outline
-          @click="menuStore.clearCart"
+          @click="cartStore.clearCart"
           color="primary"
           label="Clear Cart"
           class="q-ml-sm"
@@ -103,7 +105,7 @@
             class="q-mb-md"
             hide-bottom-space
             :lazy-rules="true"
-            :rules="[(val) => val !== null]"
+            :rules="[(val) => validateLocation(val)]"
           >
             <template v-slot:prepend>
               <q-icon size="23px" :name="outlinedPlace" @click.stop.prevent />
@@ -117,7 +119,7 @@
             label="Select Meeting Date"
             hide-bottom-space
             :lazy-rules="true"
-            :rules="[(val) => val !== '']"
+            :rules="[(val) => validateDate(val)]"
           >
             <q-popup-proxy
               cover
@@ -147,7 +149,6 @@
             type="textarea"
             label-slot
             counter
-            autogrow
             maxlength="100"
             class="q-mt-md"
           >
@@ -179,12 +180,87 @@
       :title="steps.step3.name"
       :done="step > 3"
     >
+      <div class="column">
+        <q-form ref="contactForm">
+          <q-input
+            color="primary"
+            label="Name"
+            rounded
+            outlined
+            v-model="form.name"
+            class="q-mb-md"
+            type="text"
+            hint="e.g. John Alber"
+            :lazy-rules="true"
+            :rules="[(val) => validateName(val)]"
+          >
+            <template v-slot:prepend>
+              <q-icon
+                size="23px"
+                :name="outlinedPersonOutline"
+                @click.stop.prevent
+              />
+            </template>
+          </q-input>
+          <q-input
+            color="primary"
+            label="Email"
+            rounded
+            outlined
+            v-model="form.email"
+            class="q-mb-md"
+            type="text"
+            hint="e.g. john.alber@mail.com"
+            :lazy-rules="true"
+            :rules="[(val) => validateEmail(val)]"
+          >
+            <template v-slot:prepend>
+              <q-icon size="23px" :name="outlinedEmail" @click.stop.prevent />
+            </template>
+          </q-input>
+          <q-input
+            color="primary"
+            label="Phone"
+            rounded
+            outlined
+            v-model="form.phone"
+            class="q-mb-md"
+            type="text"
+            hint="e.g. +46559822657"
+            :lazy-rules="true"
+            :rules="[(val) => validatePhone(val)]"
+          >
+            <template v-slot:prepend>
+              <q-icon size="23px" :name="outlinedPhone" @click.stop.prevent />
+            </template>
+          </q-input>
+        </q-form>
+      </div>
+
+      <q-stepper-navigation>
+        <q-btn @click="validdateContactForm" color="primary" label="Continue" />
+        <q-btn
+          outline
+          @click="step--"
+          color="primary"
+          label="Back"
+          class="q-ml-sm"
+        />
+      </q-stepper-navigation>
+    </q-step>
+
+    <q-step
+      :name="steps.step4.id"
+      color="primary"
+      :title="steps.step4.name"
+      :done="step > 4"
+    >
       <q-card flat bordered>
         <q-card-section>
           <div class="row subtotal-text q-mb-sm">
             <div class="col text-left">Subtotal</div>
             <div class="col text-right">
-              {{ util.formatCurrency(menuStore.totalPrice) }}
+              {{ util.formatCurrency(totalPrice) }}
             </div>
           </div>
           <div class="row delvyfee-text q-my-sm">
@@ -219,9 +295,7 @@
               label="Promo Code"
               hide-bottom-space
               :lazy-rules="true"
-              :rules="[
-                (val) => availPromoCodes.map((item) => item.name).includes(val),
-              ]"
+              :rules="[(val) => validatePromoCode(val)]"
             />
           </q-form>
         </div>
@@ -246,15 +320,62 @@
       </q-stepper-navigation>
     </q-step>
   </q-stepper>
-  <div v-else class="row flex-center">
-    <q-img width="280px" src="~/assets/cart-empty.png"></q-img>
+  <div v-if="!isOrderSuccess && cartStore.cartItemsCount === 0">
+    <div class="column flex-center">
+      <div class="col">
+        <q-img width="280px" src="~/assets/cart-empty.png"></q-img>
+      </div>
+      <div class="col">
+        <div class="cart-primary-text">
+          Looks like you haven't made up your mind yet.
+        </div>
+      </div>
+      <div class="col">
+        <div class="cart-secondary-text">
+          Maybe head over to our
+          <router-link replace to="/">Home Page</router-link>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div v-if="isOrderSuccess">
+    <div class="column flex-center">
+      <div class="col q-py-md">
+        <q-img src="~assets/op-success.png" class="op-success-img" />
+      </div>
+      <div class="col">
+        <div class="cart-primary-text">Thank you for your order!</div>
+      </div>
+      <div class="col q-pt-md">
+        <div class="cart-secondary-text">
+          An order confirmation email with a link to track your order's progress
+          has been sent to your email address.
+        </div>
+      </div>
+      <div class="col q-pt-md">
+        <q-btn
+          outline
+          color="secondary"
+          @click="Router.replace(`/order/${orderId}`)"
+          >View Order # {{ orderId }}</q-btn
+        >
+      </div>
+      <div class="col q-pt-lg">
+        <q-btn
+          outline
+          @click="finishCheckout"
+          color="positive"
+          label="Back to Home"
+        />
+      </div>
+    </div>
   </div>
   <q-inner-loading :showing="isLoading">
     <q-spinner-gears size="50px" color="secondary" />
   </q-inner-loading>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Pacifico&display=swap");
 
 .item-card {
@@ -283,60 +404,113 @@
   font-weight: bold;
   color: black;
 }
+.cart-primary-text {
+  font-size: 20px;
+  text-align: center;
+  color: gray;
+  padding-left: 5%;
+  padding-right: 5%;
+}
+.cart-secondary-text {
+  font-size: 15px;
+  text-align: center;
+  color: gray;
+}
+.op-success-img {
+  width: 60px;
+}
 </style>
 
 <script setup>
-import axios from "axios";
-import { onMounted, reactive, ref, computed, onBeforeMount } from "vue";
+import validator from "validator";
+import CryptoJS from "crypto-js";
+import { reactive, ref, computed, onBeforeMount } from "vue";
 import util from "src/plugins/util";
-import { useMenuStore } from "src/stores/menu";
+import { useMenuStore } from "../stores/menu";
+import { useCartStore } from "../stores/cart";
 import {
   outlinedShoppingBag,
   outlinedDelete,
   outlinedPlace,
   outlinedEvent,
   outlinedModeComment,
+  outlinedPersonOutline,
+  outlinedEmail,
+  outlinedPhone,
 } from "@quasar/extras/material-icons-outlined";
 import { date, useQuasar } from "quasar";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  addDoc,
+  arrayUnion,
+  doc,
+  serverTimestamp,
+} from "firebase/firestore";
+import { db } from "../firebase";
+import Router from "../router";
+import axios from "axios";
 
-onMounted(() => {
-  fetchDelvyLocations();
-  fetchPromoCodes();
-});
-
-onBeforeMount(() => {
-  const script = document.createElement("script");
-  script.id = "paypal-script";
-  script.src =
-    "https://www.paypal.com/sdk/js?client-id=Afypn0F0ftWe0TzZ7w_MEF-h7p3kT-0bfsgULFkpf5qKy9K3o9arN84xlIwOw0Kw7HSKShpDrJjvzQKa&currency=SEK";
-  //script.addEventListener("load", loadPaypal);
-  document.body.appendChild(script);
-});
-
-const totalToPay = computed(() => {
-  return discount.value > 0.0
-    ? menuStore.totalPrice * (1.0 - discount.value)
-    : menuStore.totalPrice;
-});
-
+const cartStore = useCartStore();
 const menuStore = useMenuStore();
 const $q = useQuasar();
 const selectItems = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const delvyForm = ref(null);
+const contactForm = ref(null);
 const promoCodeForm = ref(null);
 const paypal = ref(null);
 const steps = {
-  step1: { id: 1, name: "Review cart" },
+  step1: { id: 1, name: "Review" },
   step2: { id: 2, name: "Delivery" },
-  step3: { id: 3, name: "Payment" },
+  step3: { id: 3, name: "Contact" },
+  step4: { id: 4, name: "Payment" },
 };
 
 let discount = ref(0.0);
 let step = ref(1);
-let form = reactive({ location: null, date: "", notes: "", promocode: "" });
-let locations = [];
-let availPromoCodes = [];
+let form = reactive({
+  location: null,
+  date: "",
+  notes: "",
+  promocode: "",
+  name: "",
+  email: "",
+  phone: "",
+});
+let locations = ref([]);
+let availPromoCodes = ref([]);
 let isLoading = ref(false);
+let validCartForm = ref(false);
+let isOrderSuccess = ref(false);
+let orderId = ref("");
+let orderTrackLink = ref("");
+
+onBeforeMount(() => {
+  const paypalScript = document.createElement("script");
+  paypalScript.id = "paypal-script";
+  paypalScript.src =
+    "https://www.paypal.com/sdk/js?client-id=AVBu7h9cCuavRDf7EJYC6p7PFPhfGyOVWar5nI8Dv5Pu828M8KeSUSUxOEQew2PqugIJL28A2eNbLpe-&currency=SEK";
+  //script.addEventListener("load", loadPaypal);
+  document.body.appendChild(paypalScript);
+  fetchDelvyLocations();
+  fetchPromoCodes();
+});
+
+const totalToPay = computed(() => {
+  return discount.value > 0.0
+    ? totalPrice.value * (1.0 - discount.value)
+    : totalPrice.value;
+});
+
+const totalPrice = computed(() => {
+  let total = 0;
+  cartStore.cart.forEach((item) => {
+    total += menuStore.menuProp(item.id, "price") * item.qty;
+  });
+  return total;
+});
 
 function notifyError(errMsg) {
   $q.notify({
@@ -348,12 +522,49 @@ function notifyError(errMsg) {
 
 function handlePanelTransEvt(newVal, oldVal) {
   switch (newVal) {
-    case steps.step3.id:
+    case steps.step4.id:
       loadPaypal();
       break;
     default:
       break;
   }
+}
+
+function validateName(val) {
+  return validator.isAlpha(val, "en-US", { ignore: " '-" }) &&
+    validator.isLength(val, { min: 3, max: 50 }) &&
+    validator.matches(val, /^\S+\s\S+$/i)
+    ? true
+    : "";
+}
+
+function validateEmail(val) {
+  return validator.isEmail(val) ? true : "";
+}
+
+function validatePhone(val) {
+  return validator.isMobilePhone(val, "any", { strictMode: true }) ? true : "";
+}
+
+function validatePromoCode(val) {
+  validCartForm.value = availPromoCodes.value
+    .map((item) => item.name)
+    .includes(val);
+  return validCartForm.value ? true : "";
+}
+
+function validateLocation(val) {
+  return val !== null ? true : "";
+}
+
+function validateDate(val) {
+  return val !== "" ? true : "";
+}
+
+async function validdateContactForm() {
+  await contactForm.value.validate().then((result) => {
+    step.value = result ? step.value + 1 : step.value;
+  });
 }
 
 async function validdateDelvyForm() {
@@ -363,55 +574,51 @@ async function validdateDelvyForm() {
 }
 
 async function validatePromoCodeForm() {
-  await promoCodeForm.value.validate().then((result) => {
-    discount.value = result
-      ? availPromoCodes.filter((item) => item.name === form.promocode)[0]
-          .discount
-      : discount.value;
-  });
-}
-
-function handleLocationsFetchSuccess(jsonData) {
-  jsonData.forEach((elm) => {
-    locations.push({
-      value: {
-        lat: elm.coor_lat,
-        lng: elm.coor_lng,
-      },
-      label: elm.name,
-    });
-  });
+  discount.value = validCartForm.value
+    ? availPromoCodes.value.filter((item) => item.name === form.promocode)[0]
+        .discount
+    : discount.value;
 }
 
 async function fetchDelvyLocations() {
-  await axios
-    .get(import.meta.env.VITE_BACKEND_SERVER + "/foodapis/location")
-    .then((response) => {
-      handleLocationsFetchSuccess(response.data);
-    })
-    .catch((error) => {
-      console.log(error); /*TODO: better error handling*/
+  const delvyLocQ = query(
+    collection(db, "delivery-location"),
+    where("enabled", "==", true)
+  );
+  // unsubscribe can be called as a function to stop listening to db changes
+  const unsubscribe = onSnapshot(delvyLocQ, (delvyLocSnapshot) => {
+    const updatedLocations = [];
+    delvyLocSnapshot.forEach((doc) => {
+      updatedLocations.push({
+        value: {
+          id: doc.id,
+          lat: doc.data().loc._lat,
+          lng: doc.data().loc._lng,
+        },
+        label: doc.data().name,
+      });
     });
-}
-
-function handlePromocodesFetchSuccess(jsonData) {
-  // first element is empty -> pass validation if no promocode is provided by user
-  availPromoCodes.push({ name: "", discount: 0.0 });
-  // save server's promocodes
-  jsonData.forEach((elm) => {
-    availPromoCodes.push(elm);
+    locations.value = updatedLocations;
   });
 }
 
 async function fetchPromoCodes() {
-  await axios
-    .get(import.meta.env.VITE_BACKEND_SERVER + "/foodapis/promocode")
-    .then((response) => {
-      handlePromocodesFetchSuccess(response.data);
-    })
-    .catch((error) => {
-      console.log(error); /*TODO: better error handling*/
+  const promoCodeQ = query(
+    collection(db, "promo-code"),
+    where("enabled", "==", true)
+  );
+  // unsubscribe can be called as a function to stop listening to db changes
+  const unsubscribe = onSnapshot(promoCodeQ, (promoCodeSnapshot) => {
+    const updatedPromoCode = [];
+    promoCodeSnapshot.forEach((doc) => {
+      updatedPromoCode.push({
+        id: doc.id,
+        name: doc.data().name,
+        discount: doc.data().discount,
+      });
     });
+    availPromoCodes.value = updatedPromoCode;
+  });
 }
 
 /*TODO:include the orders time to determine the next available time for delivery - should not be next day only*/
@@ -441,51 +648,98 @@ function getAllowedDates(dateStr) {
   );
 }
 
-function handleOrderCreateSuccess(respData) {
-  isLoading.value = false;
-}
-
-function handleOrderCreateError(errorCode) {
-  isLoading.value = false;
-  switch (errorCode) {
-    case 401:
-      notifyError("Invalid order data");
-      break;
-    case 401:
-      notifyError("Invalid account credentials");
-      break;
-    case 500:
-    default:
-      notifyError("Error! Please contact us");
-      break;
-  }
-}
-
 async function submitOrder() {
-  let orderData = {
-    token: window.sessionStorage.getItem("x-access-token"),
-    cart: menuStore.cartItemsMin,
+  isLoading.value = true;
+  // prettier-ignore
+  let cartRefs = cartStore.cart.map((cartItem) => true? { item: doc(db, `menu-item/${cartItem.id}`), qty: cartItem.qty } : cartItem);
+  // prettier-ignore
+  let usedPromoCode = doc(db, `promo-code/${availPromoCodes.value.find((code) => code.name === form.promocode).id}`);
+  // send order to firestore
+  addDoc(collection(db, "menu-order"), {
+    cart: arrayUnion(...cartRefs),
     delivery: {
-      location: form.location.value,
+      location: doc(db, `delivery-location/${form.location.value.id}`),
       date: form.date,
       notes: form.notes,
     },
     payment: totalToPay.value,
-  };
-  isLoading.value = true;
-  await axios
-    .post(
-      import.meta.env.VITE_BACKEND_SERVER + "/foodapis/order/create/",
-      orderData
-    )
-    .then((response) => {
-      console.log(response);
-      handleOrderCreateSuccess(response.data);
+    contact: {
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+    },
+    promocode: usedPromoCode,
+    status: { received: serverTimestamp() },
+  })
+    .then((doc) => {
+      // finish all steps as done
+      step.value++;
+      // save order ID
+      orderId.value = doc.id;
+      // set order track link
+      orderTrackLink.value = `${import.meta.env.VITE_HOST_URL}/order/${doc.id}`;
+      // send order confirmation email
+      sendEmail({
+        emailType: "food_order_confirmation",
+        emailTo: form.email,
+        firstName: form.name.split(" ")[0],
+        totalPaid: totalToPay.value,
+        paymentMethod: "PayPal",
+        orderId: orderId.value,
+        orderTrackLink: orderTrackLink.value,
+        deliveryDate: form.date,
+        deliveryLocation: form.location.label,
+        orderItems: cartStore.cart.map((item) =>
+          true
+            ? {
+                name: menuStore.menuProp(item.id, "name"),
+                qty: item.qty,
+                price: menuStore.menuProp(item.id, "price"),
+              }
+            : ""
+        ),
+      });
+      // clear cart
+      cartStore.clearCart();
+      // stop loading
+      isLoading.value = false;
+      // mark order as successful, to show successful order div
+      isOrderSuccess.value = true;
     })
     .catch((error) => {
-      console.log(error.response);
-      handleOrderCreateError(error.response.status);
+      // TODO: better error handling
+      console.log(error);
+      // stop loading
+      isLoading.value = false;
+      // mark order as failed, do nothing
+      isOrderSuccess.value = false;
     });
+}
+
+async function sendEmail(emailData) {
+  let emailCipher = CryptoJS.AES.encrypt(
+    JSON.stringify(emailData),
+    CryptoJS.enc.Utf8.parse(import.meta.env.VITE_EMAIL_API_KEY),
+    {
+      iv: CryptoJS.enc.Utf8.parse(import.meta.env.VITE_EMAIL_API_IV),
+      padding: CryptoJS.pad.Pkcs7,
+      mode: CryptoJS.mode.CBC,
+    }
+  ).toString();
+  await axios
+    .post(import.meta.env.VITE_EMAIL_API_SERVER + "/emailapis/send-email/", {
+      data: emailCipher,
+    })
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+function finishCheckout() {
+  Router.replace("/");
 }
 
 function loadPaypal() {
@@ -513,16 +767,18 @@ function loadPaypal() {
       // Finalize the transaction
       onApprove: async (data, actions) => {
         let order = await actions.order.capture();
-        console.log(order);
         if (order) {
+          // send order to db
           submitOrder();
         }
       },
       onCancel: async (data) => {
         notifyError("Transaction cancelled");
+        console.log(data);
       },
       onError: async (err) => {
         notifyError("Transaction failed");
+        console.log(err);
       },
     })
     .render(paypal.value);
