@@ -32,6 +32,7 @@
     </q-btn>
     <div class="icon-sep q-mx-sm">|</div>-->
     <q-btn
+      v-if="props.rightBtn1"
       round
       flat
       :ripple="false"
@@ -52,7 +53,7 @@
 
 <style lang="scss" scoped>
 .logo-img {
-  width: 130px;
+  width: 145px;
 }
 //.icon-sep {
 //  font-size: 25px;
@@ -68,11 +69,15 @@ import {
 } from "@quasar/extras/material-icons-outlined";
 import Router from "../router";
 import { useCartStore } from "../stores/cart";
+import { inject, ref } from "vue";
 
 const iconSize = "30px";
 const iconColor = "secondary";
-const props = defineProps(["leftBtn"]);
+const props = defineProps(["leftBtn", "rightBtn1"]);
 const cartStore = useCartStore();
+const bus = inject("bus");
+
+let drawer = ref(false);
 
 function cartBtnClicked() {
   Router.push("/cart");
@@ -87,7 +92,10 @@ function leftBtnClicked() {
     case "back-btn":
       Router.back();
       break;
-
+    case "nav-btn":
+      drawer.value = !drawer.value;
+      bus.emit("nav-drawer", drawer.value);
+      break;
     default:
       break;
   }

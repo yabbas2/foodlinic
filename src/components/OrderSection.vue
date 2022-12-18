@@ -2,26 +2,27 @@
   <div class="q-pa-md items-width">
     <div v-if="!isLoading" class="column">
       <div class="col self-center">
-        <div class="order-id-font">ORDER # {{ props.orderId }}</div>
+        <div class="order-id">{{ props.orderId }}</div>
       </div>
       <div class="col q-mt-xl self-start">
         <q-timeline layout="dense" side="right" color="secondary">
-          <!--<q-timeline-entry
-            v-if="timelineItem === orderStatus.Delivered"
-            title="Delivered"
-            :subtitle="extractDate(order.delivery_datetime)"
+          <q-timeline-entry
+            v-if="isOrderStatusExist(orderProgress.step5)"
+            :title="orderProgress.step5"
+            :subtitle="getTimestamp(orderProgress.step5)"
             side="left"
           >
             <div>Enjoy your meal!</div>
-          </q-timeline-entry>-->
+          </q-timeline-entry>
 
-          <!--<q-timeline-entry
-            v-if="timelineItem === orderStatus.ReadyToPickup"
-            title="Ready to pickup"
+          <q-timeline-entry
+            v-if="isOrderStatusExist(orderProgress.step4)"
+            :title="orderProgress.step4"
+            :subtitle="getTimestamp(orderProgress.step4)"
             side="left"
           >
             <div>Waiting time: 15 minutes.</div>
-          </q-timeline-entry>-->
+          </q-timeline-entry>
 
           <q-timeline-entry
             v-if="isOrderStatusExist(orderProgress.step3)"
@@ -30,10 +31,13 @@
             side="left"
           >
             <div>
-              Delivery details:
+              <strong>Delivery details:</strong>
               <ul>
-                <li>where? {{ order.delivery.location }}</li>
-                <li>when? {{ order.delivery.date }} TODO_add_time</li>
+                <li>
+                  <strong>When?</strong> {{ order.delivery.date }}
+                  {{ order.delivery.time }}
+                </li>
+                <li><strong>Where?</strong> {{ order.delivery.location }}</li>
               </ul>
             </div>
           </q-timeline-entry>
@@ -44,10 +48,7 @@
             :subtitle="getTimestamp(orderProgress.step2)"
             side="left"
           >
-            <div>
-              The chef is preparing your order.<br />Delivery time selection
-              email has been sent.
-            </div>
+            <div>The chef is preparing your order.</div>
           </q-timeline-entry>
 
           <q-timeline-entry
@@ -56,10 +57,7 @@
             :subtitle="getTimestamp(orderProgress.step1)"
             side="left"
           >
-            <div>
-              The chef has received your order.<br />Order confirmation email
-              has been sent.
-            </div>
+            <div>The chef has received your order.</div>
           </q-timeline-entry>
         </q-timeline>
       </div>
@@ -76,16 +74,21 @@
   min-width: 360px;
   max-width: 360px;
 }
-.order-id-font {
-  font-family: "Bebas Neue", cursive;
-  font-size: 30px;
-  color: #f25b47 !important;
+.order-id {
+  //font-family: "Bebas Neue", cursive;
+  //font-size: 30px;
+  font-size: 20px;
+  font-weight: bold;
+  color: $primary !important;
+  border: 1px solid;
+  border-radius: 12px;
+  padding: 5px 5px 5px 5px;
 }
 </style>
 
 <script setup>
 import { onMounted, ref } from "vue";
-import { onSnapshot, doc, getDoc } from "firebase/firestore";
+import { onSnapshot, doc } from "firebase/firestore";
 import { db } from "../firebase";
 
 let order = ref({});
@@ -121,14 +124,12 @@ async function fetchOrderData() {
       order.value = {
         id: doc.id,
         delivery: {
-          location: "",
+          location: doc.data().delivery.location,
           date: doc.data().delivery.date,
+          time: doc.data().delivery.time,
         },
         status: doc.data().status,
       };
-      getDoc(doc.data().delivery.location).then((resp) => {
-        order.value.delivery.location = resp.data().name;
-      });
       isLoading.value = false;
     }
   );

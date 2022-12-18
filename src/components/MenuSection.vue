@@ -17,7 +17,7 @@
     />
   </q-tabs>
 
-  <q-tab-panels v-model="tab" animated>
+  <q-tab-panels v-model="tab" animated class="bg-transparent">
     <q-tab-panel v-for="catg in menuCatgs" :key="catg.id" :name="catg.name">
       <div class="column">
         <template v-for="(item, idx) in menuStore.menu" :key="item.id">

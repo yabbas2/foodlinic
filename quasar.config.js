@@ -70,7 +70,13 @@ module.exports = configure(function (/* ctx */) {
       // distDir
 
       // extendViteConf (viteConf) {},
-      // viteVuePluginOptions: {},
+      viteVuePluginOptions: {
+        template: {
+          compilerOptions: {
+            isCustomElement: (tag) => tag.startsWith("bdt"),
+          },
+        },
+      },
 
       // vitePlugins: [
       //   [ 'package-name', { ..options.. } ]

@@ -18,7 +18,7 @@
   </q-layout>
 </template>
 
-<style lang="scss" scoped></style>
+<style scoped></style>
 
 <script setup>
 import TopBar from "src/components/TopBar.vue";

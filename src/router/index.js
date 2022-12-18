@@ -67,6 +67,37 @@ const routes = [
   //  ],
   //},
 
+  {
+    path: "/privacy-policy",
+    component: () => import("src/layouts/PrivacyPolicyLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("pages/PrivacyPolicyPage.vue"),
+      },
+    ],
+  },
+  {
+    path: "/terms-and-conditions",
+    component: () => import("src/layouts/TermsLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("pages/TermsPage.vue"),
+      },
+    ],
+  },
+  {
+    path: import.meta.env.VITE_ADMIN_URL,
+    component: () => import("src/layouts/AdminLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("pages/AdminPage.vue"),
+      },
+    ],
+  },
+
   // Always leave this as last one,
   // but you can also remove it
   {

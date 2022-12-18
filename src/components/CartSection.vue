@@ -10,6 +10,7 @@
     flat
     style="width: 370px"
     @transition="handlePanelTransEvt"
+    class="bg-transparent"
   >
     <q-step
       :name="steps.step1.id"
@@ -100,7 +101,7 @@
             rounded
             outlined
             v-model="form.location"
-            :options="locations"
+            :options="delvyOpts"
             behavior="menu"
             class="q-mb-md"
             hide-bottom-space
@@ -109,6 +110,28 @@
           >
             <template v-slot:prepend>
               <q-icon size="23px" :name="outlinedPlace" @click.stop.prevent />
+            </template>
+          </q-select>
+          <q-select
+            color="primary"
+            label="Select Meeting Time"
+            rounded
+            outlined
+            v-model="form.time"
+            :disable="form.location === null"
+            :options="form.location === null ? [] : form.location.value.time"
+            behavior="menu"
+            class="q-mb-md"
+            hide-bottom-space
+            :lazy-rules="true"
+            :rules="[(val) => validateTime(val)]"
+          >
+            <template v-slot:prepend>
+              <q-icon
+                size="23px"
+                :name="outlinedSchedule"
+                @click.stop.prevent
+              />
             </template>
           </q-select>
           <q-input
@@ -330,7 +353,7 @@
           Looks like you haven't made up your mind yet.
         </div>
       </div>
-      <div class="col">
+      <div class="col q-pt-md">
         <div class="cart-secondary-text">
           Maybe head over to our
           <router-link replace to="/">Home Page</router-link>
@@ -340,34 +363,33 @@
   </div>
   <div v-if="isOrderSuccess">
     <div class="column flex-center">
-      <div class="col q-py-md">
+      <div class="col q-py-sm">
         <q-img src="~assets/op-success.png" class="op-success-img" />
       </div>
-      <div class="col">
+      <div class="col q-py-sm" style="min-width: 300px">
         <div class="cart-primary-text">Thank you for your order!</div>
       </div>
-      <div class="col q-pt-md">
+      <div class="col q-py-md" style="max-width: 300px">
         <div class="cart-secondary-text">
-          An order confirmation email with a link to track your order's progress
-          has been sent to your email address.
+          An order confirmation email has been sent to your email address.
         </div>
       </div>
-      <div class="col q-pt-md">
-        <q-btn
-          outline
-          color="secondary"
-          @click="Router.replace(`/order/${orderId}`)"
-          >View Order # {{ orderId }}</q-btn
-        >
-      </div>
-      <div class="col q-pt-lg">
-        <q-btn
-          outline
-          @click="finishCheckout"
-          color="positive"
-          label="Back to Home"
-        />
-      </div>
+    </div>
+    <div class="row flex-center q-mt-lg">
+      <q-btn
+        outline
+        color="primary"
+        label="Back to Home"
+        class="q-mx-md"
+        @click="finishCheckout"
+      />
+      <q-btn
+        outline
+        color="positive"
+        label="Track My Order"
+        class="q-mx-md"
+        @click="Router.replace(`/order/${orderId}`)"
+      />
     </div>
   </div>
   <q-inner-loading :showing="isLoading">
@@ -437,6 +459,7 @@ import {
   outlinedPersonOutline,
   outlinedEmail,
   outlinedPhone,
+  outlinedSchedule,
 } from "@quasar/extras/material-icons-outlined";
 import { date, useQuasar } from "quasar";
 import {
@@ -473,13 +496,14 @@ let step = ref(1);
 let form = reactive({
   location: null,
   date: "",
+  time: "",
   notes: "",
   promocode: "",
   name: "",
   email: "",
   phone: "",
 });
-let locations = ref([]);
+let delvyOpts = ref([]);
 let availPromoCodes = ref([]);
 let isLoading = ref(false);
 let validCartForm = ref(false);
@@ -494,7 +518,7 @@ onBeforeMount(() => {
     "https://www.paypal.com/sdk/js?client-id=AVBu7h9cCuavRDf7EJYC6p7PFPhfGyOVWar5nI8Dv5Pu828M8KeSUSUxOEQew2PqugIJL28A2eNbLpe-&currency=SEK";
   //script.addEventListener("load", loadPaypal);
   document.body.appendChild(paypalScript);
-  fetchDelvyLocations();
+  fetchDelvyOpts();
   fetchPromoCodes();
 });
 
@@ -561,6 +585,10 @@ function validateDate(val) {
   return val !== "" ? true : "";
 }
 
+function validateTime(val) {
+  return val !== "" ? true : "";
+}
+
 async function validdateContactForm() {
   await contactForm.value.validate().then((result) => {
     step.value = result ? step.value + 1 : step.value;
@@ -580,25 +608,26 @@ async function validatePromoCodeForm() {
     : discount.value;
 }
 
-async function fetchDelvyLocations() {
-  const delvyLocQ = query(
-    collection(db, "delivery-location"),
+async function fetchDelvyOpts() {
+  const delvyOptQ = query(
+    collection(db, "delivery-opt"),
     where("enabled", "==", true)
   );
   // unsubscribe can be called as a function to stop listening to db changes
-  const unsubscribe = onSnapshot(delvyLocQ, (delvyLocSnapshot) => {
-    const updatedLocations = [];
-    delvyLocSnapshot.forEach((doc) => {
-      updatedLocations.push({
+  const unsubscribe = onSnapshot(delvyOptQ, (delvyOptSnapshot) => {
+    const updatedDelvyOpts = [];
+    delvyOptSnapshot.forEach((doc) => {
+      updatedDelvyOpts.push({
         value: {
           id: doc.id,
           lat: doc.data().loc._lat,
           lng: doc.data().loc._lng,
+          time: doc.data().time,
         },
         label: doc.data().name,
       });
     });
-    locations.value = updatedLocations;
+    delvyOpts.value = updatedDelvyOpts;
   });
 }
 
@@ -658,8 +687,9 @@ async function submitOrder() {
   addDoc(collection(db, "menu-order"), {
     cart: arrayUnion(...cartRefs),
     delivery: {
-      location: doc(db, `delivery-location/${form.location.value.id}`),
+      location: form.location.label,
       date: form.date,
+      time: form.time,
       notes: form.notes,
     },
     payment: totalToPay.value,
@@ -688,6 +718,7 @@ async function submitOrder() {
         orderId: orderId.value,
         orderTrackLink: orderTrackLink.value,
         deliveryDate: form.date,
+        deliveryTime: form.time,
         deliveryLocation: form.location.label,
         orderItems: cartStore.cart.map((item) =>
           true

@@ -19,7 +19,7 @@ export const useCartStore = defineStore("cart", {
       } else {
         this.cart.push({ id: itemId, qty: qty });
       }
-      console.log(this.cart);
+      //console.log(this.cart);
     },
     cartItemById(itemId) {
       let possibleCartItem = this.cart.find((item) => item.id === itemId);
