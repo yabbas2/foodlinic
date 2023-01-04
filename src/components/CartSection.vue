@@ -7,7 +7,6 @@
     keep-alive
     done-color="positive"
     error-color="red"
-    flat
     style="width: 370px"
     @transition="handlePanelTransEvt"
     class="bg-transparent"
@@ -29,8 +28,7 @@
                       <div class="card-title-font">
                         {{ menuStore.menuProp(item.id, "name") }}
                       </div>
-                    </div>
-                    <div class="row justify-start items-center">
+                      <q-space />
                       <q-btn
                         :ripple="false"
                         color="red"
@@ -40,6 +38,8 @@
                       >
                         <q-icon size="35px" :name="outlinedDelete"></q-icon>
                       </q-btn>
+                    </div>
+                    <div class="row justify-start items-center">
                       <q-select
                         color="secondary"
                         rounded
@@ -97,7 +97,7 @@
         <q-form ref="delvyForm">
           <q-select
             color="primary"
-            label="Select Meeting Location"
+            label="Select Location"
             rounded
             outlined
             v-model="form.location"
@@ -111,10 +111,20 @@
             <template v-slot:prepend>
               <q-icon size="23px" :name="outlinedPlace" @click.stop.prevent />
             </template>
+            <template v-slot:option="scope">
+              <q-item v-bind="scope.itemProps">
+                <q-item-section>
+                  <q-item-label>{{ scope.opt.label }}</q-item-label>
+                  <q-item-label caption>{{
+                    scope.opt.description
+                  }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
           </q-select>
           <q-select
             color="primary"
-            label="Select Meeting Time"
+            label="Select Time"
             rounded
             outlined
             v-model="form.time"
@@ -139,7 +149,7 @@
             rounded
             v-model="form.date"
             class="q-my-md"
-            label="Select Meeting Date"
+            label="Select Date"
             hide-bottom-space
             :lazy-rules="true"
             :rules="[(val) => validateDate(val)]"
@@ -513,9 +523,11 @@ let orderTrackLink = ref("");
 
 onBeforeMount(() => {
   const paypalScript = document.createElement("script");
-  paypalScript.id = "paypal-script";
+  //paypalScript.id = "paypal-script";
   paypalScript.src =
-    "https://www.paypal.com/sdk/js?client-id=AVBu7h9cCuavRDf7EJYC6p7PFPhfGyOVWar5nI8Dv5Pu828M8KeSUSUxOEQew2PqugIJL28A2eNbLpe-&currency=SEK";
+    "https://www.paypal.com/sdk/js?client-id=" +
+    import.meta.env.VITE_PAYPAL_CLIENT_ID +
+    "&currency=SEK";
   //script.addEventListener("load", loadPaypal);
   document.body.appendChild(paypalScript);
   fetchDelvyOpts();
@@ -625,6 +637,7 @@ async function fetchDelvyOpts() {
           time: doc.data().time,
         },
         label: doc.data().name,
+        description: doc.data().description,
       });
     });
     delvyOpts.value = updatedDelvyOpts;

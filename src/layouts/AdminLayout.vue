@@ -1,10 +1,10 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header reveal elevated class="bg-white text-black">
-      <TopBar :leftBtn="'back-btn'" :rightBtn1="false"></TopBar>
+    <q-header reveal elevated class="bg-white text-black z-top">
+      <TopBar :leftBtn="'nav-btn'" :rightBtn1="false"></TopBar>
     </q-header>
 
-    <q-drawer show-if-above bordered> </q-drawer>
+    <NavDrawer></NavDrawer>
 
     <q-page-container>
       <router-view />
@@ -22,5 +22,6 @@
 
 <script setup>
 import TopBar from "src/components/TopBar.vue";
+import NavDrawer from "src/components/NavDrawer.vue";
 //import BottomBar from "src/components/BottomBar.vue";
 </script>

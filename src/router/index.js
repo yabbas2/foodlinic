@@ -88,11 +88,11 @@ const routes = [
     ],
   },
   {
-    path: import.meta.env.VITE_ADMIN_URL,
+    path: "/admin",
     component: () => import("src/layouts/AdminLayout.vue"),
     children: [
       {
-        path: "",
+        path: "order-dashboard",
         component: () => import("pages/AdminPage.vue"),
       },
     ],
@@ -102,7 +102,7 @@ const routes = [
   // but you can also remove it
   {
     path: "/:catchAll(.*)*",
-    component: () => import("pages/ErrorNotFound.vue"),
+    component: () => import("src/pages/Error404Page.vue"),
   },
 ];
 

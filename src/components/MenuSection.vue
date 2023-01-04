@@ -37,27 +37,12 @@
                 </div>
               </q-img>
               <q-card-actions>
-                <q-select
-                  :model-value="cartStore.cartItemById(item.id)"
-                  color="secondary"
-                  rounded
-                  outlined
-                  :options="selectItems"
-                  dense
-                  options-dense
-                  behavior="menu"
-                  @update:model-value="
+                <QtyBtn
+                  :modelValue="cartStore.cartItemById(item.id)"
+                  @update:modelValue="
                     (val) => cartStore.updateCart(item.id, val)
                   "
-                >
-                  <template v-slot:prepend>
-                    <q-icon
-                      size="23px"
-                      :name="outlinedShoppingBag"
-                      @click.stop.prevent
-                    />
-                  </template>
-                </q-select>
+                ></QtyBtn>
                 <q-space />
                 <q-btn
                   color="secondary"
@@ -95,19 +80,17 @@
                         Nutrition facts (per 100g):
                       </div>
                       <div class="col">
-                        <q-table
-                          dense
-                          table-colspan="2"
-                          :rows="nutDetailsRows"
-                          :columns="nutDetailsColumns"
-                          row-key="name"
-                          hide-header
-                          hide-pagination
-                          separator="cell"
-                          wrap-cells
-                          flat
-                          bordered
-                        ></q-table>
+                        <q-markup-table separator="cell" dense flat bordered>
+                          <tbody>
+                            <tr
+                              v-for="nutFact in nutDetails"
+                              :key="`${item.id}_${nutFact.name}`"
+                            >
+                              <td class="text-center">{{ nutFact.name }}</td>
+                              <td class="text-center">{{ nutFact.amount }}</td>
+                            </tr>
+                          </tbody>
+                        </q-markup-table>
                       </div>
                     </div>
                   </q-card-section>
@@ -145,43 +128,26 @@
 
 <script setup>
 import { reactive, ref, onBeforeMount } from "vue";
-import util from "src/plugins/util";
+import util from "../plugins/util";
 import { useCartStore } from "../stores/cart";
 import { useMenuStore } from "../stores/menu";
 import {
-  outlinedShoppingBag,
   outlinedInfo,
   outlinedExpandLess,
 } from "@quasar/extras/material-icons-outlined";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
+import QtyBtn from "./QtyBtn.vue";
 
 let nutFactsReveal = reactive([]);
-let tab = ref("Salads");
+let tab = ref("");
 let menuCatgs = ref([]);
 
 const cartStore = useCartStore();
 const menuStore = useMenuStore();
 const selectItems = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const nutDetailsColumns = [
-  {
-    name: "fact",
-    required: true,
-    label: "Nutrition facts",
-    align: "left",
-    field: (row) => row.name,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
-  {
-    name: "amount",
-    align: "left",
-    label: "Amount/Percentage",
-    field: "amount",
-    sortable: true,
-  },
-];
-const nutDetailsRows = [
+/*TODO:remove this array and configure the nutrition facts in db*/
+const nutDetails = [
   {
     name: "Fact#1",
     amount: "10%",
@@ -213,7 +179,7 @@ onBeforeMount(() => {
   fetchMenuItems();
 });
 
-async function fetchMenuCatgs() {
+function fetchMenuCatgs() {
   const menuCatgQ = query(
     collection(db, "menu-catg"),
     where("enabled", "==", true)
@@ -225,10 +191,11 @@ async function fetchMenuCatgs() {
       updatedMenuCatgs.push({ id: doc.id, name: doc.data().name });
     });
     menuCatgs.value = updatedMenuCatgs;
+    tab.value = updatedMenuCatgs[0].name;
   });
 }
 
-async function fetchMenuItems() {
+function fetchMenuItems() {
   const menuItemQ = query(
     collection(db, "menu-item"),
     where("enabled", "==", true)
