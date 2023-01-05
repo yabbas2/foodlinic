@@ -1,10 +1,7 @@
 <template>
   <q-page class="flex flex-center">
     <div class="column flex-center absolute-top">
-      <div class="col q-my-md">
-        <IntroSection h1="Menu" h2="Homemade, Safe, Tasty"></IntroSection>
-      </div>
-      <div class="col q-mt-md">
+      <div class="col q-mt-lg">
         <MenuSection></MenuSection>
       </div>
     </div>

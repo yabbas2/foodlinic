@@ -1,7 +1,7 @@
 <template>
   <div class="row inline no-wrap flex-center main-div">
     <q-btn
-      color="secondary"
+      :color="props.style == 'dark' ? 'white' : 'secondary'"
       flat
       rounded
       :ripple="false"
@@ -18,16 +18,25 @@
       outlined
       :model-value="props.modelValue"
       type="number"
-      bg-color="secondary"
-      :input-style="{
-        textAlign: 'center',
-        fontWeight: 'bold',
-        color: 'white',
-        fontSize: '15px',
-      }"
+      :dark="props.style == 'dark'"
+      :input-style="
+        props.style == 'dark'
+          ? {
+              textAlign: 'center',
+              fontWeight: 'bold',
+              color: 'white',
+              fontSize: '15px',
+            }
+          : {
+              textAlign: 'center',
+              fontWeight: 'bold',
+              color: '#dc3535',
+              fontSize: '15px',
+            }
+      "
     />
     <q-btn
-      color="secondary"
+      :color="props.style == 'dark' ? 'white' : 'secondary'"
       flat
       rounded
       :ripple="false"
@@ -43,6 +52,18 @@
 .main-div {
   max-width: 120px;
 }
+.light-input {
+  text-align: "center";
+  font-weight: "bold";
+  color: $secondary;
+  font-size: 15px;
+}
+.dark-input {
+  text-align: "center";
+  font-weight: "bold";
+  color: white;
+  font-size: 100px;
+}
 </style>
 
 <script setup>
@@ -51,7 +72,7 @@ import {
   outlinedAddCircleOutline,
 } from "@quasar/extras/material-icons-outlined";
 
-const props = defineProps(["modelValue"]);
+const props = defineProps(["modelValue", "style"]);
 const emit = defineEmits(["update:modelValue"]);
 
 function incrementCount() {

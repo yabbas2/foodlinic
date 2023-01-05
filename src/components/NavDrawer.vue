@@ -5,7 +5,7 @@
     :width="200"
     :breakpoint="drawerBreakpoint"
     bordered
-    class="bg-white"
+    class="bg-grey-1"
   >
     <q-list class="fixed-top">
       <q-item>

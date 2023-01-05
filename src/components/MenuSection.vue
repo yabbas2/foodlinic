@@ -1,13 +1,5 @@
 <template>
-  <q-tabs
-    v-model="tab"
-    class="text-black"
-    active-color="secondary"
-    indicator-color="secondary"
-    mobile-arrows
-    outside-arrows
-    narrow-indicator
-  >
+  <q-tabs v-model="tab" indicator-color="transparent">
     <q-tab
       v-for="catg in menuCatgs"
       :key="catg.id"
@@ -25,19 +17,41 @@
             v-if="item.menu_catg_ref.id === catg.id"
             class="col q-mt-md q-mb-md flex-center"
           >
-            <q-card class="item-card bg-white">
-              <q-img :src="item.img_src" height="200px">
-                <div class="absolute-bottom row justify-between">
-                  <div class="col-8 text-left card-title-font">
+            <q-card
+              bordered
+              :class="idx % 2 == 0 ? 'item-card2' : 'item-card1'"
+            >
+              <q-card-section horizontal>
+                <q-card-section>
+                  <div
+                    :class="
+                      idx % 2 == 0
+                        ? 'q-mt-xs item-card2-title'
+                        : 'q-mt-xs item-card1-title'
+                    "
+                  >
                     {{ item.name }}
                   </div>
-                  <div class="col-4 text-right card-title-font">
+                  <div
+                    :class="
+                      idx % 2 == 0
+                        ? 'q-mt-xs item-card2-subtitle'
+                        : 'q-mt-xs item-card1-subtitle'
+                    "
+                  >
                     {{ util.formatCurrency(item.price) }}
                   </div>
-                </div>
-              </q-img>
+                </q-card-section>
+                <q-card-section
+                  class="col-5 flex flex-center"
+                  style="margin-left: auto"
+                >
+                  <q-img :src="item.img_src" />
+                </q-card-section>
+              </q-card-section>
               <q-card-actions>
                 <QtyBtn
+                  :style="idx % 2 == 0 ? 'light' : 'dark'"
                   :modelValue="cartStore.cartItemById(item.id)"
                   @update:modelValue="
                     (val) => cartStore.updateCart(item.id, val)
@@ -45,7 +59,7 @@
                 ></QtyBtn>
                 <q-space />
                 <q-btn
-                  color="secondary"
+                  :color="idx % 2 == 0 ? 'secondary' : 'white'"
                   rounded
                   flat
                   :ripple="false"
@@ -60,7 +74,10 @@
                 </q-btn>
               </q-card-actions>
               <q-slide-transition>
-                <div v-show="nutFactsReveal[idx]">
+                <div
+                  v-show="nutFactsReveal[idx]"
+                  :class="idx % 2 == 0 ? 'text-secondary' : 'text-white'"
+                >
                   <q-separator />
                   <q-card-section>
                     <div class="row q-my-sm">
@@ -76,11 +93,19 @@
                       <div class="col">{{ item.ingredients }}</div>
                     </div>
                     <div class="column q-my-sm">
-                      <div class="col text-italic">
-                        Nutrition facts (per 100g):
-                      </div>
+                      <div class="col text-italic">Nutrition facts:</div>
                       <div class="col">
-                        <q-markup-table separator="cell" dense flat bordered>
+                        <q-markup-table
+                          separator="none"
+                          dense
+                          flat
+                          bordered
+                          style="
+                            color: inherit;
+                            background-color: transparent;
+                            border-color: inherit;
+                          "
+                        >
                           <tbody>
                             <tr
                               v-for="nutFact in nutDetails"
@@ -107,16 +132,54 @@
 <style lang="scss" scoped>
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
 
-.card-title-font {
-  font-family: "Bebas Neue", cursive;
-  font-size: 25px;
+.q-tab--inactive {
+  border-radius: 20px !important;
 }
-.item-card {
+.q-tab--active {
+  border-radius: 20px !important;
+  background-color: $secondary !important;
+  color: white !important;
+}
+.item-card1 {
   border-radius: 30px;
-  width: 280px;
-  min-height: 260px;
+  width: 340px;
+  min-height: 150px;
   margin-left: auto;
   margin-right: auto;
+  background-color: $secondary;
+}
+.item-card1-title {
+  font-family: "Bebas Neue", cursive;
+  color: white;
+  font-size: 30px;
+}
+.item-card1-subtitle {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5rem;
+  letter-spacing: 0.03125em;
+  color: white;
+}
+.item-card2 {
+  border-radius: 30px;
+  width: 340px;
+  min-height: 150px;
+  margin-left: auto;
+  margin-right: auto;
+  border-color: $secondary;
+  background-color: white;
+}
+.item-card2-title {
+  font-family: "Bebas Neue", cursive;
+  color: $secondary;
+  font-size: 30px;
+}
+.item-card2-subtitle {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5rem;
+  letter-spacing: 0.03125em;
+  color: $secondary;
 }
 </style>
 
