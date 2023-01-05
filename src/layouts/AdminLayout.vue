@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header reveal elevated class="bg-white text-black z-top">
-      <TopBar :leftBtn="'nav-btn'" :rightBtn1="false"></TopBar>
+      <TopBar :leftBtn="'nav-btn'" :rightBtn1="false" :showLogo="true"></TopBar>
     </q-header>
 
     <NavDrawer></NavDrawer>

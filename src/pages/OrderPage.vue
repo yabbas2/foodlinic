@@ -2,7 +2,7 @@
   <q-page class="flex flex-center">
     <div class="column flex-center absolute-top">
       <div class="col q-my-md">
-        <IntroSection h1="Track Order" h2="" img=""></IntroSection>
+        <IntroSection h1="Track Order" h2=""></IntroSection>
       </div>
       <div class="col q-mt-md">
         <OrderSection :orderId="id"></OrderSection>

@@ -9,7 +9,15 @@ import {
 const routes = [
   {
     path: "/",
-    redirect: "/menu",
+    //redirect: "/menu",
+    component: () => import("src/layouts/HomeLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("pages/HomePage.vue"),
+        //beforeEnter: [],
+      },
+    ],
   },
   {
     path: "/menu",

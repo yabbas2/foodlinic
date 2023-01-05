@@ -7,7 +7,17 @@
     bordered
     class="bg-white"
   >
+    <q-list class="fixed-top">
+      <q-item>
+        <q-item-section avatar>
+          <q-icon size="30px" :name="outlinedWavingHand" />
+        </q-item-section>
+        <q-item-section class="welcome-text"> WELCOME! </q-item-section>
+      </q-item>
+    </q-list>
+
     <q-list class="fixed-top topbar-margin">
+      <q-separator />
       <q-item clickable v-ripple @click="Router.replace('/')">
         <q-item-section avatar>
           <q-icon :name="outlinedHome" />
@@ -20,6 +30,13 @@
           <q-icon :name="outlinedMenuBook" />
         </q-item-section>
         <q-item-section> Food Menu </q-item-section>
+      </q-item>
+      <q-separator />
+      <q-item clickable v-ripple @click="Router.replace('/diet')">
+        <q-item-section avatar>
+          <q-icon :name="outlinedMedicalInformation" />
+        </q-item-section>
+        <q-item-section> Nutrition Plans </q-item-section>
       </q-item>
       <q-separator />
     </q-list>
@@ -37,9 +54,14 @@
   </q-drawer>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
 .topbar-margin {
-  margin-top: 70px;
+  margin-top: 55px;
+}
+.welcome-text {
+  font-family: "Bebas Neue", cursive;
+  font-size: 30px;
 }
 </style>
 
@@ -49,6 +71,8 @@ import Router from "../router";
 import {
   outlinedHome,
   outlinedMenuBook,
+  outlinedWavingHand,
+  outlinedMedicalInformation,
 } from "@quasar/extras/material-icons-outlined";
 
 const bus = inject("bus");

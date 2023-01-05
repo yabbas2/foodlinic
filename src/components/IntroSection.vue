@@ -10,9 +10,6 @@
         {{ props.h2 }}
       </div>
     </div>
-    <div v-if="props.img !== ''" class="col text-center">
-      <q-img :src="'/src/assets/' + props.img"></q-img>
-    </div>
   </div>
 </template>
 
@@ -31,5 +28,5 @@
 </style>
 
 <script setup>
-const props = defineProps(["h1", "h2", "img"]);
+const props = defineProps(["h1", "h2"]);
 </script>

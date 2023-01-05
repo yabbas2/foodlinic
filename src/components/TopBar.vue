@@ -1,5 +1,5 @@
 <template>
-  <q-toolbar class="q-mt-sm">
+  <q-toolbar class="q-pt-sm">
     <q-btn
       round
       flat
@@ -21,7 +21,11 @@
       ></q-icon>
     </q-btn>
     <q-toolbar-title>
-      <q-img src="~assets/logo-name-wbg.png" class="logo-img" />
+      <q-img
+        v-if="props.showLogo"
+        src="~assets/logo-name-wbg.png"
+        class="logo-img"
+      />
     </q-toolbar-title>
     <!--<q-btn round flat :color="iconColor" @click="profileBtnClicked">
       <q-icon
@@ -73,7 +77,7 @@ import { inject, ref } from "vue";
 
 const iconSize = "30px";
 const iconColor = "secondary";
-const props = defineProps(["leftBtn", "rightBtn1"]);
+const props = defineProps(["leftBtn", "rightBtn1", "showLogo"]);
 const cartStore = useCartStore();
 const bus = inject("bus");
 

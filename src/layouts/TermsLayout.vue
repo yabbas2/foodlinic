@@ -1,7 +1,11 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header reveal elevated class="bg-white text-black">
-      <TopBar :leftBtn="'back-btn'" :rightBtn1="false"></TopBar>
+      <TopBar
+        :leftBtn="'back-btn'"
+        :rightBtn1="false"
+        :showLogo="true"
+      ></TopBar>
     </q-header>
 
     <q-drawer show-if-above bordered> </q-drawer>
