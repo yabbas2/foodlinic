@@ -2,7 +2,10 @@
   <q-layout view="lHh Lpr lFf" class="bg-grey-1">
     <q-header reveal class="toolbar-bg">
       <TopBar :leftBtn="'nav-btn'" :rightBtn1="true" :showLogo="true"></TopBar>
-      <ExtTopBarMin></ExtTopBarMin>
+      <ExtTopBarMin
+        title="MENU"
+        subtitle="Homemade, Healthy, Tasty!"
+      ></ExtTopBarMin>
     </q-header>
 
     <NavDrawer></NavDrawer>
@@ -21,7 +24,6 @@
   background-position: center;
   border-bottom-left-radius: 50%;
   border-bottom-right-radius: 50%;
-  //height: 500px;
 }
 </style>
 

@@ -9,7 +9,7 @@
     error-color="red"
     style="width: 370px"
     @transition="handlePanelTransEvt"
-    class="bg-transparent"
+    class="stepper-class"
   >
     <q-step
       :name="steps.step1.id"
@@ -356,17 +356,18 @@
   <div v-if="!isOrderSuccess && cartStore.cartItemsCount === 0">
     <div class="column flex-center">
       <div class="col">
-        <q-img width="280px" src="~/assets/cart-empty.png"></q-img>
+        <q-img width="200px" src="~/assets/cart-empty.png"></q-img>
       </div>
-      <div class="col">
+      <div class="col q-pt-md">
         <div class="cart-primary-text">
           Looks like you haven't made up your mind yet.
         </div>
       </div>
       <div class="col q-pt-md">
         <div class="cart-secondary-text">
-          Maybe head over to our
-          <router-link replace to="/">Home Page</router-link>
+          <q-btn rounded color="secondary" :ripple="false" replace to="/"
+            >Home</q-btn
+          >
         </div>
       </div>
     </div>
@@ -381,7 +382,7 @@
       </div>
       <div class="col q-py-md" style="max-width: 300px">
         <div class="cart-secondary-text">
-          An order confirmation email has been sent to your email address.
+          An order confirmation email will be sent to your email address soon!
         </div>
       </div>
     </div>
@@ -391,10 +392,9 @@
         color="primary"
         label="Back to Home"
         class="q-mx-md"
-        @click="finishCheckout"
+        @click="Router.replace('/')"
       />
       <q-btn
-        outline
         color="positive"
         label="Track My Order"
         class="q-mx-md"
@@ -410,6 +410,10 @@
 <style lang="scss" scoped>
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Pacifico&display=swap");
 
+.stepper-class {
+  background-color: white;
+  border-radius: 12px;
+}
 .item-card {
   max-width: 280px;
   margin-left: auto;
@@ -780,10 +784,6 @@ async function sendEmail(emailData) {
     .catch((error) => {
       console.log(error);
     });
-}
-
-function finishCheckout() {
-  Router.replace("/");
 }
 
 function loadPaypal() {

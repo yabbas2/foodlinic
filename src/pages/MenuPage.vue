@@ -11,6 +11,5 @@
 <style scoped></style>
 
 <script setup>
-import IntroSection from "src/components/IntroSection.vue";
 import MenuSection from "src/components/MenuSection.vue";
 </script>

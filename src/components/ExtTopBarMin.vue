@@ -2,10 +2,12 @@
   <q-toolbar inset style="height: 200px">
     <div class="column">
       <div class="col">
-        <q-toolbar-title class="toolbar-title">MENU</q-toolbar-title>
+        <q-toolbar-title class="toolbar-title">
+          {{ props.title }}
+        </q-toolbar-title>
       </div>
       <div class="col">
-        <div class="toolbar-subtitle">Homemade, Healthy, Tasty!</div>
+        <div class="toolbar-subtitle">{{ props.subtitle }}</div>
       </div>
     </div>
   </q-toolbar>
@@ -27,4 +29,6 @@
 }
 </style>
 
-<script setup></script>
+<script setup>
+const props = defineProps(["title", "subtitle"]);
+</script>
