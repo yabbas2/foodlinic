@@ -30,7 +30,7 @@
           : {
               textAlign: 'center',
               fontWeight: 'bold',
-              color: '#dc3535',
+              color: '#b01e68',
               fontSize: '15px',
             }
       "

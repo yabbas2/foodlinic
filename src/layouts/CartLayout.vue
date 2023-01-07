@@ -1,12 +1,12 @@
 <template>
   <q-layout view="lHh Lpr lFf" class="bg-grey-1">
-    <q-header reveal class="toolbar-bg">
+    <q-header reveal class="bg-secondary">
       <TopBar
         :leftBtn="'back-btn'"
         :rightBtn1="false"
-        :showLogo="true"
+        :showLogo="false"
       ></TopBar>
-      <ExtTopBarMin title="CART & CHECKOUT" subtitle=""></ExtTopBarMin>
+      <ExtTopBarMin title="CART & CHECKOUT"></ExtTopBarMin>
     </q-header>
 
     <q-drawer show-if-above bordered> </q-drawer>
@@ -17,16 +17,7 @@
   </q-layout>
 </template>
 
-<style lang="scss" scoped>
-.toolbar-bg {
-  background-color: black;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  border-bottom-left-radius: 50%;
-  border-bottom-right-radius: 50%;
-}
-</style>
+<style lang="scss" scoped></style>
 
 <script setup>
 import TopBar from "src/components/TopBar.vue";

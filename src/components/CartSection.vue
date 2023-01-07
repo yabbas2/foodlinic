@@ -5,15 +5,16 @@
     vertical
     animated
     keep-alive
+    flat
     done-color="positive"
     error-color="red"
     style="width: 370px"
     @transition="handlePanelTransEvt"
-    class="stepper-class"
+    class="bg-transparent"
   >
     <q-step
       :name="steps.step1.id"
-      color="primary"
+      color="secondary"
       :title="steps.step1.name"
       :done="step > 1"
     >
@@ -76,11 +77,11 @@
         </template>
       </div>
       <q-stepper-navigation>
-        <q-btn @click="step++" color="primary" label="Continue" />
+        <q-btn @click="step++" color="secondary" label="Continue" />
         <q-btn
           outline
           @click="cartStore.clearCart"
-          color="primary"
+          color="secondary"
           label="Clear Cart"
           class="q-ml-sm"
         />
@@ -89,14 +90,14 @@
 
     <q-step
       :name="steps.step2.id"
-      color="primary"
+      color="secondary"
       :title="steps.step2.name"
       :done="step > 2"
     >
       <div class="column">
         <q-form ref="delvyForm">
           <q-select
-            color="primary"
+            color="secondary"
             label="Select Location"
             rounded
             outlined
@@ -123,7 +124,7 @@
             </template>
           </q-select>
           <q-select
-            color="primary"
+            color="secondary"
             label="Select Time"
             rounded
             outlined
@@ -145,6 +146,7 @@
             </template>
           </q-select>
           <q-input
+            color="secondary"
             outlined
             rounded
             v-model="form.date"
@@ -163,10 +165,11 @@
                 v-model="form.date"
                 first-day-of-week="1"
                 mask="YYYY-MM-DD"
+                color="secondary"
                 :options="getAllowedDates"
               >
                 <div class="row items-center justify-end">
-                  <q-btn v-close-popup label="Close" color="primary" flat />
+                  <q-btn v-close-popup label="Done" color="secondary" />
                 </div>
               </q-date>
             </q-popup-proxy>
@@ -184,6 +187,7 @@
             counter
             maxlength="100"
             class="q-mt-md"
+            color="secondary"
           >
             <template v-slot:label>
               Delivery notes <small>(optional)</small>
@@ -196,11 +200,11 @@
       </div>
 
       <q-stepper-navigation>
-        <q-btn @click="validdateDelvyForm" color="primary" label="Continue" />
+        <q-btn @click="validdateDelvyForm" color="secondary" label="Continue" />
         <q-btn
           outline
           @click="step--"
-          color="primary"
+          color="secondary"
           label="Back"
           class="q-ml-sm"
         />
@@ -209,14 +213,14 @@
 
     <q-step
       :name="steps.step3.id"
-      color="primary"
+      color="secondary"
       :title="steps.step3.name"
       :done="step > 3"
     >
       <div class="column">
         <q-form ref="contactForm">
           <q-input
-            color="primary"
+            color="secondary"
             label="Name"
             rounded
             outlined
@@ -236,7 +240,7 @@
             </template>
           </q-input>
           <q-input
-            color="primary"
+            color="secondary"
             label="Email"
             rounded
             outlined
@@ -252,7 +256,7 @@
             </template>
           </q-input>
           <q-input
-            color="primary"
+            color="secondary"
             label="Phone"
             rounded
             outlined
@@ -271,11 +275,15 @@
       </div>
 
       <q-stepper-navigation>
-        <q-btn @click="validdateContactForm" color="primary" label="Continue" />
+        <q-btn
+          @click="validdateContactForm"
+          color="secondary"
+          label="Continue"
+        />
         <q-btn
           outline
           @click="step--"
-          color="primary"
+          color="secondary"
           label="Back"
           class="q-ml-sm"
         />
@@ -284,7 +292,7 @@
 
     <q-step
       :name="steps.step4.id"
-      color="primary"
+      color="secondary"
       :title="steps.step4.name"
       :done="step > 4"
     >
@@ -333,7 +341,11 @@
           </q-form>
         </div>
         <div class="col-4 text-right">
-          <q-btn color="primary" label="Apply" @click="validatePromoCodeForm" />
+          <q-btn
+            color="secondary"
+            label="Apply"
+            @click="validatePromoCodeForm"
+          />
         </div>
       </div>
       <q-card flat bordered>
@@ -346,7 +358,7 @@
         <q-btn
           outline
           @click="step--"
-          color="primary"
+          color="secondary"
           label="Back"
           class="q-ml-sm"
         />
@@ -389,7 +401,7 @@
     <div class="row flex-center q-mt-lg">
       <q-btn
         outline
-        color="primary"
+        color="secondary"
         label="Back to Home"
         class="q-mx-md"
         @click="Router.replace('/')"
@@ -410,10 +422,6 @@
 <style lang="scss" scoped>
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Pacifico&display=swap");
 
-.stepper-class {
-  background-color: white;
-  border-radius: 12px;
-}
 .item-card {
   max-width: 280px;
   margin-left: auto;
@@ -426,7 +434,6 @@
 .card-subtitle-font {
   font-family: "Bebas Neue", cursive;
   font-size: 20px;
-  color: #f25b47 !important;
 }
 .subtotal-text,
 .delvyfee-text,

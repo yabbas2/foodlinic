@@ -1,8 +1,8 @@
 <template>
-  <q-toolbar inset style="height: 400px">
+  <q-toolbar inset style="height: 300px">
     <div class="column">
       <div class="col">
-        <q-img width="70px" src="~assets/logo.png" />
+        <q-img width="60px" src="~assets/logo.png" />
       </div>
       <div class="col">
         <q-toolbar-title class="toolbar-title">Foodlinic</q-toolbar-title>
@@ -47,7 +47,7 @@
 <style scoped lang="scss">
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Pacifico&display=swap");
 .toolbar-title {
-  color: $secondary;
+  color: $primary;
   font-family: "Bebas Neue", cursive;
   text-align: left;
   font-size: 80px;

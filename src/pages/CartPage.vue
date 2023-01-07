@@ -1,7 +1,7 @@
 <template>
   <q-page class="flex flex-center">
     <div class="column flex-center absolute-top">
-      <div class="col q-mt-lg">
+      <div class="col q-my-md">
         <CartSection></CartSection>
       </div>
     </div>

@@ -43,7 +43,7 @@
       :color="iconColor"
       @click="cartBtnClicked"
     >
-      <q-badge floating rounded :color="iconColor">{{
+      <q-badge floating rounded :color="iconColor" text-color="secondary">{{
         cartStore.cartItemsCount
       }}</q-badge>
       <q-icon
@@ -76,7 +76,7 @@ import { useCartStore } from "../stores/cart";
 import { inject, ref } from "vue";
 
 const iconSize = "30px";
-const iconColor = "secondary";
+const iconColor = "white";
 const props = defineProps(["leftBtn", "rightBtn1", "showLogo"]);
 const cartStore = useCartStore();
 const bus = inject("bus");

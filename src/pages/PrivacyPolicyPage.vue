@@ -1,10 +1,7 @@
 <template>
   <q-page class="flex flex-center">
-    <div class="column flex-center absolute-top">
-      <div class="col q-my-md">
-        <IntroSection h1="Privacy Policy" h2=""></IntroSection>
-      </div>
-      <div class="col q-pa-md">
+    <div class="column flex-center absolute-top bg-grey-1">
+      <div class="col q-pa-md q-my-md">
         <PrivacyPolicySection></PrivacyPolicySection>
       </div>
     </div>
@@ -14,6 +11,5 @@
 <style scoped></style>
 
 <script setup>
-import IntroSection from "src/components/IntroSection.vue";
 import PrivacyPolicySection from "src/components/PrivacyPolicySection.vue";
 </script>

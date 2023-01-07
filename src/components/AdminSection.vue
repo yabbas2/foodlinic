@@ -30,7 +30,7 @@
           >
             <q-card>
               <q-card-section>
-                <div class="text-h6">{{ order.id }}</div>
+                <div class="text-h6 text-uppercase">{{ order.id }}</div>
               </q-card-section>
               <q-card-section>
                 <div class="text-subtitle2">

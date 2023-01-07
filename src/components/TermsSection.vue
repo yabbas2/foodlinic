@@ -516,7 +516,7 @@ mso-themetint:166;"
                 and have our registered office at
                 <bdt class="question">Väderlekstorget 4</bdt
                 ><bdt class="block-component"></bdt></span></span
-            >, <bdt class="question">Gothenburg</bdt></span
+            >, <bdt class="question">Gothenburg </bdt></span
           ></span
         ><span style="font-size: 15px"
           ><span data-custom-class="body_text"
@@ -4456,7 +4456,7 @@ Calibri;color:#595959;mso-themecolor:text1;mso-themetint:166;"
       <span style="font-size: 15px"
         ><strong
           ><span style="color: rgb(89, 89, 89)"
-            ><bdt class="question">Gothenburg</bdt
+            ><bdt class="question">Gothenburg </bdt
             ><bdt class="block-component"></bdt
             ><bdt class="block-component"></bdt>
             <bdt class="question">41832</bdt

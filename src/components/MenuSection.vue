@@ -1,5 +1,5 @@
 <template>
-  <q-tabs v-model="tab" indicator-color="transparent">
+  <q-tabs dense v-model="tab" indicator-color="transparent">
     <q-tab
       v-for="catg in menuCatgs"
       :key="catg.id"
@@ -208,7 +208,6 @@ let menuCatgs = ref([]);
 
 const cartStore = useCartStore();
 const menuStore = useMenuStore();
-const selectItems = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 /*TODO:remove this array and configure the nutrition facts in db*/
 const nutDetails = [
   {
