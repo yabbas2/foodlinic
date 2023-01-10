@@ -7,7 +7,7 @@
       <div class="col q-mt-lg">
         <div class="toolbar-subtitle">The ultimate gift for your health.</div>
       </div>
-      <div class="col text-white q-mt-md self-center">
+      <div class="col text-white q-mt-md self-start">
         <q-btn
           fab-mini
           outline
@@ -16,11 +16,11 @@
           href="https://www.facebook.com/foodlinic/"
           target="_blank"
         >
-          <q-icon
-            class="q-mx-xs bg-white rounded-borders"
-            size="md"
-            name="img:src/assets/icons/facebook-3-32.png"
-          />
+          <q-icon class="q-mx-xs" size="md">
+            <img
+              src="https://cdn.tools.unlayer.com/social/icons/circle-white/facebook.png"
+            />
+          </q-icon>
         </q-btn>
         <q-btn
           fab-mini
@@ -29,11 +29,11 @@
           href="https://www.youtube.com/channel/UC4hrCT8Jp8sqSdchMxYNrqA"
           target="_blank"
         >
-          <q-icon
-            class="q-mx-xs bg-white rounded-borders"
-            size="md"
-            name="img:src/assets/icons/youtube-3-32.png"
-          />
+          <q-icon class="q-mx-xs" size="md">
+            <img
+              src="https://cdn.tools.unlayer.com/social/icons/circle-white/youtube.png"
+            />
+          </q-icon>
         </q-btn>
         <!--<q-btn fab-mini flat :ripple="false" href="" target="_blank">
               <q-icon class="text-white q-mx-xs" size="md">
@@ -47,14 +47,9 @@
 
 <style scoped lang="scss">
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Pacifico&display=swap");
-.toolbar-title {
-  color: $primary;
-  font-family: "Bebas Neue", cursive;
-  text-align: left;
-  font-size: 80px;
-}
+
 .toolbar-subtitle {
-  text-align: center;
+  text-align: left;
   font-size: large;
   color: white;
 }

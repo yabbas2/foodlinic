@@ -15,13 +15,13 @@
 
 <style lang="scss" scoped>
 .toolbar-bg {
+  background-color: $secondary;
   background-image: url("assets/cover-photo.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  border-bottom-left-radius: 50%;
+  border-bottom-left-radius: 0%;
   border-bottom-right-radius: 50%;
-  //height: 500px;
 }
 </style>
 
