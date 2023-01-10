@@ -23,7 +23,7 @@
     <q-toolbar-title>
       <q-img
         v-if="props.showLogo"
-        src="~assets/logo-name-wbg.png"
+        src="~assets/logo-wfg-cbg.png"
         class="logo-img"
       />
     </q-toolbar-title>

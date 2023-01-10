@@ -2,12 +2,9 @@
   <q-toolbar inset style="height: 300px">
     <div class="column">
       <div class="col">
-        <q-img width="60px" src="~assets/logo.png" />
+        <q-img width="300px" src="~assets/logo-cfg-tbg.png" />
       </div>
-      <div class="col">
-        <q-toolbar-title class="toolbar-title">Foodlinic</q-toolbar-title>
-      </div>
-      <div class="col">
+      <div class="col q-mt-lg">
         <div class="toolbar-subtitle">The ultimate gift for your health.</div>
       </div>
       <div class="col text-white q-mt-md self-center">
@@ -19,9 +16,11 @@
           href="https://www.facebook.com/foodlinic/"
           target="_blank"
         >
-          <q-icon class="text-white q-mx-xs" size="md">
-            <img src="~assets/icons/icon-facebook.svg" />
-          </q-icon>
+          <q-icon
+            class="q-mx-xs bg-white rounded-borders"
+            size="md"
+            name="img:src/assets/icons/facebook-3-32.png"
+          />
         </q-btn>
         <q-btn
           fab-mini
@@ -30,9 +29,11 @@
           href="https://www.youtube.com/channel/UC4hrCT8Jp8sqSdchMxYNrqA"
           target="_blank"
         >
-          <q-icon class="text-white q-mx-xs" size="md">
-            <img src="~assets/icons/icon-youtube.svg" />
-          </q-icon>
+          <q-icon
+            class="q-mx-xs bg-white rounded-borders"
+            size="md"
+            name="img:src/assets/icons/youtube-3-32.png"
+          />
         </q-btn>
         <!--<q-btn fab-mini flat :ripple="false" href="" target="_blank">
               <q-icon class="text-white q-mx-xs" size="md">
@@ -53,7 +54,7 @@
   font-size: 80px;
 }
 .toolbar-subtitle {
-  text-align: left;
+  text-align: center;
   font-size: large;
   color: white;
 }
