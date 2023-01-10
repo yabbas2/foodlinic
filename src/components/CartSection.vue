@@ -731,7 +731,7 @@ async function submitOrder() {
       // save order ID
       orderId.value = doc.id;
       // set order track link
-      orderTrackLink.value = `${import.meta.env.VITE_HOST_URL}/order/${doc.id}`;
+      orderTrackLink.value = `https://foodlinic.com/order/${doc.id}`;
       // send order confirmation email
       sendEmail({
         emailType: "food_order_confirmation",
