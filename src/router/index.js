@@ -31,6 +31,17 @@ const routes = [
     ],
   },
   {
+    path: "/diet",
+    component: () => import("src/layouts/DietLayout.vue"),
+    //children: [
+    //  {
+    //    path: "",
+    //    component: () => import("pages/MenuPage.vue"),
+    //    //beforeEnter: [],
+    //  },
+    //],
+  },
+  {
     path: "/cart",
     component: () => import("src/layouts/CartLayout.vue"),
     children: [

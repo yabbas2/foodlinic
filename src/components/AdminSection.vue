@@ -106,7 +106,6 @@ import {
   updateDoc,
   doc,
   serverTimestamp,
-  getDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
 

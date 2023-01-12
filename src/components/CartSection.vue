@@ -148,6 +148,7 @@
           <q-input
             color="secondary"
             outlined
+            readonly
             rounded
             v-model="form.date"
             class="q-my-md"
@@ -624,14 +625,14 @@ async function validdateDelvyForm() {
   });
 }
 
-async function validatePromoCodeForm() {
+function validatePromoCodeForm() {
   discount.value = validCartForm.value
     ? availPromoCodes.value.filter((item) => item.name === form.promocode)[0]
         .discount
     : discount.value;
 }
 
-async function fetchDelvyOpts() {
+function fetchDelvyOpts() {
   const delvyOptQ = query(
     collection(db, "delivery-opt"),
     where("enabled", "==", true)
@@ -655,7 +656,7 @@ async function fetchDelvyOpts() {
   });
 }
 
-async function fetchPromoCodes() {
+function fetchPromoCodes() {
   const promoCodeQ = query(
     collection(db, "promo-code"),
     where("enabled", "==", true)
@@ -682,22 +683,20 @@ function getMinDate() {
   return date.formatDate(minDay.toISOString().substring(0, 10), "YYYY/MM/DD");
 }
 
-function getMaxDate() {
-  /* Two-week time frame is the maximum */
-  const numWeeks = 2;
+function getMaxDate(offset) {
   let maxDay = new Date(Date.now());
-  maxDay.setDate(maxDay.getDate() + numWeeks * 7);
+  maxDay.setDate(maxDay.getDate() + offset);
   return date.formatDate(maxDay.toISOString().substring(0, 10), "YYYY/MM/DD");
 }
 
 /*TODO:exclude holidays as well*/
 function getAllowedDates(dateStr) {
-  const excludedDays = date.formatDate(dateStr, "YYYY-MM-ddd").split("-")[2];
+  const dayStr = date.formatDate(dateStr, "YYYY-MM-ddd").split("-")[2];
   return (
     dateStr >= getMinDate() &&
-    dateStr <= getMaxDate() &&
-    excludedDays != "Sat" &&
-    excludedDays != "Sun"
+    dateStr <= getMaxDate(14) &&
+    dayStr != "Sat" &&
+    dayStr != "Sun"
   );
 }
 
