@@ -54,7 +54,7 @@
             <div class="column">
               <Transition name="cartBtn">
                 <q-btn
-                  v-if="cartStore.cartItemById(props.id) === 0"
+                  v-show="cartStore.cartItemById(props.id) === 0"
                   color="secondary"
                   @click="cartStore.updateCart(props.id, 1)"
                 >
@@ -63,7 +63,7 @@
               </Transition>
               <Transition name="qtyBtn">
                 <QtyBtn
-                  v-if="cartStore.cartItemById(props.id) > 0"
+                  v-show="cartStore.cartItemById(props.id) > 0"
                   style="light"
                   :modelValue="cartStore.cartItemById(props.id)"
                   @update:modelValue="
@@ -153,7 +153,6 @@
   margin: auto;
   height: 120px;
 }
-
 .q-dialog__inner > div {
   //box-shadow: 0 2px 4px -1px rgb(0 0 0 / 20%),
   //            0 4px 5px rgb(0 0 0 / 14%),
@@ -161,13 +160,11 @@
   box-shadow: none !important;
   //border: 1px solid red;
 }
-
 .card2 {
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
   margin-top: -12px;
 }
-
 .cartBtn-enter-active {
   transition: opacity 0.5s ease;
 }
@@ -190,7 +187,7 @@
 }
 </style>
 
-<style>
+<style lang="scss">
 .q-dialog__backdrop {
   background: rgba(0, 0, 0, 0.7) !important;
 }

@@ -28,7 +28,7 @@
             v-if="delvyDate === order.data.delivery.date"
             class="col q-my-sm"
           >
-            <q-card>
+            <q-card class="order-card">
               <q-card-section>
                 <div class="text-h6 text-uppercase">{{ order.id }}</div>
               </q-card-section>
@@ -45,7 +45,7 @@
                 </div>
               </q-card-section>
               <q-card-section>
-                <q-markup-table dense>
+                <q-markup-table>
                   <thead>
                     <tr>
                       <th class="text-left">Item</th>
@@ -93,7 +93,13 @@
   </q-tab-panels>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.order-card {
+  width: 340px;
+  margin-right: auto;
+  margin-left: auto;
+}
+</style>
 
 <script setup>
 import { ref, onBeforeMount, reactive } from "vue";

@@ -24,7 +24,7 @@
               "
             >
               <q-card-section horizontal @click="nutFactsReveal[idx] = true">
-                <q-card-section>
+                <q-card-section style="padding-bottom: 0px">
                   <div
                     :class="
                       idx % 2 == 0
@@ -46,27 +46,41 @@
                 </q-card-section>
                 <q-card-section
                   class="col-5 flex flex-center"
-                  style="margin-left: auto"
+                  style="margin-left: auto; padding-bottom: 0px"
                 >
                   <q-img :src="item.img_src" />
                 </q-card-section>
               </q-card-section>
-              <q-card-actions>
-                <QtyBtn
-                  :style="idx % 2 == 0 ? 'light' : 'dark'"
-                  :modelValue="cartStore.cartItemById(item.id)"
-                  @update:modelValue="
-                    (val) => cartStore.updateCart(item.id, val)
-                  "
-                ></QtyBtn>
-                <q-space />
+              <q-card-actions style="padding-left: 16px; padding-top: 0px">
+                <Transition name="cartBtn">
+                  <q-btn
+                    v-show="cartStore.cartItemById(item.id) === 0"
+                    :color="idx % 2 == 0 ? 'secondary' : 'white'"
+                    @click="cartStore.updateCart(item.id, 1)"
+                    outline
+                    rounded
+                    style="width: 120px; border: 2px solid"
+                  >
+                    <q-icon :name="outlinedAddShoppingCart"></q-icon>
+                  </q-btn>
+                </Transition>
+                <Transition name="qtyBtn">
+                  <QtyBtn
+                    v-show="cartStore.cartItemById(item.id) > 0"
+                    :style="idx % 2 == 0 ? 'light' : 'dark'"
+                    :modelValue="cartStore.cartItemById(item.id)"
+                    @update:modelValue="
+                      (val) => cartStore.updateCart(item.id, val)
+                    "
+                  />
+                </Transition>
               </q-card-actions>
             </q-card>
             <MenuItemDialog
               :show="nutFactsReveal[idx]"
               @close="nutFactsReveal[idx] = false"
               :id="item.id"
-            ></MenuItemDialog>
+            />
           </div>
         </template>
       </div>
@@ -88,7 +102,7 @@
 .item-card {
   border-radius: 30px;
   width: 340px;
-  height: 200px;
+  height: 180px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -121,6 +135,26 @@
 .item-card2-subtitle {
   color: $secondary;
 }
+.cartBtn-enter-active {
+  transition: opacity 0.5s ease;
+}
+.cartBtn-leave-active {
+  opacity: 0;
+}
+.cartBtn-enter-from,
+.cartBtn-leave-to {
+  opacity: 0;
+}
+.qtyBtn-enter-active {
+  transition: opacity 0.5s ease;
+}
+.qtyBtn-leave-active {
+  opacity: 0;
+}
+.qtyBtn-enter-from,
+.qtyBtn-leave-to {
+  opacity: 0;
+}
 </style>
 
 <style lang="scss">
@@ -144,6 +178,7 @@ import {
 import { db } from "../firebase";
 import QtyBtn from "./QtyBtn.vue";
 import MenuItemDialog from "./MenuItemDialog.vue";
+import { outlinedAddShoppingCart } from "@quasar/extras/material-icons-outlined";
 
 let nutFactsReveal = reactive([]);
 let tab = ref("");
