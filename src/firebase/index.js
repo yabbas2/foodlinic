@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAuth, signInAnonymously } from "firebase/auth";
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -32,4 +32,14 @@ const appCheck = initializeAppCheck(app, {
 // export vars
 const db = getFirestore(app);
 const auth = getAuth(app);
+
+signInAnonymously(auth)
+  .then(() => {
+    // Signed in..
+  })
+  .catch((error) => {
+    // Error
+    console.log(error);
+  });
+
 export { db, auth };
