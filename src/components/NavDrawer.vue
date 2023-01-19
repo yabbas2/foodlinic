@@ -25,18 +25,18 @@
         <q-item-section> Home </q-item-section>
       </q-item>
       <q-separator />
-      <q-item clickable v-ripple @click="Router.replace('/menu')">
+      <q-item clickable v-ripple @click="Router.replace('/food')">
         <q-item-section avatar>
           <q-icon :name="outlinedMenuBook" />
         </q-item-section>
-        <q-item-section> Food Menu </q-item-section>
+        <q-item-section> Food Section </q-item-section>
       </q-item>
       <q-separator />
-      <q-item clickable v-ripple @click="Router.replace('/diet')">
+      <q-item clickable v-ripple @click="Router.replace('/clinic')">
         <q-item-section avatar>
           <q-icon :name="outlinedMedicalInformation" />
         </q-item-section>
-        <q-item-section> Nutrition Plans </q-item-section>
+        <q-item-section> Clinic Section </q-item-section>
       </q-item>
       <q-separator />
     </q-list>

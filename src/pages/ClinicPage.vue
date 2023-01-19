@@ -2,7 +2,7 @@
   <q-page class="flex flex-center">
     <div class="column flex-center absolute-top">
       <div class="col q-my-md">
-        <MenuSection></MenuSection>
+        <ClinicSection></ClinicSection>
       </div>
     </div>
   </q-page>
@@ -11,5 +11,5 @@
 <style lang="scss" scoped></style>
 
 <script setup>
-import MenuSection from "src/components/MenuSection.vue";
+import ClinicSection from "src/components/ClinicSection.vue";
 </script>

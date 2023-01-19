@@ -2,7 +2,7 @@
   <q-layout v-if="!maintenanceFlag" view="lHh Lpr lFf" class="bg-grey-1">
     <q-header reveal class="bg-secondary">
       <TopBar :leftBtn="'nav-btn'" :rightBtn1="true" :showLogo="false"></TopBar>
-      <ExtTopBarMin title="MENU"></ExtTopBarMin>
+      <ExtTopBarMin title="CLINIC SECTION"></ExtTopBarMin>
     </q-header>
 
     <NavDrawer></NavDrawer>

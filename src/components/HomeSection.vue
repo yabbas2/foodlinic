@@ -5,8 +5,7 @@
         <q-card-section horizontal>
           <q-card-section>
             <div class="q-mt-xs">
-              <span class="home-card1-title1">FOOD: </span>
-              <span class="home-card1-title2">MENU</span>
+              <span class="home-card1-title1">FOOD SECTION</span>
             </div>
             <div class="text-body2 q-mt-xs text-white">
               Homemade, <br />Healthy, <br />Tasty!
@@ -20,6 +19,11 @@
             <q-img src="~assets/food_menu.png" />
           </q-card-section>
         </q-card-section>
+        <q-card-actions class="justify-center q-pt-none">
+          <span class="home-card1-info">
+            Currently available in Sweden only!
+          </span>
+        </q-card-actions>
       </q-card>
     </div>
     <div class="col">
@@ -27,11 +31,10 @@
         <q-card-section horizontal>
           <q-card-section>
             <div class="q-mt-xs">
-              <span class="home-card2-title1">CLINIC: </span>
-              <span class="home-card2-title2">PLANS</span>
+              <span class="home-card2-title1">CLINIC SECTION </span>
             </div>
             <div class="text-body2 q-mt-xs text-secondary">
-              Online, <br />Regular follow-up, <br />Affordable!
+              Online registration, <br />Regular follow-up, <br />Affordable!
             </div>
           </q-card-section>
 
@@ -42,6 +45,9 @@
             <q-img src="~assets/clinic_plans.jpg" />
           </q-card-section>
         </q-card-section>
+        <q-card-actions class="justify-center q-pt-none">
+          <span class="home-card2-info">Available all over the world!</span>
+        </q-card-actions>
       </q-card>
     </div>
   </div>
@@ -52,7 +58,7 @@
 .home-card1 {
   border-radius: 30px;
   width: 340px;
-  max-height: 150px;
+  max-height: 180px;
   margin-left: auto;
   margin-right: auto;
   background-color: $secondary;
@@ -62,15 +68,14 @@
   color: white;
   font-size: 35px;
 }
-.home-card1-title2 {
-  font-family: "Pacifico", cursive;
+.home-card1-info {
   color: white;
-  font-size: 22px;
+  font-size: 11px;
 }
 .home-card2 {
   border-radius: 30px;
   width: 340px;
-  max-height: 150px;
+  max-height: 180px;
   margin-left: auto;
   margin-right: auto;
   border-color: $secondary;
@@ -81,10 +86,9 @@
   color: $secondary;
   font-size: 35px;
 }
-.home-card2-title2 {
-  font-family: "Pacifico", cursive;
+.home-card2-info {
   color: $secondary;
-  font-size: 22px;
+  font-size: 11px;
 }
 </style>
 
@@ -92,10 +96,10 @@
 import Router from "../router";
 
 function gotoFoodMenu() {
-  Router.push("/menu");
+  Router.push("/food");
 }
 
 function gotoClinicPlans() {
-  Router.push("/diet");
+  Router.push("/clinic");
 }
 </script>

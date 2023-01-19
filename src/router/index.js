@@ -20,26 +20,26 @@ const routes = [
     ],
   },
   {
-    path: "/menu",
-    component: () => import("src/layouts/MenuLayout.vue"),
+    path: "/food",
+    component: () => import("src/layouts/FoodLayout.vue"),
     children: [
       {
         path: "",
-        component: () => import("pages/MenuPage.vue"),
+        component: () => import("src/pages/FoodPage.vue"),
         //beforeEnter: [],
       },
     ],
   },
   {
-    path: "/diet",
-    component: () => import("src/layouts/DietLayout.vue"),
-    //children: [
-    //  {
-    //    path: "",
-    //    component: () => import("pages/MenuPage.vue"),
-    //    //beforeEnter: [],
-    //  },
-    //],
+    path: "/clinic",
+    component: () => import("src/layouts/ClinicLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("src/pages/ClinicPage.vue"),
+        //beforeEnter: [],
+      },
+    ],
   },
   {
     path: "/cart",
