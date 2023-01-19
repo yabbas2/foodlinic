@@ -226,6 +226,8 @@ function fetchMenuItems() {
         menu_catg_ref: doc.data().menu_catg_ref,
         price: doc.data().price,
         img_src: `/src/assets/mi-${doc.id}-1.webp`,
+        img_count: doc.data().img_count,
+        nutr_facts: doc.data().nutr_facts,
       });
     });
     menuStore.menu = updatedMenuItems;

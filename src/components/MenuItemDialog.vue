@@ -21,23 +21,16 @@
           infinite
           transition-prev="slide-right"
           transition-next="slide-left"
+          control-color="secondary"
+          control-type="flat"
         >
           <q-carousel-slide
-            :name="1"
-            img-src="https://cdn.quasar.dev/img/mountains.jpg"
-          />
-          <q-carousel-slide
-            :name="2"
-            img-src="https://cdn.quasar.dev/img/parallax1.jpg"
-          />
-          <q-carousel-slide
-            :name="3"
-            img-src="https://cdn.quasar.dev/img/parallax2.jpg"
-          />
-          <q-carousel-slide
-            :name="4"
-            img-src="https://cdn.quasar.dev/img/quasar.jpg"
-          />
+            v-for="idx in menuStore.menuProp(props.id, 'img_count')"
+            :key="idx"
+            :name="idx"
+            :img-src="`/src/assets/mi-${props.id}-${idx}.webp`"
+          >
+          </q-carousel-slide>
         </q-carousel>
       </q-card>
       <q-card class="bg-grey-1 card2">
@@ -117,11 +110,16 @@
               >
                 <tbody>
                   <tr
-                    v-for="nutFact in nutDetails"
-                    :key="`${props.id}_${nutFact.name}`"
+                    v-for="(nutFactValue, nutFactName) in menuStore.menuProp(
+                      props.id,
+                      'nutr_facts'
+                    )"
+                    :key="`${props.id}_${nutFactName}_${nutFactValue}`"
                   >
-                    <td class="text-center">{{ nutFact.name }}</td>
-                    <td class="text-center">{{ nutFact.amount }}</td>
+                    <td class="text-center text-capitalize">
+                      {{ nutFactName }}
+                    </td>
+                    <td class="text-center">{{ nutFactValue }}</td>
                   </tr>
                 </tbody>
               </q-markup-table>
@@ -163,7 +161,7 @@
 .card2 {
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
-  margin-top: -12px;
+  margin-top: -17px;
 }
 .cartBtn-enter-active {
   transition: opacity 0.5s ease;
@@ -204,33 +202,6 @@ const props = defineProps(["show", "id"]);
 const menuStore = useMenuStore();
 const cartStore = useCartStore();
 const emit = defineEmits(["close"]);
-/*TODO:remove this array and configure the nutrition facts in db*/
-const nutDetails = [
-  {
-    name: "Fact#1",
-    amount: "10%",
-  },
-  {
-    name: "Fact#2",
-    amount: "5%",
-  },
-  {
-    name: "Fact#3",
-    amount: "20%",
-  },
-  {
-    name: "Fact#4",
-    amount: "30%",
-  },
-  {
-    name: "Fact#5",
-    amount: "12%",
-  },
-  {
-    name: "Fact#5",
-    amount: "11%",
-  },
-];
 
 let slide = ref(1);
 </script>
