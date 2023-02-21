@@ -21,47 +21,55 @@ const routes = [
   },
   {
     path: "/food",
-    component: () => import("src/layouts/FoodLayout.vue"),
-    children: [
-      {
-        path: "",
-        component: () => import("src/pages/FoodPage.vue"),
-        //beforeEnter: [],
-      },
-    ],
+    //TODO: enable food section once ready
+    redirect: "/",
+    //component: () => import("src/layouts/FoodLayout.vue"),
+    //children: [
+    //  {
+    //    path: "",
+    //    component: () => import("src/pages/FoodPage.vue"),
+    //    //beforeEnter: [],
+    //  },
+    //],
   },
   {
     path: "/clinic",
-    component: () => import("src/layouts/ClinicLayout.vue"),
-    children: [
-      {
-        path: "",
-        component: () => import("src/pages/ClinicPage.vue"),
-        //beforeEnter: [],
-      },
-    ],
+    //TODO: enable clinic section once ready
+    redirect: "/",
+    //component: () => import("src/layouts/ClinicLayout.vue"),
+    //children: [
+    //  {
+    //    path: "",
+    //    component: () => import("src/pages/ClinicPage.vue"),
+    //    //beforeEnter: [],
+    //  },
+    //],
   },
   {
     path: "/cart",
-    component: () => import("src/layouts/CartLayout.vue"),
-    children: [
-      {
-        path: "",
-        component: () => import("pages/CartPage.vue"),
-        //beforeEnter: [checkCartPaths],
-      },
-    ],
+    //TODO: enable cart section once ready
+    redirect: "/",
+    //component: () => import("src/layouts/CartLayout.vue"),
+    //children: [
+    //  {
+    //    path: "",
+    //    component: () => import("pages/CartPage.vue"),
+    //    //beforeEnter: [checkCartPaths],
+    //  },
+    //],
   },
   {
     path: "/order/:id",
-    component: () => import("src/layouts/OrderLayout.vue"),
-    children: [
-      {
-        path: "",
-        component: () => import("pages/OrderPage.vue"),
-        //beforeEnter: [checkOrderPaths],
-      },
-    ],
+    //TODO: enable order section once ready
+    redirect: "/",
+    //component: () => import("src/layouts/OrderLayout.vue"),
+    //children: [
+    //  {
+    //    path: "",
+    //    component: () => import("pages/OrderPage.vue"),
+    //    //beforeEnter: [checkOrderPaths],
+    //  },
+    //],
   },
   //{
   //  path: "/user",

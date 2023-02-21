@@ -30,6 +30,7 @@
           <q-icon :name="outlinedMenuBook" />
         </q-item-section>
         <q-item-section> Food Section </q-item-section>
+        <q-item-section><q-badge align="middle">SOON!</q-badge></q-item-section>
       </q-item>
       <q-separator />
       <q-item clickable v-ripple @click="Router.replace('/clinic')">
@@ -37,6 +38,7 @@
           <q-icon :name="outlinedMedicalInformation" />
         </q-item-section>
         <q-item-section> Clinic Section </q-item-section>
+        <q-item-section><q-badge align="middle">SOON!</q-badge></q-item-section>
       </q-item>
       <q-separator />
     </q-list>

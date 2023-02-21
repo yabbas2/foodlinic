@@ -1,8 +1,8 @@
 <template>
-  <q-toolbar inset style="height: 300px">
+  <q-toolbar inset style="height: 250px">
     <div class="column">
       <div class="col">
-        <q-img width="280px" src="~assets/logo-cfg-tbg.png" />
+        <q-img width="280px" src="~assets/logo-wfg-tbg.png" />
       </div>
       <div class="col q-mt-lg">
         <div class="toolbar-subtitle">The ultimate gift for your health.</div>

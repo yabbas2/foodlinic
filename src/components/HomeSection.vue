@@ -21,7 +21,7 @@
         </q-card-section>
         <q-card-actions class="justify-center q-pt-none">
           <span class="home-card1-info">
-            Currently available in Sweden only!
+            Will be available soon!
           </span>
         </q-card-actions>
       </q-card>
@@ -46,7 +46,7 @@
           </q-card-section>
         </q-card-section>
         <q-card-actions class="justify-center q-pt-none">
-          <span class="home-card2-info">Available all over the world!</span>
+          <span class="home-card2-info">Will be available soon!</span>
         </q-card-actions>
       </q-card>
     </div>
